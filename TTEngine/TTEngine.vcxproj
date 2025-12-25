@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{3c8421fa-3c40-4082-806a-b07f856f4ab8}</ProjectGuid>
+    <RootNamespace>TTEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\TalhaTan\Desktop\TTEngine\External\Json;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3_image\include;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL_ttf\include;C:\Users\TalhaTan\Desktop\TTEngine\src;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3_image\lib;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL_ttf\lib;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL3_image.lib;SDL3.lib;SDL3_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\TalhaTan\Desktop\TTEngine\External\Json;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3_image\include;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL_ttf\include;C:\Users\TalhaTan\Desktop\TTEngine\src;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3_image\lib;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL_ttf\lib;C:\Users\TalhaTan\Desktop\TTEngine\External\SDL3\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL3_image.lib;SDL3.lib;SDL3_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Core\Animation.cpp" />
+    <ClCompile Include="..\src\Core\Application.cpp" />
+    <ClCompile Include="..\src\Core\Debug.cpp" />
+    <ClCompile Include="..\src\Core\DebugOverlay.cpp" />
+    <ClCompile Include="..\src\Core\Input.cpp" />
+    <ClCompile Include="..\src\Core\Log.cpp" />
+    <ClCompile Include="..\src\Core\Time.cpp" />
+    <ClCompile Include="..\src\Game\Camera.cpp" />
+    <ClCompile Include="..\src\Game\MapLoader.cpp" />
+    <ClCompile Include="..\src\Game\Player.cpp" />
+    <ClCompile Include="..\src\Game\Texture.cpp" />
+    <ClCompile Include="..\src\Game\TileMap.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Platform\AssetManager.cpp" />
+    <ClCompile Include="..\src\Platform\RendererSdl.cpp" />
+    <ClCompile Include="..\src\Platform\Scene.cpp" />
+    <ClCompile Include="..\src\Platform\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Core\AABB.h" />
+    <ClInclude Include="..\src\Core\Animation.h" />
+    <ClInclude Include="..\src\Core\Application.h" />
+    <ClInclude Include="..\src\Core\Debug.h" />
+    <ClInclude Include="..\src\Core\DebugOverlay.h" />
+    <ClInclude Include="..\src\Core\Input.h" />
+    <ClInclude Include="..\src\Core\IRenderer.h" />
+    <ClInclude Include="..\src\Core\Log.h" />
+    <ClInclude Include="..\src\Core\Math\Vector2.h" />
+    <ClInclude Include="..\src\Core\PathUtil.h" />
+    <ClInclude Include="..\src\Core\Time.h" />
+    <ClInclude Include="..\src\Game\Camera.h" />
+    <ClInclude Include="..\src\Game\MapLoader.h" />
+    <ClInclude Include="..\src\Game\Player.h" />
+    <ClInclude Include="..\src\Game\Texture.h" />
+    <ClInclude Include="..\src\Game\TileMap.h" />
+    <ClInclude Include="..\src\Platform\AssetManager.h" />
+    <ClInclude Include="..\src\Platform\RendererSdl.h" />
+    <ClInclude Include="..\src\Platform\Scene.h" />
+    <ClInclude Include="..\src\Platform\Window.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
