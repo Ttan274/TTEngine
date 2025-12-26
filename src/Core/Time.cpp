@@ -11,6 +11,13 @@ namespace EngineCore
 		Uint64 current = SDL_GetPerformanceCounter();
 		Uint64 freq = SDL_GetPerformanceFrequency();
 
+		if (lastTime == 0)
+		{
+			lastTime = current;
+			s_DeltaTime = 0.0f;
+			return;
+		}
+
 		s_DeltaTime = (float)(current - lastTime) / (float)freq;
 		lastTime = current;
 	}

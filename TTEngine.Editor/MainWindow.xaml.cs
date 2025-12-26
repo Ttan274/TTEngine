@@ -90,6 +90,7 @@ namespace TTEngine.Editor
             }
 
             DrawPlayerSpawn();
+            DrawEnemySpawns();
         }
     
         //Mouse Events
@@ -101,7 +102,7 @@ namespace TTEngine.Editor
             Point pos = e.GetPosition(MapCanvas);
 
             //Player Spawn Tool
-            if (_currentToolMode == ToolMode.Spawn && e.LeftButton == MouseButtonState.Pressed)
+            if (_currentToolMode == ToolMode.PlayerSpawn && e.LeftButton == MouseButtonState.Pressed)
             {
                 int tileX = (int)(pos.X / _tileMap.TileSize);
                 int tileY = (int)(pos.Y / _tileMap.TileSize);
@@ -115,7 +116,36 @@ namespace TTEngine.Editor
                 }
 
                 _tileMap.PlayerSpawn = new Point(tileX, tileY);
+                DrawGrid();
 
+                Mouse.Capture(null);
+                _isPainting = false;
+                return;
+            }
+            else if(_currentToolMode == ToolMode.EnemySpawn)
+            {
+                int tileX = (int)(pos.X / _tileMap.TileSize);
+                int tileY = (int)(pos.Y / _tileMap.TileSize);
+
+                if (tileX < 0 || tileY < 0 ||
+                tileX >= _tileMap.Width || tileY >= _tileMap.Height)
+                {
+                    Mouse.Capture(null);
+                    _isPainting = false;
+                    return;
+                }
+
+                Point p = new Point(tileX, tileY);
+
+                if(e.LeftButton == MouseButtonState.Pressed)
+                {
+                    if (!_tileMap.EnemySpawns.Contains(p))
+                        _tileMap.EnemySpawns.Add(p);
+                }
+                else if(e.RightButton == MouseButtonState.Pressed)
+                {
+                    _tileMap.EnemySpawns.Remove(p);
+                }
                 DrawGrid();
 
                 Mouse.Capture(null);
@@ -127,7 +157,7 @@ namespace TTEngine.Editor
             //Fill and Brush Tools
             _currentBatch = new TileBatchCommand();
 
-            if(_currentToolMode == ToolMode.Fill && e.LeftButton == MouseButtonState.Pressed)
+            if (_currentToolMode == ToolMode.Fill && e.LeftButton == MouseButtonState.Pressed)
             {
                 Fill(pos);
 
@@ -197,7 +227,8 @@ namespace TTEngine.Editor
                 TileSize = _tileMap.TileSize,
                 Tiles = _tileMap.Tiles,
                 PlayerSpawnX = _tileMap.PlayerSpawn.X,
-                PlayerSpawnY = _tileMap.PlayerSpawn.Y
+                PlayerSpawnY = _tileMap.PlayerSpawn.Y,
+                EnemySpawns = _tileMap.EnemySpawns.Select(p => new SpawnDto { X = p.X, Y = p.Y }).ToList()
             };
 
             MapFileService.Save(LIVE_MAP_PATH, data);
@@ -212,6 +243,10 @@ namespace TTEngine.Editor
             _tileMap.TileSize = data.TileSize;
             _tileMap.Tiles = data.Tiles;
             _tileMap.PlayerSpawn = new Point(data.PlayerSpawnX, data.PlayerSpawnY);
+            _tileMap.EnemySpawns.Clear();
+
+            foreach (var sp in data.EnemySpawns)
+                _tileMap.EnemySpawns.Add(new Point(sp.X, sp.Y));
 
             DrawGrid();
         }
@@ -220,7 +255,9 @@ namespace TTEngine.Editor
 
         private void FillTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.Fill;
 
-        private void SpawnTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.Spawn;
+        private void PlayerSpawnTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.PlayerSpawn;
+
+        private void EnemySpawnTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.EnemySpawn;
 
         private void StartGame_Click(object sender, RoutedEventArgs e) => Process.Start(ENGINE_PATH, LIVE_MAP_PATH);
 
@@ -283,6 +320,32 @@ namespace TTEngine.Editor
             star.RenderTransform = new TranslateTransform(-10, -10);
 
             MapCanvas.Children.Add(star);
+        }
+
+        private void DrawEnemySpawns()
+        {
+            foreach (var spawn in _tileMap.EnemySpawns)
+            {
+                double cx = (spawn.X + 0.5) * _tileMap.TileSize;
+                double cy = (spawn.Y + 0.5) * _tileMap.TileSize;
+
+                Ellipse e = new Ellipse
+                {
+                    Width = _tileMap.TileSize * 0.5,
+                    Height = _tileMap.TileSize * 0.5,
+                    Stroke = Brushes.Red,
+                    StrokeThickness = 2,
+                    Fill = Brushes.Transparent,
+                    IsHitTestVisible = false,
+                    Tag = "EnemySpawn"
+                };
+
+                Canvas.SetLeft(e, cx - e.Width / 2);
+                Canvas.SetTop(e, cy - e.Height / 2);
+
+                MapCanvas.Children.Add(e);
+
+            }
         }
 
         private void PaintTile(Point pos) => PaintingHelper(pos, true);

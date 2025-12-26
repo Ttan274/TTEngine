@@ -1,13 +1,11 @@
-#include "Game/Player.h"
-#include "Platform/AssetManager.h"
-#include "Core/Log.h"
+#include "Game/Enemy.h"
 
 namespace EngineGame
 {
-	Player::Player()
+	Enemy::Enemy()
 	{
-		m_Position = { 0.0f, 0.0f};
-		m_Speed = 150.0f;
+		m_Position = { 0.0f, 0.0f };
+		m_Speed = 100.0f;
 
 		//Idle Anim
 		m_IdleAnim.SetFrameTime(0.25f);
@@ -22,46 +20,71 @@ namespace EngineGame
 		{
 			m_WalkAnim.AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
 		}
-		
+
 		m_CurrentAnim = &m_IdleAnim;
 		UpdateCollider();
 	}
 
-	void Player::Update(float dt)
+	void Enemy::Update(float dt)
 	{
-		UpdateMovement(dt);
+		switch (m_State)
+		{
+		case EnemyState::Idle:
+			UpdateIdle(dt);
+			break;
+		case EnemyState::Patrol:
+			UpdatePatrol(dt);
+			break;
+		}
+
 		UpdateCollider();
 	}
 
-	void Player::UpdateMovement(float dt)
+	void Enemy::UpdateIdle(float dt)
 	{
-		EngineMath::Vector2 movement{ 0, 0 };
+		m_StateTimer += dt;
+		m_IsMoving = false;
 
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::W)) movement.y -= 1.0f;
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::S)) movement.y += 1.0f;
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::A)) movement.x -= 1.0f;
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::D)) movement.x += 1.0f;
-	
-		m_IsMoving = (movement.x != 0.0f || movement.y != 0.0f);
-		m_CurrentAnim = m_IsMoving ? &m_WalkAnim : &m_IdleAnim;
+		m_CurrentAnim = &m_IdleAnim;
 		m_CurrentAnim->Update(dt);
 
-		if (movement.x > 0.0f)
-			m_FacingRight = true;
-		else if (movement.x < 0.0f)
-			m_FacingRight = false;
-
-		EngineMath::Vector2 velocity =
-		{
-			movement.x * m_Speed * dt,
-			movement.y * m_Speed * dt
-		};
-
-		MoveAndCollide(velocity);
+		if (m_StateTimer >= m_IdleDuration)
+			ChangeState(EnemyState::Patrol);
 	}
 
-	void Player::Render(EngineCore::IRenderer* renderer,
-						const Camera2D& camera)
+	void Enemy::UpdatePatrol(float dt)
+	{
+		m_StateTimer += dt;
+		m_IsMoving = true;
+
+		m_CurrentAnim = &m_WalkAnim;
+		m_CurrentAnim->Update(dt);
+
+		EngineMath::Vector2 move =
+		{
+			m_Direction * m_Speed * dt,
+			0.0f
+		};
+
+		MoveAndCollide(move);
+
+		//Flipping
+		if (m_StateTimer >= m_PatrolDuration)
+		{
+			m_FacingRight = !m_FacingRight;
+			m_Direction *= -1.0f;
+			ChangeState(EnemyState::Idle);
+		}
+	}
+
+	void Enemy::ChangeState(EnemyState newState)
+	{
+		m_State = newState;
+		m_StateTimer = 0.0f;
+	}
+
+	void Enemy::Render(EngineCore::IRenderer* renderer,
+		const Camera2D& camera)
 	{
 		float pX = m_Position.x - camera.GetX();
 		float pY = m_Position.y - camera.GetY();
@@ -69,13 +92,13 @@ namespace EngineGame
 		SDL_FRect sldRect = m_CurrentAnim->GetCurrentFrame();
 		EngineCore::Rect src =
 		{
-			sldRect.x, 
+			sldRect.x,
 			sldRect.y,
 			sldRect.w,
 			sldRect.h
 		};
 		EngineCore::SpriteFlip flip = m_FacingRight ? EngineCore::SpriteFlip::None : EngineCore::SpriteFlip::Horizontal;
-		
+
 		Texture2D* currentTexture = nullptr;
 		currentTexture = (m_CurrentAnim == &m_WalkAnim) ? m_WalkTexture : m_IdleTexture;
 
@@ -84,7 +107,7 @@ namespace EngineGame
 			src,
 			{ pX, pY, m_SpriteW, m_SpriteH },
 			flip);
-
+		
 		//Collider Debug
 		renderer->DrawRectOutline(
 			{

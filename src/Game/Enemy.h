@@ -1,32 +1,44 @@
 #pragma once
 #include "Game/Texture.h"
-#include "Core/Input.h"
 #include "Core/Animation.h"
 #include "Game/Entity.h"
 
 namespace EngineGame
 {
-	class Player : public Entity
+	enum class EnemyState
+	{
+		Idle,
+		Patrol
+	};
+
+	class Enemy : public Entity
 	{
 	public:
-		Player();
+		Enemy();
 
 		void Update(float dt) override;
 		void Render(EngineCore::IRenderer* renderer,
-					const Camera2D& camera) override;
+			const Camera2D& camera) override;
 
 		void SetTexture(Texture2D* idleT, Texture2D* walkT) {
 			m_IdleTexture = idleT;
 			m_WalkTexture = walkT;
 		}
 
-		const EngineCore::Rect& GetCollider() const { return m_Collider; }
-		EngineMath::Vector2 GetPosition() const { return m_Position; }
 		void SetPosition(float px, float py) { m_Position.x = px; m_Position.y = py; }
-	private:
+		EngineMath::Vector2 GetPosition() const { return m_Position; }
 
-		void UpdateMovement(float dt);
 	private:
+		void UpdateIdle(float dt);
+		void UpdatePatrol(float dt);
+		void ChangeState(EnemyState newState);
+	private:
+		//State
+		EnemyState m_State = EnemyState::Idle;
+		float m_StateTimer = 0.0f;
+		float m_IdleDuration = 1.5f;
+		float m_PatrolDuration = 3.0f;
+
 		//Animation
 		EngineCore::Animation m_IdleAnim;
 		EngineCore::Animation m_WalkAnim;
@@ -38,5 +50,8 @@ namespace EngineGame
 		EngineGame::Texture2D* m_WalkTexture = nullptr;
 		float m_SpriteW = 128.0f;
 		float m_SpriteH = 128.0f;
+
+		//Patrol direction
+		float m_Direction = 1.0f;
 	};
 }

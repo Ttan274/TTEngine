@@ -3,6 +3,7 @@
 #include "Game/MapLoader.h"
 #include "Core/Log.h"
 #include "Core/PathUtil.h"
+#include "Game/Texture.h"
 
 namespace EnginePlatform
 {
@@ -32,12 +33,6 @@ namespace EnginePlatform
 			return;
 		}
 
-		EngineCore::Log::Write(
-			EngineCore::LogLevel::Info,
-			EngineCore::LogCategory::Scene,
-			"Map Loaded map.json"
-		);
-
 		//Tilemap Creation
 		m_TileMap = std::make_unique<EngineGame::TileMap>(mapData.w, mapData.h, mapData.tSize);
 		
@@ -53,26 +48,35 @@ namespace EnginePlatform
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
-			"TileMap initialized"
+			"Map Loaded + TileMap initialized"
 		);
+		
+		std::string exeDir = EngineCore::GetExecutableDirectory();
+		LoadPlayer(exeDir, mapData.playerSpawn);
+		LoadEnemy(exeDir, mapData.enemySpawns);
+		LoadCamera();
 
-		//Player Loading
-		const char* basePath = SDL_GetBasePath();
-		std::string idlePath = std::string(basePath) + "Assets/Textures/idle.png";
-		std::string walkPath = std::string(basePath) + "Assets/Textures/walk.png";
-		m_Player.SetTexture(AssetManager::GetTexture(idlePath),
-							AssetManager::GetTexture(walkPath));
-		m_Player.SetWorld(m_TileMap.get());
-		//Player Spawning
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
-			"Player pos : " + std::to_string(mapData.spawnX) + "," + std::to_string(mapData.spawnY)
+			"Camera + Player + Enemy Loaded. Scene Completed"
 		);
-		if (mapData.spawnX >= 0 && mapData.spawnY >= 0)
+	}
+
+	void Scene::LoadPlayer(std::string exeDir, EngineMath::Vector2 pos)
+	{
+		//Player Loading
+		std::string idlePath = exeDir + "\\Assets/Textures/idle.png";
+		std::string walkPath = exeDir + "\\Assets/Textures/walk.png";
+		m_Player.SetTexture(AssetManager::GetTexture(idlePath),
+			AssetManager::GetTexture(walkPath));
+		m_Player.SetWorld(m_TileMap.get());
+		
+		//Player Spawning
+		if (pos.x >= 0 && pos.y >= 0)
 		{
-			float xPos = mapData.spawnX * m_TileMap->GetTileSize();
-			float yPos = mapData.spawnY * m_TileMap->GetTileSize();
+			float xPos = pos.x * m_TileMap->GetTileSize();
+			float yPos = pos.y * m_TileMap->GetTileSize();
 
 			if (m_TileMap->IsSolidAt(xPos, yPos))
 			{
@@ -98,24 +102,45 @@ namespace EnginePlatform
 				m_TileMap->GetTileSize()
 			);
 		}
+	}
 
+	void Scene::LoadEnemy(std::string exeDir, std::vector<EngineMath::Vector2> spawns)
+	{
+		//Enemy Loading
+		std::string idlePath = exeDir + "\\Assets/Textures/idle1.png";
+		std::string walkPath = exeDir + "\\Assets/Textures/walk1.png";
+		EngineGame::Texture2D* enemyIdle = AssetManager::GetTexture(idlePath);
+		EngineGame::Texture2D* enemyWalk = AssetManager::GetTexture(walkPath);
 
+		//Enemy Spawning
+		for (auto& sp : spawns)
+		{
+			auto enemy = std::make_unique<EngineGame::Enemy>();
+
+			float xPos = sp.x * m_TileMap->GetTileSize();
+			float yPos = sp.y * m_TileMap->GetTileSize();
+
+			enemy->SetTexture(enemyIdle, enemyWalk);
+			enemy->SetPosition(xPos, yPos);
+			enemy->SetWorld(m_TileMap.get());
+
+			m_Enemies.push_back(std::move(enemy));
+		}
+	}
+
+	void Scene::LoadCamera()
+	{
 		//Camera loading
 		m_Camera.SetWorldBounds(m_TileMap->GetWorldWidth(), m_TileMap->GetWorldHeight());
 		m_Camera.Follow(m_Player.GetPosition().x, m_Player.GetPosition().y);
 		m_Camera.SetSmoothness(20.0f);
-
-		EngineCore::Log::Write(
-			EngineCore::LogLevel::Info,
-			EngineCore::LogCategory::Scene,
-			"Scene loaded successfully"
-		);
 	}
 
 	void Scene::Update(float dt)
 	{
 		m_Player.Update(dt);
-
+		for (auto& e : m_Enemies)
+			e->Update(dt);
 		m_Camera.FollowSmooth(
 			m_Player.GetPosition().x,
 			m_Player.GetPosition().y,
@@ -128,5 +153,7 @@ namespace EnginePlatform
 		m_TileMap->Draw(renderer, m_Camera);
 		m_TileMap->DrawSolidDebug(renderer, m_Camera);
 		m_Player.Render(renderer, m_Camera);
+		for (auto& e : m_Enemies)
+			e->Render(renderer, m_Camera);
 	}
 }

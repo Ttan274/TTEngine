@@ -27,10 +27,11 @@ namespace EngineGame
 		outMap.h = j["Height"];
 		outMap.tSize = j["TileSize"];
 		
-		if (j.contains("PlayerSpawnX"))
-			outMap.spawnX = j["PlayerSpawnX"];
-		if (j.contains("PlayerSpawnY"))
-			outMap.spawnY = j["PlayerSpawnY"];
+		if (j.contains("PlayerSpawnX") && j.contains("PlayerSpawnY"))
+		{
+			outMap.playerSpawn.x = j["PlayerSpawnX"];
+			outMap.playerSpawn.y = j["PlayerSpawnY"];
+		}
 
 		outMap.tiles = j["Tiles"].get<std::vector<int>>();
 		if ((int)outMap.tiles.size() != outMap.w * outMap.h)
@@ -41,6 +42,18 @@ namespace EngineGame
 				"Tile count mismatch in map file"
 			);
 			return false;
+		}
+
+		if (j.contains("EnemySpawns"))
+		{
+			for (auto& e : j["EnemySpawns"])
+			{
+				outMap.enemySpawns.push_back(
+					{
+						e["X"].get<float>(),
+						e["Y"].get<float>()
+					});
+			}
 		}
 
 		EngineCore::Log::Write(

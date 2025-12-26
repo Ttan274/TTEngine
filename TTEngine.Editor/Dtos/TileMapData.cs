@@ -1,4 +1,6 @@
-﻿namespace TTEngine.Editor.Dtos
+﻿using System.Windows;
+
+namespace TTEngine.Editor.Dtos
 {
     public class TileMapData
     {
@@ -8,5 +10,6 @@
         public int[] Tiles { get; set; }
         public double PlayerSpawnX { get; set; }
         public double PlayerSpawnY { get; set; }
+        public List<SpawnDto> EnemySpawns { get; set; } 
     }
 }

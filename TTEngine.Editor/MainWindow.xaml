@@ -73,7 +73,12 @@
             <RadioButton    Content="Player Spawn"
                             Margin="0,6,0,0"
                             GroupName="ToolGroup"
-                            Checked="SpawnTool_Checked"/>
+                            Checked="PlayerSpawnTool_Checked"/>
+            
+            <RadioButton    Content="Enemy Spawn"
+                            Margin="0,6,0,0"
+                            GroupName="ToolGroup"
+                            Checked="EnemySpawnTool_Checked"/>
             
 
             <Button Content="Start Game"

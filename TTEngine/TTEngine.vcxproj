@@ -139,6 +139,8 @@
     <ClCompile Include="..\src\Core\Log.cpp" />
     <ClCompile Include="..\src\Core\Time.cpp" />
     <ClCompile Include="..\src\Game\Camera.cpp" />
+    <ClCompile Include="..\src\Game\Enemy.cpp" />
+    <ClCompile Include="..\src\Game\Entity.cpp" />
     <ClCompile Include="..\src\Game\MapLoader.cpp" />
     <ClCompile Include="..\src\Game\Player.cpp" />
     <ClCompile Include="..\src\Game\Texture.cpp" />
@@ -162,6 +164,8 @@
     <ClInclude Include="..\src\Core\PathUtil.h" />
     <ClInclude Include="..\src\Core\Time.h" />
     <ClInclude Include="..\src\Game\Camera.h" />
+    <ClInclude Include="..\src\Game\Enemy.h" />
+    <ClInclude Include="..\src\Game\Entity.h" />
     <ClInclude Include="..\src\Game\MapLoader.h" />
     <ClInclude Include="..\src\Game\Player.h" />
     <ClInclude Include="..\src\Game\Texture.h" />

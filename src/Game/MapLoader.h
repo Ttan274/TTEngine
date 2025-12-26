@@ -2,6 +2,7 @@
 #include "Game/TileMap.h"
 #include <string>
 #include <vector>
+#include "Core/Math/Vector2.h"
 
 namespace EngineGame
 {
@@ -12,8 +13,8 @@ namespace EngineGame
 		int tSize;
 		std::vector<int> tiles;
 
-		int spawnX = -1;
-		int spawnY = -1;
+		EngineMath::Vector2 playerSpawn;
+		std::vector<EngineMath::Vector2> enemySpawns;
 	};
 
 	class MapLoader

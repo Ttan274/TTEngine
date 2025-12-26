@@ -85,7 +85,9 @@ namespace EngineCore
 	{
 		Debug::Update(deltaTime);
 		if (DebugOverlay::IsEnabled())
+		{
 			DebugOverlay::AddLine("FPS: " + std::to_string(Debug::GetFPS()));
+		}
 
 		Input::Update();
 		m_Scene.Update(deltaTime);

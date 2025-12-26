@@ -4,6 +4,7 @@
     {
         Brush,
         Fill,
-        Spawn
+        PlayerSpawn,
+        EnemySpawn
     }
 }

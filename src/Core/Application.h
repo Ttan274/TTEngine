@@ -14,7 +14,7 @@ namespace EngineCore
 	private:
 		bool m_Running = true;
 		IRenderer* m_Renderer = nullptr;
-		EnginePlatform::Scene m_Scene;
+		EnginePlatform::Scene m_Scene;  
 
 		void ProcessInput();
 		void Update(float deltaTime);
