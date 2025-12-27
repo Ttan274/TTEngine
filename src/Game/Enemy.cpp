@@ -23,16 +23,6 @@ namespace EngineGame
 		UpdateCollider();
 	}
 
-	void Enemy::CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop)
-	{
-		anim->SetLoop(loop);
-		anim->SetFrameTime(frameTime);
-		for (int i = 0; i < frameSize; i++)
-		{
-			anim->AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
-		}
-	}
-
 	void Enemy::Update(float dt)
 	{
 		if (m_AttackCooldown > 0.0f)
@@ -178,32 +168,6 @@ namespace EngineGame
 			);
 	}
 
-	void Enemy::TakeDamage(float amount, bool playerRight)
-	{
-		if (m_State == EnemyState::Hurt)
-			return;
-
-		m_HP -= amount;
-		
-		if (m_HP <= 0)
-		{
-			OnDeath();
-			return;
-		}
-
-		//Hurt State
-		m_State = EnemyState::Hurt;
-		m_HurtTimer = m_HurtDuration;
-		m_HurtAnim.Reset();
-		m_CurrentAnim = &m_HurtAnim;
-
-		//Knockback
-		float forceX = playerRight ? 1.0f : -1.0f;
-		m_KnockbackVel.x = forceX * 100.0f;
-		m_KnockbackVel.y = -50.0f;
-		m_KnockbackTimer = m_KnockbackDuration;
-	}
-
 	void Enemy::OnDeath()
 	{
 		m_State = EnemyState::Dead;
@@ -213,5 +177,31 @@ namespace EngineGame
 
 		m_Collider.w = 0;
 		m_Collider.h = 0;
+	}
+
+	void Enemy::TakeDamage(float amount, bool objectDir)
+	{
+		if(m_State == EnemyState::Dead)
+			return;
+
+		m_HP -= amount;
+
+		if (m_HP <= 0)
+		{
+			OnDeath();
+			return;
+		}
+
+		//Hurt State
+		m_State = EnemyState::Hurt;
+		m_HurtTimer = m_HurtDuration;
+		m_CurrentAnim = &m_HurtAnim;
+		m_CurrentAnim->Reset();
+
+		//Knockback
+		float forceX = objectDir ? 1.0f : -1.0f;
+		m_KnockbackVel.x = forceX * 100.0f;
+		m_KnockbackVel.y = -50.0f;
+		m_KnockbackTimer = m_KnockbackDuration;
 	}
 }

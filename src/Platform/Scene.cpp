@@ -70,18 +70,24 @@ namespace EnginePlatform
 		m_Player.SetTexture(
 			AssetManager::GetTexture(path + "\\idle.png"),
 			AssetManager::GetTexture(path + "\\walk.png"),
+			AssetManager::GetTexture(path + "\\hurt.png"),
+			AssetManager::GetTexture(path + "\\dead.png")
+			);
+		m_Player.SetAttackTexture(
 			AssetManager::GetTexture(path + "\\attack1.png"),
 			AssetManager::GetTexture(path + "\\attack2.png"),
-			AssetManager::GetTexture(path + "\\attack3.png"));
+			AssetManager::GetTexture(path + "\\attack3.png")
+			);
 		m_Player.SetWorld(m_TileMap.get());
 		
+		EngineMath::Vector2 newPos;
 		//Player Spawning
 		if (pos.x >= 0 && pos.y >= 0)
 		{
-			float xPos = pos.x * m_TileMap->GetTileSize();
-			float yPos = pos.y * m_TileMap->GetTileSize();
+			newPos.x = pos.x * m_TileMap->GetTileSize();
+			newPos.y = pos.y * m_TileMap->GetTileSize();
 
-			if (m_TileMap->IsSolidAt(xPos, yPos))
+			if (m_TileMap->IsSolidAt(newPos))
 			{
 				EngineCore::Log::Write(
 					EngineCore::LogLevel::Warning,
@@ -90,20 +96,20 @@ namespace EnginePlatform
 				);
 			}
 
-			m_Player.SetPosition(xPos, yPos);
+			m_Player.SetPosition(newPos);
+			m_Player.SetSpawnPoint(newPos);
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Info,
 				EngineCore::LogCategory::Scene,
-				"Player pos : " + std::to_string(xPos) + "," + std::to_string(yPos)
+				"Player pos : " + std::to_string(newPos.x) + "," + std::to_string(newPos.y)
 			);
 		}
 		else
 		{
 			// Fallback (spawn yoksa)
-			m_Player.SetPosition(
-				m_TileMap->GetTileSize(),
-				m_TileMap->GetTileSize()
-			);
+			newPos.x = m_TileMap->GetTileSize();
+			newPos.y = m_TileMap->GetTileSize();
+			m_Player.SetPosition(newPos);
 		}
 	}
 
@@ -113,19 +119,20 @@ namespace EnginePlatform
 		std::string path = exeDir + "\\Assets/Textures";
 		EngineGame::Texture2D* enemyIdle = AssetManager::GetTexture(path + "\\idle1.png");
 		EngineGame::Texture2D* enemyWalk = AssetManager::GetTexture(path + "\\walk1.png");
-		EngineGame::Texture2D* enemyHurt = AssetManager::GetTexture(path + "\\hurt.png");
-		EngineGame::Texture2D* enemyDeath = AssetManager::GetTexture(path + "\\dead.png");
+		EngineGame::Texture2D* enemyHurt = AssetManager::GetTexture(path + "\\hurt1.png");
+		EngineGame::Texture2D* enemyDeath = AssetManager::GetTexture(path + "\\dead1.png");
 
 		//Enemy Spawning
+		EngineMath::Vector2 newPos;
 		for (auto& sp : spawns)
 		{
 			auto enemy = std::make_unique<EngineGame::Enemy>();
 
-			float xPos = sp.x * m_TileMap->GetTileSize();
-			float yPos = sp.y * m_TileMap->GetTileSize();
+			newPos.x = sp.x * m_TileMap->GetTileSize();
+			newPos.y = sp.y * m_TileMap->GetTileSize();
 
 			enemy->SetTexture(enemyIdle, enemyWalk, enemyHurt, enemyDeath);
-			enemy->SetPosition(xPos, yPos);
+			enemy->SetPosition(newPos);
 			enemy->SetWorld(m_TileMap.get());
 
 			m_Enemies.push_back(std::move(enemy));
@@ -156,12 +163,12 @@ namespace EnginePlatform
 			}
 
 			//Enemy attack behaviour
-			if (Intersects(m_Player.GetCollider(), e->GetCollider()))
+			if (Intersects(m_Player.GetCollider(), e->GetCollider()) && !m_Player.IsDead())
 			{
 				if (e->CanAttack())
 				{
-					//m_Player.TakeDamage(5);
-					//e->ResetCooldown();
+					m_Player.TakeDamage(20, e->IsFacingRight());
+					e->ResetCooldown();
 				}
 			}
 

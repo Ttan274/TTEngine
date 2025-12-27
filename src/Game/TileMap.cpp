@@ -147,6 +147,15 @@ namespace EngineGame
 		return tile == TileType::Wall;
 	}
 
+	bool TileMap::IsSolidAt(EngineMath::Vector2 pos)
+	{
+		int tileX = (int)(pos.x / m_TileSize);
+		int tileY = (int)(pos.y / m_TileSize);
+
+		TileType tile = GetTile(tileX, tileY);
+		return tile == TileType::Wall;
+	}
+
 	float TileMap::GetWorldWidth() const
 	{
 		return m_Width * m_TileSize;

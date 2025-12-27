@@ -49,7 +49,6 @@ namespace EngineGame
 			m_World->IsSolidAt(rect.x + rect.w, rect.y + rect.h);
 	}
 
-	//Might be updated
 	void Entity::UpdateCollider()
 	{
 		m_Collider.x = m_Position.x + 50;
@@ -57,23 +56,22 @@ namespace EngineGame
 		m_Collider.w = 32;
 		m_Collider.h = 80;
 	}
-
-	void Entity::TakeDamage(float amount)
+	
+	void Entity::SetTexture(Texture2D* idleT, Texture2D* walkT, Texture2D* hurtT, Texture2D* deadT)
 	{
-		if (m_HP <= 0)
-			return;
-
-		m_HP -= amount;
-
-		if (m_HP <= 0)
-		{
-			m_HP = 0;
-			OnDeath();
-		}
+		m_IdleTexture = idleT;
+		m_WalkTexture = walkT;
+		m_HurtTexture = hurtT;
+		m_DeathTexture = deadT;
 	}
 
-	void Entity::OnDeath()
+	void Entity::CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop)
 	{
-		//Dead state
+		anim->SetLoop(loop);
+		anim->SetFrameTime(frameTime);
+		for (int i = 0; i < frameSize; i++)
+		{
+			anim->AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
+		}
 	}
 }

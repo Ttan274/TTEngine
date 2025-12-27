@@ -3,6 +3,8 @@
 #include "Core/IRenderer.h"
 #include "Game/Camera.h"
 #include "Game/TileMap.h"
+#include "Core/Animation.h"
+
 
 namespace EngineGame
 {
@@ -15,17 +17,25 @@ namespace EngineGame
 		virtual void Update(float dt) = 0;
 		virtual void Render(EngineCore::IRenderer* renderer,
 			const Camera2D& camera) = 0;
-		virtual void UpdateCollider();
-
+		
+		void SetTexture(Texture2D* idleT, Texture2D* walkT, Texture2D* hurtT, Texture2D* deadT);
 		void SetWorld(TileMap* world);
+		EngineMath::Vector2 GetPosition() const { return m_Position; }
+		void SetPosition(EngineMath::Vector2 pos) { m_Position.x = pos.x; m_Position.y = pos.y; };
+		bool IsFacingRight() const { return m_FacingRight; }
+		bool IsDead() const { return m_IsDead; }
 
-		//Combat
-		virtual void TakeDamage(float amount);
+		//Debug için sadece
 		float GetHp() const { return m_HP; }
+
 	protected:
-		void MoveAndCollide(const EngineMath::Vector2& velocity);
 		bool IsCollidingWithWorld(const EngineCore::Rect& rect) const;
-		virtual void OnDeath();
+		void MoveAndCollide(const EngineMath::Vector2& velocity);
+		void UpdateCollider();
+		void CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop);
+
+		virtual void OnDeath() = 0;
+		virtual void TakeDamage(float amount, bool objectDir) = 0;
 	protected:
 		//Movement
 		EngineMath::Vector2 m_Position{};
@@ -35,6 +45,27 @@ namespace EngineGame
 		//Hp
 		float m_MaxHP = 100;
 		float m_HP = 100;
+		bool m_IsDead = false;
+
+		//Hurt Cooldown
+		float m_HurtTimer = 0.0f;
+		float m_HurtDuration = 0.3f;
+
+		//Animation
+		EngineCore::Animation m_IdleAnim;
+		EngineCore::Animation m_WalkAnim;
+		EngineCore::Animation m_HurtAnim;
+		EngineCore::Animation m_DeathAnim;
+		EngineCore::Animation* m_CurrentAnim = nullptr;
+		bool m_IsMoving = false;
+
+		//Sprite
+		Texture2D* m_IdleTexture = nullptr;
+		Texture2D* m_WalkTexture = nullptr;
+		Texture2D* m_HurtTexture = nullptr;
+		Texture2D* m_DeathTexture = nullptr;
+		float m_SpriteW = 128.0f;
+		float m_SpriteH = 128.0f;
 
 		//Collider
 		EngineCore::Rect m_Collider{};

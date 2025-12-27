@@ -4,6 +4,7 @@
 #include "Core/AABB.h"
 #include "Game/Texture.h"
 #include <vector>
+#include "Core/Math/Vector2.h"
 
 namespace EngineGame
 {
@@ -26,6 +27,7 @@ namespace EngineGame
 		
 		bool IsSolid(const EngineCore::AABB& box) const;
 		bool IsSolidAt(float worldX, float worldY);
+		bool IsSolidAt(EngineMath::Vector2 pos);
 
 		float GetWorldWidth() const;
 		float GetWorldHeight() const;

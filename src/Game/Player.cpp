@@ -8,7 +8,7 @@ namespace EngineGame
 	{
 		m_Position = { 0.0f, 0.0f};
 		m_Speed = 150.0f;
-		m_AttackDamage = 55.0f;	//silinecek
+		m_AttackDamage = 20.0f;	
 
 		//Idle Anim
 		CreateAnim(&m_IdleAnim, 0.25f, 6, true);
@@ -18,44 +18,50 @@ namespace EngineGame
 
 		//Attack Animations
 		EngineCore::Animation attack1;
-		CreateAnim(&attack1, 0.18f, 5, false);
+		CreateAnim(&attack1, 0.12f, 5, false);
 		m_AttackAnims.push_back(attack1);
 
 		EngineCore::Animation attack2;
-		CreateAnim(&attack2, 0.14f, 3, false);
+		CreateAnim(&attack2, 0.18f, 3, false);
 		m_AttackAnims.push_back(attack2);
 
 		EngineCore::Animation attack3;
-		CreateAnim(&attack3, 0.16f, 4, false);
+		CreateAnim(&attack3, 0.14f, 4, false);
 		m_AttackAnims.push_back(attack3);
+
+		//Hurt Animation
+		CreateAnim(&m_HurtAnim, 0.12f, 2, false);
+
+		//Death Animation
+		CreateAnim(&m_DeathAnim, 0.3f, 4, false);
 
 		m_CurrentAnim = &m_IdleAnim;
 		UpdateCollider();
 	}
 
-	void Player::SetTexture(Texture2D* idleT, Texture2D* walkT, Texture2D* aT1, Texture2D* aT2, Texture2D* aT3)
+	void Player::SetAttackTexture(Texture2D* aT1, Texture2D* aT2, Texture2D* aT3)
 	{
-		m_IdleTexture = idleT;
-		m_WalkTexture = walkT;
 		m_AttackTextures.push_back(aT1);
 		m_AttackTextures.push_back(aT2);
 		m_AttackTextures.push_back(aT3);
 	}
 
-	void Player::CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop)
-	{
-		anim->SetLoop(loop);
-		anim->SetFrameTime(frameTime);
-		for (int i = 0; i < frameSize; i++)
-		{
-			anim->AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
-		}
-	}
-
 	void Player::Update(float dt)
 	{
-		UpdateMovement(dt);
-		UpdateAttack(dt);
+		switch (m_State)
+		{
+		case PlayerState::Normal:
+			UpdateMovement(dt);
+			UpdateAttack(dt);
+			break;
+		case PlayerState::Hurt:
+			UpdateHurt(dt);
+			break;
+		case PlayerState::Dead:
+			UpdateDeath(dt);
+			break;
+		}
+		
 		UpdateCollider();
 	}
 
@@ -92,6 +98,20 @@ namespace EngineGame
 		MoveAndCollide(velocity);
 	}
 
+	void Player::UpdateHurt(float dt)
+	{
+		m_HurtTimer -= dt;
+		MoveAndCollide({ m_KnockbackVel.x * dt, m_KnockbackVel.y * dt });
+		m_CurrentAnim->Update(dt);
+
+		if (m_HurtTimer <= 0.0f && m_CurrentAnim->IsFinished())
+		{
+			m_State = PlayerState::Normal;
+			m_KnockbackVel = { 0, 0 };
+			m_CurrentAnim = m_IsMoving ? &m_WalkAnim : &m_IdleAnim;
+		}
+	}
+
 	void Player::Render(EngineCore::IRenderer* renderer,
 						const Camera2D& camera)
 	{
@@ -109,10 +129,20 @@ namespace EngineGame
 		EngineCore::SpriteFlip flip = m_FacingRight ? EngineCore::SpriteFlip::None : EngineCore::SpriteFlip::Horizontal;
 		
 		Texture2D* currentTexture = nullptr;
-		if (m_IsAttacking)
-			currentTexture = m_AttackTextures[m_CurrentAttackAnimIndex];
-		else
-			currentTexture = (m_CurrentAnim == &m_WalkAnim) ? m_WalkTexture : m_IdleTexture;
+		if (m_CurrentAnim == &m_IdleAnim)
+			currentTexture = m_IdleTexture;
+		else if (m_CurrentAnim == &m_WalkAnim)
+			currentTexture = m_WalkTexture;
+		else if (m_CurrentAnim == &m_AttackAnims[0])
+			currentTexture = m_AttackTextures[0];
+		else if (m_CurrentAnim == &m_AttackAnims[1])
+			currentTexture = m_AttackTextures[1];
+		else if (m_CurrentAnim == &m_AttackAnims[2])
+			currentTexture = m_AttackTextures[2];
+		else if (m_CurrentAnim == &m_HurtAnim)
+			currentTexture = m_HurtTexture;
+		else if (m_CurrentAnim == &m_DeathAnim)
+			currentTexture = m_DeathTexture;
 		
 		renderer->DrawTexture(
 			currentTexture,
@@ -155,24 +185,32 @@ namespace EngineGame
 		{
 			m_CurrentAnim->Update(dt);
 
+			if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::E))
+				m_ComboQueued = true;
+
 			if (m_CurrentAnim->IsFinished())
 			{
-				m_IsAttacking = false;
-				m_CurrentAnim = m_IsMoving ? &m_WalkAnim : &m_IdleAnim;
+				if (m_ComboQueued)
+				{
+					if (m_AttackStage == AttackStage::Attack1)
+						StartAttack(AttackStage::Attack2);
+					else if (m_AttackStage == AttackStage::Attack2)
+						StartAttack(AttackStage::Attack3);
+					else
+						ResetCombo();
+				}
+				else
+				{
+					ResetCombo();
+				}
 			}
 			return;
 		}
 
 		if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::E) && m_AttackCooldown <= 0.0f)
 		{
-			m_IsAttacking = true;
-			m_HasHitThisAttack = false;
 			m_AttackCooldown = m_AttackInterval;
-
-			m_CurrentAttackAnimIndex = rand() % m_AttackAnims.size();
-
-			m_AttackAnims[m_CurrentAttackAnimIndex].Reset();
-			m_CurrentAnim = &m_AttackAnims[m_CurrentAttackAnimIndex];
+			StartAttack(AttackStage::Attack1);
 		}
 	}
 
@@ -203,5 +241,89 @@ namespace EngineGame
 		int end = std::max(count - 1, center + halfwidth);
 
 		return frame >= start && frame <= end;
+	}
+
+	void Player::StartAttack(AttackStage stage)
+	{
+		m_AttackStage = stage;
+		m_IsAttacking = true;
+		m_ComboQueued = false;
+		m_HasHitThisAttack = false;
+
+		int index = 0;
+		if (stage == AttackStage::Attack2) index = 1;
+		if (stage == AttackStage::Attack3) index = 2;
+
+		m_CurrentAnim = &m_AttackAnims[index];
+		m_CurrentAnim->Reset();
+	}
+
+	void Player::ResetCombo()
+	{
+		m_AttackStage = AttackStage::None;
+		m_IsAttacking = false;
+		m_ComboQueued = false;
+		m_CurrentAnim = m_IsMoving ? &m_WalkAnim : &m_IdleAnim;
+	}
+
+	void Player::TakeDamage(float amount, bool objectDir)
+	{
+		if (m_State == PlayerState::Dead)
+			return;
+
+		m_HP -= amount;
+
+		if (m_HP <= 0)
+		{
+			OnDeath();
+			return;
+		}
+
+		//Hurt State
+		m_State = PlayerState::Hurt;
+		m_HurtTimer = m_HurtDuration;
+		m_CurrentAnim = &m_HurtAnim;
+		m_CurrentAnim->Reset();
+
+		//Knockback
+		float dir = objectDir ? 1.0f : -1.0f;
+		m_KnockbackVel.x = dir * 100.0f;
+		m_KnockbackVel.y = dir * -50.0f;
+	}
+
+	void Player::OnDeath()
+	{
+		m_State = PlayerState::Dead;
+
+		m_DeathTimer = m_DeathDuration;
+		
+		m_CurrentAnim = &m_DeathAnim;
+		m_CurrentAnim->Reset();
+
+		m_KnockbackVel = { 0, 0 };
+	}
+
+	void Player::UpdateDeath(float dt)
+	{
+		m_DeathTimer -= dt;
+		m_CurrentAnim->Update(dt);
+		
+		if (m_CurrentAnim->IsFinished() && m_DeathTimer <= 0.0f)
+		{
+			m_IsDead = true;
+			Respawn();
+		}
+	}
+
+	void Player::Respawn()
+	{
+		m_IsDead = false;
+		m_Position = m_SpawnPoint;
+		m_HP = m_MaxHP;
+
+		m_State = PlayerState::Normal;
+
+		m_CurrentAnim = &m_IdleAnim;
+		m_CurrentAnim->Reset();
 	}
 }
