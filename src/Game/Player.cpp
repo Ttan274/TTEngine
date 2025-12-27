@@ -8,6 +8,7 @@ namespace EngineGame
 	{
 		m_Position = { 0.0f, 0.0f};
 		m_Speed = 150.0f;
+		m_AttackDamage = 55.0f;	//silinecek
 
 		//Idle Anim
 		CreateAnim(&m_IdleAnim, 0.25f, 6, true);

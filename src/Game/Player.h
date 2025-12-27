@@ -25,6 +25,7 @@ namespace EngineGame
 		bool IsAttacking() const { return m_IsAttacking;}
 		float GetAttackDamage() const { return m_AttackDamage; }
 		bool IsDamageFrame() const;
+		bool IsFacingRight() const { return m_FacingRight; }
 
 		bool HasHitThisAttack() const { return m_HasHitThisAttack; }
 		void MarkHitDone() { m_HasHitThisAttack = true; }

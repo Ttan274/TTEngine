@@ -16,6 +16,9 @@ namespace EngineGame
 		//Hurt Anim
 		CreateAnim(&m_HurtAnim, 0.12f, 2, false);
 
+		//Dead Anim
+		CreateAnim(&m_DeathAnim, 0.3f, 3, false);
+
 		m_CurrentAnim = &m_IdleAnim;
 		UpdateCollider();
 	}
@@ -45,6 +48,9 @@ namespace EngineGame
 			break;
 		case EnemyState::Hurt:
 			UpdateHurt(dt);
+			break;
+		case  EnemyState::Dead:
+			UpdateDeath(dt);
 			break;
 		}
 
@@ -90,6 +96,12 @@ namespace EngineGame
 
 	void Enemy::UpdateHurt(float dt)
 	{
+		if (m_KnockbackTimer > 0.0f)
+		{
+			m_KnockbackTimer -= dt;
+			MoveAndCollide({ m_KnockbackVel.x * dt, m_KnockbackVel.y * dt });
+		}
+
 		m_HurtTimer -= dt;
 		m_CurrentAnim->Update(dt);
 
@@ -97,7 +109,15 @@ namespace EngineGame
 		{
 			m_State = EnemyState::Idle;
 			m_CurrentAnim = &m_IdleAnim;
+			m_KnockbackVel = { 0, 0 };
 		}
+	}
+
+	void Enemy::UpdateDeath(float dt)
+	{
+		m_CurrentAnim->Update(dt);
+		if (m_CurrentAnim->IsFinished())
+			m_IsDead = true;
 	}
 
 	void Enemy::ChangeState(EnemyState newState)
@@ -123,9 +143,21 @@ namespace EngineGame
 		EngineCore::SpriteFlip flip = m_FacingRight ? EngineCore::SpriteFlip::None : EngineCore::SpriteFlip::Horizontal;
 
 		Texture2D* currentTexture = nullptr;
-		currentTexture = (m_CurrentAnim == &m_WalkAnim) ? m_WalkTexture : 
-						 (m_CurrentAnim == &m_IdleAnim) ? m_IdleTexture : 
-						 m_HurtTexture;
+		switch (m_State)
+		{
+		case EnemyState::Dead:
+			currentTexture = m_DeathTexture;
+			break;
+		case EnemyState::Hurt:
+			currentTexture = m_HurtTexture;
+			break;
+		case EnemyState::Patrol:
+			currentTexture = m_WalkTexture;
+			break;
+		default:
+			currentTexture = m_IdleTexture;
+			break;
+		}
 
 		renderer->DrawTexture(
 			currentTexture,
@@ -146,15 +178,40 @@ namespace EngineGame
 			);
 	}
 
-	void Enemy::TakeDamage(float amount)
+	void Enemy::TakeDamage(float amount, bool playerRight)
 	{
 		if (m_State == EnemyState::Hurt)
 			return;
 
 		m_HP -= amount;
+		
+		if (m_HP <= 0)
+		{
+			OnDeath();
+			return;
+		}
+
+		//Hurt State
 		m_State = EnemyState::Hurt;
 		m_HurtTimer = m_HurtDuration;
 		m_HurtAnim.Reset();
 		m_CurrentAnim = &m_HurtAnim;
+
+		//Knockback
+		float forceX = playerRight ? 1.0f : -1.0f;
+		m_KnockbackVel.x = forceX * 100.0f;
+		m_KnockbackVel.y = -50.0f;
+		m_KnockbackTimer = m_KnockbackDuration;
+	}
+
+	void Enemy::OnDeath()
+	{
+		m_State = EnemyState::Dead;
+
+		m_DeathAnim.Reset();
+		m_CurrentAnim = &m_DeathAnim;
+
+		m_Collider.w = 0;
+		m_Collider.h = 0;
 	}
 }

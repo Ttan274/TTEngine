@@ -21,7 +21,6 @@ namespace EngineGame
 
 		//Combat
 		virtual void TakeDamage(float amount);
-		bool IsAlive() const { return m_HP > 0; }
 		float GetHp() const { return m_HP; }
 	protected:
 		void MoveAndCollide(const EngineMath::Vector2& velocity);
