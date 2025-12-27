@@ -39,6 +39,7 @@ namespace EngineCore
 			DebugOverlay::BeginFrame();
 			Time::Update();
 
+			Input::BeginFrame();
 			ProcessInput();
 			Update(Time::GetDeltaTime());
 			Render();
@@ -55,11 +56,11 @@ namespace EngineCore
 			if (event.type == SDL_EVENT_QUIT)
 				Input::OnQuit();
 
-			if (event.type == SDL_EVENT_KEY_DOWN)
-				Input::OnKey(event.key.key, true);
+			if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
+				Input::OnKey(event.key.scancode, true);
 
 			if (event.type == SDL_EVENT_KEY_UP)
-				Input::OnKey(event.key.key, false);
+				Input::OnKey(event.key.scancode, false);
 		}
 
 		if(Input::IsKeyDown(KeyCode::Escape))
@@ -67,18 +68,6 @@ namespace EngineCore
 
 		if (Input::IsKeyPressed(KeyCode::F1))
 			DebugOverlay::Toggle();
-
-		//Save atýyoruz
-		if (Input::IsKeyPressed(KeyCode::F5))
-		{
-			
-		}
-
-		//Load yapýyoruz
-		if (Input::IsKeyPressed(KeyCode::F9))
-		{
-			
-		}
 	}
 
 	void Application::Update(float deltaTime)
@@ -87,9 +76,10 @@ namespace EngineCore
 		if (DebugOverlay::IsEnabled())
 		{
 			DebugOverlay::AddLine("FPS: " + std::to_string(Debug::GetFPS()));
+			DebugOverlay::AddLine("Player hp: " + std::to_string(m_Scene.GetPlayer().GetHp()));
 		}
 
-		Input::Update();
+		//Input::Update();
 		m_Scene.Update(deltaTime);
 	}
 
@@ -99,6 +89,7 @@ namespace EngineCore
 
 		m_Scene.Render(m_Renderer);
 		DebugOverlay::Render();
+		Input::EndFrame();
 	
 		m_Renderer->EndFrame();
 	}

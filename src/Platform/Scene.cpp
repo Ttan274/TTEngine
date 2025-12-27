@@ -21,7 +21,7 @@ namespace EnginePlatform
 		);
 
 		//Map Loading
-		std::string mapPath =EngineCore::GetRootDirectory("Maps", "active_map.json");
+		std::string mapPath = EngineCore::GetRootDirectory("Maps", "active_map.json");
 		EngineGame::MapData mapData;
 		if (!EngineGame::MapLoader::LoadFromFile(mapPath, mapData))
 		{
@@ -66,10 +66,13 @@ namespace EnginePlatform
 	void Scene::LoadPlayer(std::string exeDir, EngineMath::Vector2 pos)
 	{
 		//Player Loading
-		std::string idlePath = exeDir + "\\Assets/Textures/idle.png";
-		std::string walkPath = exeDir + "\\Assets/Textures/walk.png";
-		m_Player.SetTexture(AssetManager::GetTexture(idlePath),
-			AssetManager::GetTexture(walkPath));
+		std::string path = exeDir + "\\Assets/Textures";
+		m_Player.SetTexture(
+			AssetManager::GetTexture(path + "\\idle.png"),
+			AssetManager::GetTexture(path + "\\walk.png"),
+			AssetManager::GetTexture(path + "\\attack1.png"),
+			AssetManager::GetTexture(path + "\\attack2.png"),
+			AssetManager::GetTexture(path + "\\attack3.png"));
 		m_Player.SetWorld(m_TileMap.get());
 		
 		//Player Spawning
@@ -107,10 +110,10 @@ namespace EnginePlatform
 	void Scene::LoadEnemy(std::string exeDir, std::vector<EngineMath::Vector2> spawns)
 	{
 		//Enemy Loading
-		std::string idlePath = exeDir + "\\Assets/Textures/idle1.png";
-		std::string walkPath = exeDir + "\\Assets/Textures/walk1.png";
-		EngineGame::Texture2D* enemyIdle = AssetManager::GetTexture(idlePath);
-		EngineGame::Texture2D* enemyWalk = AssetManager::GetTexture(walkPath);
+		std::string path = exeDir + "\\Assets/Textures";
+		EngineGame::Texture2D* enemyIdle = AssetManager::GetTexture(path + "\\idle1.png");
+		EngineGame::Texture2D* enemyWalk = AssetManager::GetTexture(path + "\\walk1.png");
+		EngineGame::Texture2D* enemyHurt = AssetManager::GetTexture(path + "\\hurt.png");
 
 		//Enemy Spawning
 		for (auto& sp : spawns)
@@ -120,7 +123,7 @@ namespace EnginePlatform
 			float xPos = sp.x * m_TileMap->GetTileSize();
 			float yPos = sp.y * m_TileMap->GetTileSize();
 
-			enemy->SetTexture(enemyIdle, enemyWalk);
+			enemy->SetTexture(enemyIdle, enemyWalk, enemyHurt);
 			enemy->SetPosition(xPos, yPos);
 			enemy->SetWorld(m_TileMap.get());
 
@@ -140,7 +143,28 @@ namespace EnginePlatform
 	{
 		m_Player.Update(dt);
 		for (auto& e : m_Enemies)
+		{
+			EngineCore::Rect playerBox = m_Player.GetAttackBox();
 			e->Update(dt);
+
+			if (!e->IsAlive())
+				continue;
+
+			if (Intersects(m_Player.GetCollider(), e->GetCollider()))
+			{
+				if (e->CanAttack())
+				{
+					//m_Player.TakeDamage(5);
+					//e->ResetCooldown();
+				}
+
+				if (m_Player.IsAttacking() && m_Player.IsDamageFrame() && !m_Player.HasHitThisAttack())
+				{
+					e->TakeDamage(m_Player.GetAttackDamage());
+					m_Player.MarkHitDone();
+				}
+			}
+		}
 		m_Camera.FollowSmooth(
 			m_Player.GetPosition().x,
 			m_Player.GetPosition().y,
@@ -155,5 +179,15 @@ namespace EnginePlatform
 		m_Player.Render(renderer, m_Camera);
 		for (auto& e : m_Enemies)
 			e->Render(renderer, m_Camera);
+	}
+
+	bool Scene::Intersects(const EngineCore::Rect& a, const EngineCore::Rect& b)
+	{
+		return !(
+			a.x + a.w < b.x ||
+			a.x > b.x + b.w ||
+			a.y + a.h < b.y ||
+			a.y > b.y + b.h
+			);
 	}
 }

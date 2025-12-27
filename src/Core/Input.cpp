@@ -16,6 +16,7 @@ namespace EngineCore
 			KeyCode::A,
 			KeyCode::S,
 			KeyCode::D,
+			KeyCode::E,
 			KeyCode::Escape,
 			KeyCode::F1,
 			KeyCode::F5,
@@ -26,7 +27,12 @@ namespace EngineCore
 			s_KeyState[key] = KeyState::None;
 	}
 
-	void Input::Update()
+	void Input::BeginFrame()
+	{
+
+	}
+
+	void Input::EndFrame()
 	{
 		for (auto& [key, state] : s_KeyState)
 		{
@@ -118,25 +124,27 @@ namespace EngineCore
 	}
 
 	//Helper method
-	KeyCode Input::TranslateSdlKey(int sdlKey)
+	KeyCode Input::TranslateSdlKey(int scancode)
 	{
-		switch (sdlKey)
+		switch (scancode)
 		{
-		case SDLK_W:
+		case SDL_SCANCODE_W:
 			return KeyCode::W;
-		case SDLK_A:
+		case SDL_SCANCODE_A:
 			return KeyCode::A;
-		case SDLK_S:
+		case SDL_SCANCODE_S:
 			return KeyCode::S;
-		case SDLK_D:
+		case SDL_SCANCODE_D:
 			return KeyCode::D;
-		case SDLK_ESCAPE:
+		case SDL_SCANCODE_E:
+			return KeyCode::E;
+		case SDL_SCANCODE_ESCAPE:
 			return KeyCode::Escape;
-		case SDLK_F1:
+		case SDL_SCANCODE_F1:
 			return KeyCode::F1;
-		case SDLK_F5:
+		case SDL_SCANCODE_F5:
 			return KeyCode::F5;
-		case SDLK_F9:
+		case SDL_SCANCODE_F9:
 			return KeyCode::F9;
 		default:
 			return KeyCode::Unknown;

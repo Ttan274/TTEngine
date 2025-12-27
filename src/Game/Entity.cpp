@@ -57,4 +57,23 @@ namespace EngineGame
 		m_Collider.w = 32;
 		m_Collider.h = 80;
 	}
+
+	void Entity::TakeDamage(float amount)
+	{
+		if (m_HP <= 0)
+			return;
+
+		m_HP -= amount;
+
+		if (m_HP <= 0)
+		{
+			m_HP = 0;
+			OnDeath();
+		}
+	}
+
+	void Entity::OnDeath()
+	{
+		//Dead state
+	}
 }

@@ -19,7 +19,8 @@ namespace EnginePlatform
 		void LoadCamera();
 		void Update(float dt);
 		void Render(EngineCore::IRenderer* renderer);
-		
+		bool Intersects(const EngineCore::Rect& a, const EngineCore::Rect& b);
+
 		EngineGame::Player& GetPlayer() { return m_Player; }
 		EngineGame::Camera2D& GetCamera() { return m_Camera; }
 	private:

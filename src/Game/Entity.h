@@ -18,14 +18,24 @@ namespace EngineGame
 		virtual void UpdateCollider();
 
 		void SetWorld(TileMap* world);
+
+		//Combat
+		virtual void TakeDamage(float amount);
+		bool IsAlive() const { return m_HP > 0; }
+		float GetHp() const { return m_HP; }
 	protected:
 		void MoveAndCollide(const EngineMath::Vector2& velocity);
 		bool IsCollidingWithWorld(const EngineCore::Rect& rect) const;
+		virtual void OnDeath();
 	protected:
 		//Movement
 		EngineMath::Vector2 m_Position{};
 		float m_Speed = 0.0f;
 		bool m_FacingRight = true;
+
+		//Hp
+		float m_MaxHP = 100;
+		float m_HP = 100;
 
 		//Collider
 		EngineCore::Rect m_Collider{};

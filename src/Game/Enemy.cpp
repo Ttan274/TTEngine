@@ -8,25 +8,33 @@ namespace EngineGame
 		m_Speed = 100.0f;
 
 		//Idle Anim
-		m_IdleAnim.SetFrameTime(0.25f);
-		for (int i = 0; i < 6; i++)
-		{
-			m_IdleAnim.AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
-		}
+		CreateAnim(&m_IdleAnim, 0.25f, 6, true);
 
 		//Walk Anim
-		m_WalkAnim.SetFrameTime(0.12f);
-		for (int i = 0; i < 8; i++)
-		{
-			m_WalkAnim.AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
-		}
+		CreateAnim(&m_WalkAnim, 0.12f, 8, true);
+
+		//Hurt Anim
+		CreateAnim(&m_HurtAnim, 0.12f, 2, false);
 
 		m_CurrentAnim = &m_IdleAnim;
 		UpdateCollider();
 	}
 
+	void Enemy::CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop)
+	{
+		anim->SetLoop(loop);
+		anim->SetFrameTime(frameTime);
+		for (int i = 0; i < frameSize; i++)
+		{
+			anim->AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
+		}
+	}
+
 	void Enemy::Update(float dt)
 	{
+		if (m_AttackCooldown > 0.0f)
+			m_AttackCooldown -= dt;
+
 		switch (m_State)
 		{
 		case EnemyState::Idle:
@@ -34,6 +42,9 @@ namespace EngineGame
 			break;
 		case EnemyState::Patrol:
 			UpdatePatrol(dt);
+			break;
+		case EnemyState::Hurt:
+			UpdateHurt(dt);
 			break;
 		}
 
@@ -77,6 +88,18 @@ namespace EngineGame
 		}
 	}
 
+	void Enemy::UpdateHurt(float dt)
+	{
+		m_HurtTimer -= dt;
+		m_CurrentAnim->Update(dt);
+
+		if (m_HurtTimer <= 0.0f && m_CurrentAnim->IsFinished())
+		{
+			m_State = EnemyState::Idle;
+			m_CurrentAnim = &m_IdleAnim;
+		}
+	}
+
 	void Enemy::ChangeState(EnemyState newState)
 	{
 		m_State = newState;
@@ -100,7 +123,9 @@ namespace EngineGame
 		EngineCore::SpriteFlip flip = m_FacingRight ? EngineCore::SpriteFlip::None : EngineCore::SpriteFlip::Horizontal;
 
 		Texture2D* currentTexture = nullptr;
-		currentTexture = (m_CurrentAnim == &m_WalkAnim) ? m_WalkTexture : m_IdleTexture;
+		currentTexture = (m_CurrentAnim == &m_WalkAnim) ? m_WalkTexture : 
+						 (m_CurrentAnim == &m_IdleAnim) ? m_IdleTexture : 
+						 m_HurtTexture;
 
 		renderer->DrawTexture(
 			currentTexture,
@@ -109,6 +134,7 @@ namespace EngineGame
 			flip);
 		
 		//Collider Debug
+		EngineCore::Color c = (m_State == EnemyState::Hurt) ? EngineCore::Color{ 0, 255, 0, 255 } : EngineCore::Color{ 255, 255, 255, 255 };
 		renderer->DrawRectOutline(
 			{
 				m_Collider.x - camera.GetX(),
@@ -116,6 +142,19 @@ namespace EngineGame
 				m_Collider.w,
 				m_Collider.h
 			},
-			{ 255, 0, 0, 255 });
+			c
+			);
+	}
+
+	void Enemy::TakeDamage(float amount)
+	{
+		if (m_State == EnemyState::Hurt)
+			return;
+
+		m_HP -= amount;
+		m_State = EnemyState::Hurt;
+		m_HurtTimer = m_HurtDuration;
+		m_HurtAnim.Reset();
+		m_CurrentAnim = &m_HurtAnim;
 	}
 }

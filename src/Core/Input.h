@@ -11,6 +11,7 @@ namespace EngineCore
 		A,
 		S,
 		D,
+		E,
 		Escape,
 		F1,
 		F5,
@@ -31,6 +32,8 @@ namespace EngineCore
 		//Lifecycle
 		static void Init();
 		static void Update();
+		static void BeginFrame();
+		static void EndFrame();
 
 		//Queries
 		static bool IsKeyDown(KeyCode key);		//Held | Pressed
