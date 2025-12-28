@@ -6,7 +6,7 @@ namespace EngineGame
 	{
 		m_Position = { 0.0f, 0.0f };
 		m_Speed = 100.0f;
-
+		
 		//Idle Anim
 		CreateAnim(&m_IdleAnim, 0.25f, 6, true);
 
@@ -19,17 +19,23 @@ namespace EngineGame
 		//Dead Anim
 		CreateAnim(&m_DeathAnim, 0.3f, 3, false);
 
+		//Attack Anim
+		CreateAnim(&m_AttackAnim, 0.05f, 6, false);
+
 		m_CurrentAnim = &m_IdleAnim;
 		UpdateCollider();
 	}
 
-	void Enemy::Update(float dt)
+	void Enemy::Update(float dt, const EngineMath::Vector2& playerPos)
 	{
 		if (m_AttackCooldown > 0.0f)
 			m_AttackCooldown -= dt;
 
 		if (m_DamageFlashTimer > 0.0f)
 			m_DamageFlashTimer -= dt;
+
+		if (CanAttack(playerPos))
+			ChangeState(EnemyState::Attack);
 
 		switch (m_State)
 		{
@@ -38,6 +44,9 @@ namespace EngineGame
 			break;
 		case EnemyState::Patrol:
 			UpdatePatrol(dt);
+			break;
+		case EnemyState::Attack:
+			UpdateAttack(dt);
 			break;
 		case EnemyState::Hurt:
 			UpdateHurt(dt);
@@ -87,37 +96,45 @@ namespace EngineGame
 		}
 	}
 
-	void Enemy::UpdateHurt(float dt)
-	{
-		if (m_KnockbackTimer > 0.0f)
-		{
-			m_KnockbackTimer -= dt;
-			MoveAndCollide({ m_KnockbackVel.x * dt, m_KnockbackVel.y * dt });
-		}
-
-		m_HurtTimer -= dt;
-		m_CurrentAnim->Update(dt);
-
-		if (m_HurtTimer <= 0.0f && m_CurrentAnim->IsFinished())
-		{
-			m_State = EnemyState::Idle;
-			m_CurrentAnim = &m_IdleAnim;
-			m_KnockbackVel = { 0, 0 };
-		}
-	}
-
-	void Enemy::UpdateDeath(float dt)
-	{
-		m_CurrentAnim->Update(dt);
-		if (m_CurrentAnim->IsFinished())
-			m_IsDead = true;
-	}
-
 	void Enemy::ChangeState(EnemyState newState)
 	{
 		m_State = newState;
 		m_StateTimer = 0.0f;
+
+		switch (newState)
+		{
+		case EnemyState::Attack:
+			m_IsAttacking = true;
+			m_HasHitThisAttack = false;
+			m_AttackAnim.Reset();
+			m_CurrentAnim = &m_AttackAnim;
+			break;
+
+		case EnemyState::Idle:
+			m_IsAttacking = false;
+			m_CurrentAnim = &m_IdleAnim;
+			break;
+
+		case EnemyState::Hurt:
+			m_IsAttacking = false;
+			break;
+
+		default:
+			break;
+		}
 	}
+	
+	bool Enemy::CanAttack(const EngineMath::Vector2& playerPos) const
+	{
+		if (m_State == EnemyState::Dead || m_State == EnemyState::Hurt || m_State == EnemyState::Attack)
+			return false;
+
+		float dist = std::abs(playerPos.x - m_Position.x);
+
+		return m_AttackCooldown <= 0.0f && dist <= m_AttackRange;
+	}
+
+	#pragma region Inherited Methods
 
 	void Enemy::Render(EngineCore::IRenderer* renderer,
 		const Camera2D& camera)
@@ -147,6 +164,9 @@ namespace EngineGame
 		case EnemyState::Patrol:
 			currentTexture = m_WalkTexture;
 			break;
+		case EnemyState::Attack:
+			currentTexture = m_AttackTexture;
+			break;
 		default:
 			currentTexture = m_IdleTexture;
 			break;
@@ -157,7 +177,7 @@ namespace EngineGame
 			src,
 			{ pX, pY, m_SpriteW, m_SpriteH },
 			flip);
-		
+
 		//Collider Debug
 		EngineCore::Color c = (m_State == EnemyState::Hurt) ? EngineCore::Color{ 0, 255, 0, 255 } : EngineCore::Color{ 255, 255, 255, 255 };
 		renderer->DrawRectOutline(
@@ -168,23 +188,66 @@ namespace EngineGame
 				m_Collider.h
 			},
 			c
-			);
+		);
+
+		EngineCore::Color c1 = IsDamageFrame() ? EngineCore::Color{ 255, 0, 0, 255 } : EngineCore::Color{ 255, 255, 255, 255 };
+		auto box = GetAttackBox();
+		renderer->DrawRectOutline({
+				box.x - camera.GetX(),
+				box.y - camera.GetY(),
+				box.w,
+				box.h
+			},
+			c1
+		);
 	}
 
-	void Enemy::OnDeath()
+	void Enemy::UpdateAttack(float dt)
 	{
-		m_State = EnemyState::Dead;
+		if (m_IsAttacking)
+		{
+			m_CurrentAnim->Update(dt);
 
-		m_DeathAnim.Reset();
-		m_CurrentAnim = &m_DeathAnim;
+			if (m_CurrentAnim->IsFinished())
+			{
+				m_AttackCooldown = m_AttackInterval;
+				m_IsAttacking = false;
+				m_HasHitThisAttack = false;
+				ChangeState(EnemyState::Idle);
+			}
+			return;
+		}
+	}
 
-		m_Collider.w = 0;
-		m_Collider.h = 0;
+	void Enemy::UpdateHurt(float dt)
+	{
+		if (m_KnockbackTimer > 0.0f)
+		{
+			m_KnockbackTimer -= dt;
+			MoveAndCollide({ m_KnockbackVel.x * dt, m_KnockbackVel.y * dt });
+		}
+
+		m_HurtTimer -= dt;
+		m_CurrentAnim->Update(dt);
+
+		if (m_HurtTimer <= 0.0f && m_CurrentAnim->IsFinished())
+		{
+			m_State = EnemyState::Idle;
+			m_CurrentAnim = &m_IdleAnim;
+			m_KnockbackVel = { 0, 0 };
+		}
+	}
+
+	void Enemy::UpdateDeath(float dt)
+	{
+		m_CurrentAnim->Update(dt);
+		if (m_CurrentAnim->IsFinished())
+			m_IsDead = true;
 	}
 
 	void Enemy::TakeDamage(float amount, bool objectDir)
 	{
-		if(m_State == EnemyState::Dead)
+		if (m_State == EnemyState::Dead)
 			return;
 
 		m_HP -= amount;
@@ -208,4 +271,17 @@ namespace EngineGame
 		m_KnockbackVel.y = -50.0f;
 		m_KnockbackTimer = m_KnockbackDuration;
 	}
+
+	void Enemy::OnDeath()
+	{
+		m_State = EnemyState::Dead;
+
+		m_DeathAnim.Reset();
+		m_CurrentAnim = &m_DeathAnim;
+
+		m_Collider.w = 0;
+		m_Collider.h = 0;
+	}
+
+	#pragma endregion
 }

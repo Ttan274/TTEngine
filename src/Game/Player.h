@@ -27,31 +27,26 @@ namespace EngineGame
 		Player();
 
 		//Base class methods
-		void Update(float dt) override;
 		void Render(EngineCore::IRenderer* renderer,
 					const Camera2D& camera) override;
-		void OnDeath() override;
 		void TakeDamage(float amount, bool objectDir) override;
 
+		//Player Spesific Methods
+		void Update(float dt);
 		void SetAttackTexture(Texture2D* aT1, Texture2D* aT2, Texture2D* aT3);
-		
-		const EngineCore::Rect& GetCollider() const { return m_Collider; }
-		EngineCore::Rect GetAttackBox() const;
-		bool IsAttacking() const { return m_IsAttacking;}
-		float GetAttackDamage() const { return m_AttackDamage; }
-		bool IsDamageFrame() const;
 		void SetSpawnPoint(const EngineMath::Vector2& pos) { m_SpawnPoint = pos; }
 		void Respawn();
-		
 
-		bool HasHitThisAttack() const { return m_HasHitThisAttack; }
-		void MarkHitDone() { m_HasHitThisAttack = true; }
-	
+	protected:
+		//Base Class Methods
+		void OnDeath() override;
+		void UpdateAttack(float dt) override;
+		void UpdateHurt(float dt) override;
+		void UpdateDeath(float dt) override;
+
 	private:
+		//Player Spesific Methods
 		void UpdateMovement(float dt);
-		void UpdateAttack(float dt);
-		void UpdateHurt(float dt);
-		void UpdateDeath(float dt);
 		void StartAttack(AttackStage stage);
 		void ResetCombo();
 		
@@ -64,13 +59,6 @@ namespace EngineGame
 
 		//Sprite
 		std::vector<Texture2D*> m_AttackTextures;
-
-		//Attack
-		bool m_IsAttacking = false;
-		float m_AttackCooldown = 0.0f;
-		float m_AttackInterval = 0.5f;
-		float m_AttackDamage = 10.0f;
-		bool m_HasHitThisAttack = false;
 
 		//Attack Combo
 		AttackStage m_AttackStage = AttackStage::None;

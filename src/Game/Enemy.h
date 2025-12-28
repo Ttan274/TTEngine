@@ -7,6 +7,7 @@ namespace EngineGame
 	{
 		Idle,
 		Patrol,
+		Attack,
 		Hurt,
 		Dead
 	};
@@ -17,22 +18,28 @@ namespace EngineGame
 		Enemy();
 
 		//Base class methods
-		void Update(float dt) override;
 		void Render(EngineCore::IRenderer* renderer,
 			const Camera2D& camera) override;
-		void OnDeath() override;
 		void TakeDamage(float amount, bool objectDir) override;
 
-		const EngineCore::Rect& GetCollider() const { return m_Collider; }
-		bool CanAttack() const { return m_AttackCooldown <= 0.0f; }
-		void ResetCooldown() { m_AttackCooldown = m_AttackInterval; }
+		//Enemy Spesific Methods
+		void Update(float dt, const EngineMath::Vector2& playerPos);
+		void SetAttackTexture(Texture2D* aT) { m_AttackTexture = aT; }
+		bool CanAttack(const EngineMath::Vector2& playerPos) const;
+	
+	protected:
+		//Base Class Methods
+		void OnDeath() override;
+		void UpdateHurt(float dt) override;
+		void UpdateDeath(float dt) override;
+		void UpdateAttack(float dt) override;
 
 	private:
+		//Enemy Spesific Methods
 		void UpdateIdle(float dt);
 		void UpdatePatrol(float dt);
-		void UpdateHurt(float dt);
-		void UpdateDeath(float dt);
 		void ChangeState(EnemyState newState);
+
 	private:
 		//State
 		EnemyState m_State = EnemyState::Idle;
@@ -41,9 +48,15 @@ namespace EngineGame
 		float m_PatrolDuration = 3.0f;
 		float m_Direction = 1.0f;
 
-		//Attack Cooldown
-		float m_AttackCooldown = 0.0f;
-		float m_AttackInterval = 1.0f;
+		//Animation
+		EngineCore::Animation m_AttackAnim;
+
+		//Sprite
+		Texture2D* m_AttackTexture = nullptr;
+
+		//Attack Detection
+		float m_DetectRange = 200.0f;
+		float m_AttackRange = 60.0f;
 
 		//Knockback
 		EngineMath::Vector2 m_KnockbackVel{ 0, 0 };

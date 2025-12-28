@@ -74,4 +74,33 @@ namespace EngineGame
 			anim->AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
 		}
 	}
+
+	EngineCore::Rect Entity::GetAttackBox() const
+	{
+		EngineCore::Rect attackBox;
+
+		attackBox.w = 40;
+		attackBox.h = m_Collider.h - 20;
+		attackBox.y = m_Collider.y + 10;
+		attackBox.x = m_FacingRight ? m_Collider.x + m_Collider.w : m_Collider.x - attackBox.w;
+
+		return attackBox;
+	}
+
+	bool Entity::IsDamageFrame() const
+	{
+		if (!m_IsAttacking || m_CurrentAnim == nullptr)
+			return false;
+
+		int frame = m_CurrentAnim->GetCurrentFrameIndex();
+		int count = m_CurrentAnim->GetFrameCount();
+
+		int center = count / 2;
+		int halfwidth = (count <= 3) ? 0 : 1;
+
+		int start = std::max(0, center - halfwidth);
+		int end = std::min(count - 1, center + halfwidth);
+
+		return frame >= start && frame <= end;
+	}
 }

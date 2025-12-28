@@ -130,6 +130,7 @@ namespace EnginePlatform
 		EngineGame::Texture2D* enemyWalk = AssetManager::GetTexture(path + "\\walk1.png");
 		EngineGame::Texture2D* enemyHurt = AssetManager::GetTexture(path + "\\hurt1.png");
 		EngineGame::Texture2D* enemyDeath = AssetManager::GetTexture(path + "\\dead1.png");
+		EngineGame::Texture2D* enemyAttack = AssetManager::GetTexture(path + "\\attack4.png");
 
 		//Enemy Spawning
 		EngineMath::Vector2 newPos;
@@ -141,6 +142,7 @@ namespace EnginePlatform
 			newPos.y = sp.y * m_TileMap->GetTileSize();
 
 			enemy->SetTexture(enemyIdle, enemyWalk, enemyHurt, enemyDeath);
+			enemy->SetAttackTexture(enemyAttack);
 			enemy->SetPosition(newPos);
 			enemy->SetWorld(m_TileMap.get());
 
@@ -258,7 +260,7 @@ namespace EnginePlatform
 		{
 			auto& e = *it;
 			EngineCore::Rect playerBox = m_Player.GetAttackBox();
-			e->Update(dt);
+			e->Update(dt, m_Player.GetPosition());
 
 			if (e->IsDead())
 			{
@@ -267,13 +269,13 @@ namespace EnginePlatform
 			}
 
 			//Enemy attack behaviour
-			if (Intersects(m_Player.GetCollider(), e->GetCollider()) && !m_Player.IsDead())
+			if (Intersects(e->GetAttackBox(), m_Player.GetCollider()) && !m_Player.IsDead())
 			{
-				if (e->CanAttack())
+				if (e->IsAttacking() && e->IsDamageFrame() && !e->HasHitThisAttack())
 				{
-					m_Player.TakeDamage(20, e->IsFacingRight());
-					e->ResetCooldown();
+					m_Player.TakeDamage(e->GetAttackDamage(), e->IsFacingRight());
 					m_Camera.StartShake(0.15f, 6.0f);
+					e->MarkHitDone();
 				}
 			}
 
