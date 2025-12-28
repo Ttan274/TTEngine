@@ -48,6 +48,9 @@ namespace EngineGame
 
 	void Player::Update(float dt)
 	{
+		if (m_DamageFlashTimer > 0.0f)
+			m_DamageFlashTimer -= dt;
+
 		switch (m_State)
 		{
 		case PlayerState::Normal:
@@ -272,6 +275,7 @@ namespace EngineGame
 			return;
 
 		m_HP -= amount;
+		m_DamageFlashTimer = m_DamageFlashDuration;
 
 		if (m_HP <= 0)
 		{
@@ -309,10 +313,7 @@ namespace EngineGame
 		m_CurrentAnim->Update(dt);
 		
 		if (m_CurrentAnim->IsFinished() && m_DeathTimer <= 0.0f)
-		{
 			m_IsDead = true;
-			Respawn();
-		}
 	}
 
 	void Player::Respawn()

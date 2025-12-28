@@ -34,7 +34,7 @@ namespace EngineCore
 
 		virtual void DrawTexture(EngineGame::Texture2D* texture, const Rect& rect) = 0;
 		virtual void DrawTexture(EngineGame::Texture2D* texture, const Rect& src, const Rect& dest, SpriteFlip flip) = 0;
-		virtual void DrawText(const std::string& text,
+		virtual void DrawUIText(const std::string& text,
 							 float x, float y,
 							 const Color& color = { 255, 255, 255, 255 }) = 0;
 	};

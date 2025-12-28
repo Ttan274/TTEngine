@@ -56,6 +56,37 @@ namespace EngineGame
 		m_Y = std::clamp(m_Y, 0.0f, maxY);
 	}
 
-	float Camera2D::GetX() const { return m_X; }
-	float Camera2D::GetY() const { return m_Y; }
+	float Camera2D::GetX() const 
+	{
+		float shakeX = 0.0f;
+		if (m_ShakeTimer > 0.0f)
+			shakeX = ((rand() % 200) / 100.0f - 1.0f) * m_ShakeStrength;
+		
+		return m_X + shakeX; 
+	}
+	float Camera2D::GetY() const 
+	{
+		float shakeY = 0.0f;
+		if (m_ShakeTimer > 0.0f)
+			shakeY = ((rand() % 200) / 100.0f - 1.0f) * m_ShakeStrength;
+
+		return m_Y + shakeY; 
+	}
+
+	void Camera2D::StartShake(float duration, float strength)
+	{
+		m_ShakeDuration = duration;
+		m_ShakeTimer = duration;
+		m_ShakeStrength = strength;
+	}
+	
+	void Camera2D::UpdateShake(float dt)
+	{
+		if (m_ShakeTimer > 0.0f)
+		{
+			m_ShakeTimer -= dt;
+			if (m_ShakeTimer < 0.0f)
+				m_ShakeTimer = 0.0f;
+		}
+	}
 }

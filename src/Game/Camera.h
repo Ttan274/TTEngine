@@ -17,6 +17,9 @@ namespace EngineGame
 
 		float GetX() const;
 		float GetY() const;
+
+		void StartShake(float duration, float strength);
+		void UpdateShake(float dt);
 	private:
 		void ApplyWorldBounds();
 
@@ -30,5 +33,10 @@ namespace EngineGame
 		float m_WorldHeight = 0.0f;
 
 		float m_Smoothness = 5.0f;
+
+		//Screen Shake
+		float m_ShakeTimer = 0.0f;
+		float m_ShakeDuration = 0.0f;
+		float m_ShakeStrength = 0.0f;
 	};
 }

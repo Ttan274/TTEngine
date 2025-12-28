@@ -25,8 +25,10 @@ namespace EngineGame
 		bool IsFacingRight() const { return m_FacingRight; }
 		bool IsDead() const { return m_IsDead; }
 
-		//Debug için sadece
 		float GetHp() const { return m_HP; }
+		float GetRatio() const { return m_HP / m_MaxHP; }
+		bool IsDamageFlashing() const { return m_DamageFlashTimer > 0.0f; }
+		float GetDamageFlashTimer() { return m_DamageFlashTimer; }
 
 	protected:
 		bool IsCollidingWithWorld(const EngineCore::Rect& rect) const;
@@ -66,6 +68,10 @@ namespace EngineGame
 		Texture2D* m_DeathTexture = nullptr;
 		float m_SpriteW = 128.0f;
 		float m_SpriteH = 128.0f;
+
+		//Damage Flash
+		float m_DamageFlashTimer = 0.0f;
+		float m_DamageFlashDuration = 0.2f;
 
 		//Collider
 		EngineCore::Rect m_Collider{};

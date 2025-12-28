@@ -10,8 +10,6 @@
 
 namespace EngineCore
 {
-	const std::string SCENE_PATH = "scene_test.json";
-
 	Application::Application()
 	{
 		Log::Init();
@@ -73,7 +71,7 @@ namespace EngineCore
 	void Application::Update(float deltaTime)
 	{
 		Debug::Update(deltaTime);
-		if (DebugOverlay::IsEnabled())
+		if (DebugOverlay::IsEnabled() && m_Scene.GetGameState() == EnginePlatform::GameState::Playing)
 		{
 			DebugOverlay::AddLine("FPS: " + std::to_string(Debug::GetFPS()));
 			DebugOverlay::AddLine("Player hp: " + std::to_string(m_Scene.GetPlayer().GetHp()));

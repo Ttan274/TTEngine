@@ -36,13 +36,13 @@ namespace EngineGame
 		void SetAttackTexture(Texture2D* aT1, Texture2D* aT2, Texture2D* aT3);
 		
 		const EngineCore::Rect& GetCollider() const { return m_Collider; }
-		
-		
 		EngineCore::Rect GetAttackBox() const;
 		bool IsAttacking() const { return m_IsAttacking;}
 		float GetAttackDamage() const { return m_AttackDamage; }
 		bool IsDamageFrame() const;
 		void SetSpawnPoint(const EngineMath::Vector2& pos) { m_SpawnPoint = pos; }
+		void Respawn();
+		
 
 		bool HasHitThisAttack() const { return m_HasHitThisAttack; }
 		void MarkHitDone() { m_HasHitThisAttack = true; }
@@ -54,7 +54,7 @@ namespace EngineGame
 		void UpdateDeath(float dt);
 		void StartAttack(AttackStage stage);
 		void ResetCombo();
-		void Respawn();
+		
 	private:
 		//State
 		PlayerState m_State = PlayerState::Normal;

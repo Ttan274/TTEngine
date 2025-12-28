@@ -42,7 +42,7 @@ namespace EngineCore
 			if (line.text.empty())
 				continue;
 
-			s_Renderer->DrawText(line.text, 5.0f, y);
+			s_Renderer->DrawUIText(line.text, 5.0f, y);
 
 			y += 18.0f;
 		}

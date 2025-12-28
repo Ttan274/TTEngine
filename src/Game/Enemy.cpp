@@ -28,6 +28,9 @@ namespace EngineGame
 		if (m_AttackCooldown > 0.0f)
 			m_AttackCooldown -= dt;
 
+		if (m_DamageFlashTimer > 0.0f)
+			m_DamageFlashTimer -= dt;
+
 		switch (m_State)
 		{
 		case EnemyState::Idle:
@@ -185,6 +188,7 @@ namespace EngineGame
 			return;
 
 		m_HP -= amount;
+		m_DamageFlashTimer = m_DamageFlashDuration;
 
 		if (m_HP <= 0)
 		{

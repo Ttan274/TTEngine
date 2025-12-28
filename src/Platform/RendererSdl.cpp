@@ -90,7 +90,7 @@ namespace EnginePlatform
         SDL_RenderTextureRotated(s_Renderer, texture->Get(), &s, &d, 0.0, nullptr, sdlFlip);
     }
 
-    void RendererSdl::DrawText(const std::string& text,
+    void RendererSdl::DrawUIText(const std::string& text,
         float x,
         float y,
         const EngineCore::Color& c)

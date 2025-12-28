@@ -26,7 +26,7 @@ namespace EnginePlatform
             const EngineCore::Rect& src,
             const EngineCore::Rect& dest,
             EngineCore::SpriteFlip flip) override;
-        void DrawText(const std::string& text,
+        void DrawUIText(const std::string& text,
             float x,
             float y,
             const EngineCore::Color& color) override;
