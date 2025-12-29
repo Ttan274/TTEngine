@@ -19,19 +19,28 @@ namespace EngineGame
 	{
 	public:
 		TileMap(int width, int height, int tileSize);
-		void LoadAssets();
-
-		void GenerateTestMap();
-		void Draw(EngineCore::IRenderer* renderer, const Camera2D& camera) const;
-		void DrawSolidDebug(EngineCore::IRenderer* renderer, const Camera2D& camera) const;
 		
-		bool IsSolid(const EngineCore::AABB& box) const;
-		bool IsSolidAt(float worldX, float worldY);
-		bool IsSolidAt(EngineMath::Vector2 pos);
+		void LoadAssets();
+		void GenerateTestMap();
+		
+		//Tile Queries
+		TileType GetTile(int x, int y) const;
+		bool IsWall(int x, int y) const;
+		bool IsGround(int x, int y) const;
+
+		//Collision Queries
+		bool IsSolidX(const EngineCore::AABB& box) const; // Wall Only
+		bool IsSolidY(const EngineCore::AABB& box, float velocityY) const; //Wall + Ground
+		bool IsGrounded(const EngineCore::AABB& box) const;
+
+		//Rendering
+		void Draw(EngineCore::IRenderer* renderer, const Camera2D& camera) const;
+		void DrawCollisionDebug(EngineCore::IRenderer* renderer, const Camera2D& camera) const;
 
 		float GetWorldWidth() const;
 		float GetWorldHeight() const;
 
+		//Setups
 		int GetTileSize() const { return m_TileSize; }
 		int GetHeight() const { return m_Height; }
 		int GetWidth() const { return m_Width; }
@@ -46,6 +55,5 @@ namespace EngineGame
 		Texture2D* m_WallTex;
 
 		std::vector<TileType> m_Tiles;
-		TileType GetTile(int x, int y) const;
 	};
 }

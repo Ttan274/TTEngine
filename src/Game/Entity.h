@@ -26,8 +26,10 @@ namespace EngineGame
 		EngineMath::Vector2 GetPosition() const { return m_Position; }
 		
 		//Colliders
-		const EngineCore::Rect& GetCollider() const { return m_Collider; }
+		const EngineCore::AABB& GetCollider() const { return m_Collider; }
 		EngineCore::Rect GetAttackBox() const;
+		float GetColliderW() const { return m_ColliderWidth; }
+		float GetColliderH() const { return m_ColliderHeight; }
 
 		//Direction
 		bool IsFacingRight() const { return m_FacingRight; }
@@ -49,7 +51,6 @@ namespace EngineGame
 		void MarkHitDone() { m_HasHitThisAttack = true; }
 
 	protected:
-		bool IsCollidingWithWorld(const EngineCore::Rect& rect) const;
 		void MoveAndCollide(const EngineMath::Vector2& velocity);
 		void UpdateCollider();
 		void CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop);
@@ -59,10 +60,12 @@ namespace EngineGame
 		virtual void UpdateAttack(float dt) = 0;
 		virtual void UpdateHurt(float dt) = 0;
 		virtual void UpdateDeath(float dt) = 0;
-		
+		virtual void UpdatePhysics(float dt) = 0;
+
 	protected:
 		//Movement
 		EngineMath::Vector2 m_Position{};
+		EngineMath::Vector2 m_Velocity{};
 		float m_Speed = 0.0f;
 		bool m_FacingRight = true;
 
@@ -103,7 +106,15 @@ namespace EngineGame
 		float m_DamageFlashDuration = 0.2f;
 
 		//Collider
-		EngineCore::Rect m_Collider{};
+		EngineCore::AABB m_Collider{};
+		float m_ColliderWidth = 32.0f;
+		float m_ColliderHeight = 64.0f;
+		bool m_IsGrounded = false;
+		bool m_ColliderEnabled = true;
+
+		//Physics
+		float m_Gravity = 200.0f;
+		float m_MaxFallSpeed = 800.0f;
 
 		//World Reference
 		TileMap* m_World = nullptr;

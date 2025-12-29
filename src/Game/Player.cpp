@@ -58,7 +58,7 @@ namespace EngineGame
 			break;
 		}
 
-		UpdateCollider();
+		UpdatePhysics(dt);
 	}
 
 	void Player::SetAttackTexture(Texture2D* aT1, Texture2D* aT2, Texture2D* aT3)
@@ -76,29 +76,34 @@ namespace EngineGame
 			return;
 		}
 
-		EngineMath::Vector2 movement{ 0, 0 };
+		//Horizontal Movement
+		float moveX = 0.0f;
 
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::W)) movement.y -= 1.0f;
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::S)) movement.y += 1.0f;
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::A)) movement.x -= 1.0f;
-		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::D)) movement.x += 1.0f;
+		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::A)) moveX -= 1.0f;
+		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::D)) moveX += 1.0f;
 	
-		m_IsMoving = (movement.x != 0.0f || movement.y != 0.0f);
+		m_Velocity.x = moveX * m_Speed;
+
+		//Facing
+		if (moveX > 0.0f)
+			m_FacingRight = true;
+		else if (moveX < 0.0f)
+			m_FacingRight = false;
+
+		//Animation
+		m_IsMoving = (moveX != 0.0f);
 		m_CurrentAnim = m_IsMoving ? &m_WalkAnim : &m_IdleAnim;
 		m_CurrentAnim->Update(dt);
 
-		if (movement.x > 0.0f)
-			m_FacingRight = true;
-		else if (movement.x < 0.0f)
-			m_FacingRight = false;
-
-		EngineMath::Vector2 velocity =
+		//Jump
+		if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::W))
 		{
-			movement.x * m_Speed * dt,
-			movement.y * m_Speed * dt
-		};
-
-		MoveAndCollide(velocity);
+			m_JumpBufferTimer = m_JumpBufferTime;
+		}
+		else
+		{
+			m_JumpBufferTimer -= dt;
+		}
 	}
 
 	void Player::StartAttack(AttackStage stage)
@@ -136,13 +141,28 @@ namespace EngineGame
 		m_CurrentAnim->Reset();
 	}
 
+	void Player::Jump()
+	{
+		if (m_CoyoteTimer > 0.0f && m_JumpBufferTimer > 0.0f)
+		{
+			m_Velocity.y = -m_JumpForce;
+			m_IsGrounded = false;
+
+			m_CoyoteTimer = 0.0f;
+			m_JumpBufferTimer = 0.0f;
+		}
+	}
+
 	#pragma region Inherited Methods
 
 	void Player::Render(EngineCore::IRenderer* renderer,
 		const Camera2D& camera)
 	{
-		float pX = m_Position.x - camera.GetX();
-		float pY = m_Position.y - camera.GetY();
+		float spriteOffsetX = (m_ColliderWidth - m_SpriteW) * 0.5f;
+		float spriteOffsetY = m_ColliderHeight - m_SpriteH;
+
+		float pX = m_Position.x + spriteOffsetX - camera.GetX();
+		float pY = m_Position.y + spriteOffsetY - camera.GetY();
 
 		SDL_FRect sldRect = m_CurrentAnim->GetCurrentFrame();
 		EngineCore::Rect src =
@@ -179,27 +199,25 @@ namespace EngineGame
 		//Collider Debug
 		renderer->DrawRectOutline(
 			{
-				m_Collider.x - camera.GetX(),
-				m_Collider.y - camera.GetY(),
-				m_Collider.w,
-				m_Collider.h
+				m_Collider.Left() - camera.GetX(),
+				m_Collider.Top() - camera.GetY(),
+				m_Collider.Width(),
+				m_Collider.Height()
 			},
 			{ 255, 0, 0, 255 });
 
 
-		if (IsAttacking())
-		{
-			EngineCore::Color c = IsDamageFrame() ? EngineCore::Color{ 255, 0, 0, 255 } : EngineCore::Color{ 255, 255, 255, 255 };
-			auto box = GetAttackBox();
-			renderer->DrawRectOutline({
-					box.x - camera.GetX(),
-					box.y - camera.GetY(),
-					box.w,
-					box.h
-				},
-				c
-			);
-		}
+		EngineCore::Color c = IsDamageFrame() ? EngineCore::Color{ 255, 0, 0, 255 } : EngineCore::Color{ 255, 255, 255, 255 };
+		auto box = GetAttackBox();
+		renderer->DrawRectOutline({
+				box.x - camera.GetX(),
+				box.y - camera.GetY(),
+				box.w,
+				box.h
+			},
+			c
+		);
+			
 	}
 
 	void Player::UpdateHurt(float dt)
@@ -268,6 +286,9 @@ namespace EngineGame
 		if (m_State == PlayerState::Dead)
 			return;
 
+		m_IsAttacking = false;
+		m_HasHitThisAttack = false;
+
 		m_HP -= amount;
 		m_DamageFlashTimer = m_DamageFlashDuration;
 
@@ -286,7 +307,7 @@ namespace EngineGame
 		//Knockback
 		float dir = objectDir ? 1.0f : -1.0f;
 		m_KnockbackVel.x = dir * 100.0f;
-		m_KnockbackVel.y = dir * -50.0f;
+		m_KnockbackVel.y = -100.0f;
 	}
 
 	void Player::OnDeath()
@@ -299,6 +320,33 @@ namespace EngineGame
 		m_CurrentAnim->Reset();
 
 		m_KnockbackVel = { 0, 0 };
+	}
+
+	void Player::UpdatePhysics(float dt)
+	{
+		if (m_IsDead)
+			return;
+
+		//Gravity
+		if (!m_IsGrounded)
+		{
+			m_CoyoteTimer -= dt;
+			m_Velocity.y += m_Gravity * dt;
+
+			if (m_Velocity.y > m_MaxFallSpeed)
+				m_Velocity.y = m_MaxFallSpeed;
+		}
+
+		MoveAndCollide(m_Velocity * dt);
+
+		//Grounded Behaviour
+		if (m_IsGrounded)
+		{
+			m_Velocity.y = 0.0f;
+			m_CoyoteTimer = m_CoyoteTime;
+		}
+
+		Jump();
 	}
 
 	#pragma endregion

@@ -43,12 +43,14 @@ namespace EngineGame
 		void UpdateAttack(float dt) override;
 		void UpdateHurt(float dt) override;
 		void UpdateDeath(float dt) override;
+		void UpdatePhysics(float dt) override;
 
 	private:
 		//Player Spesific Methods
 		void UpdateMovement(float dt);
 		void StartAttack(AttackStage stage);
 		void ResetCombo();
+		void Jump();
 		
 	private:
 		//State
@@ -73,5 +75,12 @@ namespace EngineGame
 
 		//SpawnPoint
 		EngineMath::Vector2 m_SpawnPoint;
+
+		//Physics
+		float m_JumpForce = 150.0f;
+		float m_CoyoteTime = 0.1f;
+		float m_CoyoteTimer = 0.0f;
+		float m_JumpBufferTimer = 0.0f;
+		float m_JumpBufferTime = 0.1f;
 	};
 }

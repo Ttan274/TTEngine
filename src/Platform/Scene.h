@@ -27,7 +27,6 @@ namespace EnginePlatform
 		void LoadCamera();
 		void Update(float dt);
 		void Render(EngineCore::IRenderer* renderer);
-		bool Intersects(const EngineCore::Rect& a, const EngineCore::Rect& b);	//?
 		void ChangeGameState(GameState newState);
 		GameState GetGameState() { return m_GameState; }
 		void RenderPlayerHP(EngineCore::IRenderer* renderer);

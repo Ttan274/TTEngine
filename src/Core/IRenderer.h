@@ -1,17 +1,13 @@
 #pragma once
 #include <string>
 #include "Game/Texture.h"
+#include "Core/AABB.h"
 
 namespace EngineCore
 {
 	struct Color
 	{
 		unsigned char r, g, b, a;
-	};
-
-	struct Rect
-	{
-		float x, y, w, h;
 	};
 
 	enum class SpriteFlip

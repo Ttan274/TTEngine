@@ -1,4 +1,5 @@
 #include "Game/Enemy.h"
+#include "Core/Math/Collision.h"
 
 namespace EngineGame
 {
@@ -26,7 +27,7 @@ namespace EngineGame
 		UpdateCollider();
 	}
 
-	void Enemy::Update(float dt, const EngineMath::Vector2& playerPos)
+	void Enemy::Update(float dt, const EngineMath::Vector2& playerPos, const EngineCore::AABB& playerColldier)
 	{
 		if (m_AttackCooldown > 0.0f)
 			m_AttackCooldown -= dt;
@@ -34,7 +35,7 @@ namespace EngineGame
 		if (m_DamageFlashTimer > 0.0f)
 			m_DamageFlashTimer -= dt;
 
-		if (CanAttack(playerPos))
+		if (CanAttack(playerPos, playerColldier))
 			ChangeState(EnemyState::Attack);
 
 		switch (m_State)
@@ -56,7 +57,7 @@ namespace EngineGame
 			break;
 		}
 
-		UpdateCollider();
+		UpdatePhysics(dt);
 	}
 
 	void Enemy::UpdateIdle(float dt)
@@ -124,14 +125,29 @@ namespace EngineGame
 		}
 	}
 	
-	bool Enemy::CanAttack(const EngineMath::Vector2& playerPos) const
+	bool Enemy::CanAttack(const EngineMath::Vector2& playerPos,
+						  const EngineCore::AABB& playerCollider) const
 	{
-		if (m_State == EnemyState::Dead || m_State == EnemyState::Hurt || m_State == EnemyState::Attack)
+		if (m_State == EnemyState::Dead || m_State == EnemyState::Hurt || m_State == EnemyState::Attack || m_AttackCooldown > 0.0f)
 			return false;
 
-		float dist = std::abs(playerPos.x - m_Position.x);
+		bool isFacingToPlayer =
+			(m_FacingRight && playerPos.x > m_Position.x) ||
+			(!m_FacingRight && playerPos.x < m_Position.x);
 
-		return m_AttackCooldown <= 0.0f && dist <= m_AttackRange;
+		if (!isFacingToPlayer)
+			return false;
+
+		//X
+		float distX = std::abs(playerPos.x - m_Position.x);
+		if (distX > m_AttackRangeX)
+			return false;
+
+		//Y
+		if (std::abs(m_Collider.Bottom() - playerCollider.Bottom()) > m_AttackRangeY)
+			return false;
+
+		return true;
 	}
 
 	#pragma region Inherited Methods
@@ -139,8 +155,11 @@ namespace EngineGame
 	void Enemy::Render(EngineCore::IRenderer* renderer,
 		const Camera2D& camera)
 	{
-		float pX = m_Position.x - camera.GetX();
-		float pY = m_Position.y - camera.GetY();
+		float spriteOffsetX = (m_ColliderWidth - m_SpriteW) * 0.5f;
+		float spriteOffsetY = m_ColliderHeight - m_SpriteH;
+
+		float pX = m_Position.x + spriteOffsetX - camera.GetX();
+		float pY = m_Position.y + spriteOffsetY - camera.GetY();
 
 		SDL_FRect sldRect = m_CurrentAnim->GetCurrentFrame();
 		EngineCore::Rect src =
@@ -182,10 +201,10 @@ namespace EngineGame
 		EngineCore::Color c = (m_State == EnemyState::Hurt) ? EngineCore::Color{ 0, 255, 0, 255 } : EngineCore::Color{ 255, 255, 255, 255 };
 		renderer->DrawRectOutline(
 			{
-				m_Collider.x - camera.GetX(),
-				m_Collider.y - camera.GetY(),
-				m_Collider.w,
-				m_Collider.h
+				m_Collider.Left() - camera.GetX(),
+				m_Collider.Top() - camera.GetY(),
+				m_Collider.Width(),
+				m_Collider.Height()
 			},
 			c
 		);
@@ -266,8 +285,8 @@ namespace EngineGame
 		m_CurrentAnim->Reset();
 
 		//Knockback
-		float forceX = objectDir ? 1.0f : -1.0f;
-		m_KnockbackVel.x = forceX * 100.0f;
+		float dir = objectDir ? 1.0f : -1.0f;
+		m_KnockbackVel.x = dir * 100.0f;
 		m_KnockbackVel.y = -50.0f;
 		m_KnockbackTimer = m_KnockbackDuration;
 	}
@@ -279,8 +298,27 @@ namespace EngineGame
 		m_DeathAnim.Reset();
 		m_CurrentAnim = &m_DeathAnim;
 
-		m_Collider.w = 0;
-		m_Collider.h = 0;
+		m_ColliderEnabled = false;
+	}
+
+	void Enemy::UpdatePhysics(float dt)
+	{
+		if (m_IsDead)
+			return;
+
+		if (!m_IsGrounded)
+		{
+			m_Velocity.y += m_Gravity * dt;
+
+			if (m_Velocity.y > m_MaxFallSpeed)
+				m_Velocity.y = m_MaxFallSpeed;
+		}
+
+		MoveAndCollide(m_Velocity * dt);
+
+		//Grounded Behaviour
+		if (m_IsGrounded)
+			m_Velocity.y = 0.0f;
 	}
 
 	#pragma endregion

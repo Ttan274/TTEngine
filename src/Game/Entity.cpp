@@ -16,45 +16,45 @@ namespace EngineGame
 
 	void Entity::MoveAndCollide(const EngineMath::Vector2& velocity)
 	{
-		if (!m_World)
+		if (!m_World || !m_ColliderEnabled)
 			return;		
 
-		EngineMath::Vector2 oldPos = m_Position;
+		//X axis collision
+		EngineCore::AABB nextX = m_Collider;
+		nextX.Translate({ velocity.x, 0.0f });
 
-		EngineCore::Rect nextX = m_Collider;
-		nextX.x += velocity.x;
-
-		if (!IsCollidingWithWorld(nextX))
+		if (!m_World->IsSolidX(nextX))
 		{
 			m_Position.x += velocity.x;
+			m_Collider = nextX;
 		}
-			
-		EngineCore::Rect nextY = m_Collider;
-		nextY.y += velocity.y;
+		
+		//Y axis collision
+		EngineCore::AABB nextY = m_Collider;
+		nextY.Translate({0.0f, velocity.y});
 
-		if (!IsCollidingWithWorld(nextY))
+		if (!m_World->IsSolidY(nextY, velocity.y))
 		{
 			m_Position.y += velocity.y;
+			m_Collider = nextY;
 		}
-	}
+		else
+		{
+			m_Velocity.y = 0.0f;
+		}
 
-	bool Entity::IsCollidingWithWorld(const EngineCore::Rect& rect) const
-	{
-		if (!m_World) return false;
-
-		return
-			m_World->IsSolidAt(rect.x, rect.y) ||
-			m_World->IsSolidAt(rect.x + rect.w, rect.y) ||
-			m_World->IsSolidAt(rect.x, rect.y + rect.h) ||
-			m_World->IsSolidAt(rect.x + rect.w, rect.y + rect.h);
+		m_IsGrounded = m_World->IsGrounded(m_Collider);
+		UpdateCollider();
 	}
 
 	void Entity::UpdateCollider()
 	{
-		m_Collider.x = m_Position.x + 50;
-		m_Collider.y = m_Position.y + 50;
-		m_Collider.w = 32;
-		m_Collider.h = 80;
+		m_Collider.SetFromPositionSize(
+			m_Position.x,
+			m_Position.y,
+			m_ColliderWidth,
+			m_ColliderHeight
+		);
 	}
 	
 	void Entity::SetTexture(Texture2D* idleT, Texture2D* walkT, Texture2D* hurtT, Texture2D* deadT)
@@ -79,10 +79,10 @@ namespace EngineGame
 	{
 		EngineCore::Rect attackBox;
 
-		attackBox.w = 40;
-		attackBox.h = m_Collider.h - 20;
-		attackBox.y = m_Collider.y + 10;
-		attackBox.x = m_FacingRight ? m_Collider.x + m_Collider.w : m_Collider.x - attackBox.w;
+		attackBox.w = 40.0f;
+		attackBox.h = m_Collider.Height() - 20.0f;
+		attackBox.y = m_Collider.Top() + 10.0f;
+		attackBox.x = m_FacingRight ? m_Collider.Right() : m_Collider.Left() - attackBox.w;
 
 		return attackBox;
 	}

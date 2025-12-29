@@ -23,9 +23,10 @@ namespace EngineGame
 		void TakeDamage(float amount, bool objectDir) override;
 
 		//Enemy Spesific Methods
-		void Update(float dt, const EngineMath::Vector2& playerPos);
+		void Update(float dt, const EngineMath::Vector2& playerPos, const EngineCore::AABB& playerCollider);
 		void SetAttackTexture(Texture2D* aT) { m_AttackTexture = aT; }
-		bool CanAttack(const EngineMath::Vector2& playerPos) const;
+		bool CanAttack(const EngineMath::Vector2& playerPos, 
+					   const EngineCore::AABB& playerCollider) const;
 	
 	protected:
 		//Base Class Methods
@@ -33,6 +34,7 @@ namespace EngineGame
 		void UpdateHurt(float dt) override;
 		void UpdateDeath(float dt) override;
 		void UpdateAttack(float dt) override;
+		void UpdatePhysics(float dt) override;
 
 	private:
 		//Enemy Spesific Methods
@@ -55,8 +57,8 @@ namespace EngineGame
 		Texture2D* m_AttackTexture = nullptr;
 
 		//Attack Detection
-		float m_DetectRange = 200.0f;
-		float m_AttackRange = 60.0f;
+		float m_AttackRangeX = 60.0f;
+		float m_AttackRangeY = 20.0f;
 
 		//Knockback
 		EngineMath::Vector2 m_KnockbackVel{ 0, 0 };

@@ -3,6 +3,7 @@
 #include "Game/MapLoader.h"
 #include "Core/Log.h"
 #include "Core/PathUtil.h"
+#include "Core/Math/Collision.h"
 
 namespace EnginePlatform
 {
@@ -96,7 +97,16 @@ namespace EnginePlatform
 			newPos.x = pos.x * m_TileMap->GetTileSize();
 			newPos.y = pos.y * m_TileMap->GetTileSize();
 
-			if (m_TileMap->IsSolidAt(newPos))
+			EngineCore::AABB spawnBox;
+			spawnBox.SetFromPositionSize(
+				newPos.x,
+				newPos.y,
+				m_Player.GetColliderW(),
+				m_Player.GetColliderH()
+			);
+
+			//Wall Overlap Check
+			if (m_TileMap->IsSolidX(spawnBox) || m_TileMap->IsSolidY(spawnBox, -1.0f))
 			{
 				EngineCore::Log::Write(
 					EngineCore::LogLevel::Warning,
@@ -119,6 +129,7 @@ namespace EnginePlatform
 			newPos.x = m_TileMap->GetTileSize();
 			newPos.y = m_TileMap->GetTileSize();
 			m_Player.SetPosition(newPos);
+			m_Player.SetSpawnPoint(newPos);
 		}
 	}
 
@@ -183,7 +194,7 @@ namespace EnginePlatform
 			break;
 		case GameState::Playing:
 			m_TileMap->Draw(renderer, m_Camera);
-			m_TileMap->DrawSolidDebug(renderer, m_Camera);
+			m_TileMap->DrawCollisionDebug(renderer, m_Camera);
 			m_Player.Render(renderer, m_Camera);
 			RenderPlayerHP(renderer);
 			for (auto& e : m_Enemies)
@@ -197,16 +208,6 @@ namespace EnginePlatform
 			renderer->DrawUIText("PRESS F9 TO MAIN MENU", 300, 300, { 255, 255, 255, 255 });
 			break;
 		}
-	}
-
-	bool Scene::Intersects(const EngineCore::Rect& a, const EngineCore::Rect& b)
-	{
-		return !(
-			a.x + a.w < b.x ||
-			a.x > b.x + b.w ||
-			a.y + a.h < b.y ||
-			a.y > b.y + b.h
-			);
 	}
 
 	void Scene::ChangeGameState(GameState newState)
@@ -259,9 +260,11 @@ namespace EnginePlatform
 		for (auto it = m_Enemies.begin(); it != m_Enemies.end();)
 		{
 			auto& e = *it;
-			EngineCore::Rect playerBox = m_Player.GetAttackBox();
-			e->Update(dt, m_Player.GetPosition());
 
+			//Enemy AI update
+			e->Update(dt, m_Player.GetPosition(), m_Player.GetCollider());
+
+			//Enemy died
 			if (e->IsDead())
 			{
 				it = m_Enemies.erase(it);
@@ -269,18 +272,23 @@ namespace EnginePlatform
 			}
 
 			//Enemy attack behaviour
-			if (Intersects(e->GetAttackBox(), m_Player.GetCollider()) && !m_Player.IsDead())
+			if (!m_Player.IsDead())
 			{
-				if (e->IsAttacking() && e->IsDamageFrame() && !e->HasHitThisAttack())
+				const EngineCore::Rect eAttackBox = e->GetAttackBox();
+				if (EngineMath::RectIntersectsAABB(eAttackBox, m_Player.GetCollider()))
 				{
-					m_Player.TakeDamage(e->GetAttackDamage(), e->IsFacingRight());
-					m_Camera.StartShake(0.15f, 6.0f);
-					e->MarkHitDone();
+					if (e->IsAttacking() && e->IsDamageFrame() && !e->HasHitThisAttack())
+					{
+						m_Player.TakeDamage(e->GetAttackDamage(), e->IsFacingRight());
+						m_Camera.StartShake(0.15f, 6.0f);
+						e->MarkHitDone();
+					}
 				}
 			}
 
 			//Player attack behaviour
-			if (Intersects(playerBox, e->GetCollider()))
+			const EngineCore::Rect pAttackBox = m_Player.GetAttackBox();
+			if (EngineMath::RectIntersectsAABB(pAttackBox, e->GetCollider()))
 			{
 				if (m_Player.IsAttacking() && m_Player.IsDamageFrame() && !m_Player.HasHitThisAttack())
 				{
@@ -339,17 +347,17 @@ namespace EnginePlatform
 		if (ratio <= 0.0f)
 			return;
 
-		EngineCore::Rect col = enemy->GetCollider();
+		//EngineCore::Rect col = enemy->GetCollider();
 
-		float x = col.x + col.w * 0.5f - HP_BAR_W_EN * 0.5f - m_Camera.GetX();
-		float y = col.y - 10 - m_Camera.GetY();
+		//float x = col.x + col.w * 0.5f - HP_BAR_W_EN * 0.5f - m_Camera.GetX();
+		//float y = col.y - 10 - m_Camera.GetY();
 
-		EngineCore::Color hpColor = { 200, 40, 40, 255 };
-		if (enemy->IsDamageFlashing())
-			hpColor = { 255, 255, 255, 255 };
+		//EngineCore::Color hpColor = { 200, 40, 40, 255 };
+		//if (enemy->IsDamageFlashing())
+		//	hpColor = { 255, 255, 255, 255 };
 
-		renderer->DrawRect({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 40, 40, 40, 255 });	//Background
-		renderer->DrawRect({ x, y, (HP_BAR_W_EN * ratio), (float)HP_BAR_H_EN }, hpColor);	//HP area
-		renderer->DrawRectOutline({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 255, 255, 255, 255 });
+		//renderer->DrawRect({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 40, 40, 40, 255 });	//Background
+		//renderer->DrawRect({ x, y, (HP_BAR_W_EN * ratio), (float)HP_BAR_H_EN }, hpColor);	//HP area
+		//renderer->DrawRectOutline({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 255, 255, 255, 255 });
 	}
 }

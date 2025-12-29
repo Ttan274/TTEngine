@@ -160,6 +160,7 @@
     <ClInclude Include="..\src\Core\Input.h" />
     <ClInclude Include="..\src\Core\IRenderer.h" />
     <ClInclude Include="..\src\Core\Log.h" />
+    <ClInclude Include="..\src\Core\Math\Collision.h" />
     <ClInclude Include="..\src\Core\Math\Vector2.h" />
     <ClInclude Include="..\src\Core\PathUtil.h" />
     <ClInclude Include="..\src\Core\Time.h" />
