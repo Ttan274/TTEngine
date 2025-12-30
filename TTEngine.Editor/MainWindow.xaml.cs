@@ -8,6 +8,7 @@ using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models;
 using TTEngine.Editor.Services;
 using System.Diagnostics;
+using TTEngine.Editor.Panels;
 
 namespace TTEngine.Editor
 {
@@ -24,76 +25,22 @@ namespace TTEngine.Editor
         private Stack<TileBatchCommand> _redoStack = new();
         private TileBatchCommand _currentBatch;
         private ToolMode _currentToolMode = ToolMode.Brush;
+        private TileType _currentTileType = TileType.Ground;
+        private SelectionModel _currentSelection = new();
         private const string LIVE_MAP_PATH = @"..\..\..\..\Maps\active_map.json";
         private const string ENGINE_PATH = @"..\..\..\..\x64\Debug\TTEngine.exe";
 
         public MainWindow()
         {
             InitializeComponent();
-            CommandBindings.Add(new CommandBinding(
-                ApplicationCommands.Undo,
-                (_, _) => Undo()
-            ));
-
-            CommandBindings.Add(new CommandBinding(
-                ApplicationCommands.Redo,
-                (_, _) => Redo()
-            ));
-
-            BrushSizeSlider.Value = 1;
+            WindowSetup();
             _tileMap.Init();
-            
             DrawGrid();
             CreateHoverRect();
         }
 
-        private void DrawGrid()
-        {
-            //Mapcanvas settings
-            MapCanvas.Children.Clear();
-            MapCanvas.Width = _tileMap.Width * _tileMap.TileSize;
-            MapCanvas.Height = _tileMap.Height * _tileMap.TileSize;
-            MapCanvas.Background = Brushes.Transparent;
+        #region Mouse Events
 
-            for (int y = 0; y < _tileMap.Height; y++)
-            {
-                for (int x = 0; x < _tileMap.Width; x++)
-                {
-                    int index = _tileMap.GetIndex(x, y);
-                    int tile = _tileMap.Tiles[index];
-
-                    Rectangle rect = new Rectangle
-                    {
-                        Width = _tileMap.TileSize,
-                        Height = _tileMap.TileSize,
-                        Stroke = Brushes.Gray,
-                        Fill = tile switch
-                        {
-                            (int)TileType.None => Brushes.DimGray,
-                            (int)TileType.Ground => Brushes.LightGreen,
-                            (int)TileType.Wall => Brushes.DarkSlateGray,
-                            _ => Brushes.Magenta
-                        }, 
-                        IsHitTestVisible = false
-                    };
-
-                    Canvas.SetLeft(rect, x * _tileMap.TileSize);
-                    Canvas.SetTop(rect, y * _tileMap.TileSize);
-
-                    MapCanvas.Children.Add(rect);
-                }
-            }
-
-            if (_hoverRect != null && !MapCanvas.Children.Contains(_hoverRect))
-            {
-                MapCanvas.Children.Add(_hoverRect);
-            }
-
-            DrawPlayerSpawn();
-            DrawEnemySpawns();
-        }
-    
-        //Mouse Events
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             _isPainting = true;
@@ -101,76 +48,90 @@ namespace TTEngine.Editor
 
             Point pos = e.GetPosition(MapCanvas);
 
-            //Player Spawn Tool
-            if (_currentToolMode == ToolMode.PlayerSpawn && e.LeftButton == MouseButtonState.Pressed)
+            if (TryGetTilePosition(pos, out int sx, out int sy))
+                HandleSelection(sx, sy);
+
+            if(Keyboard.IsKeyDown(Key.LeftAlt))
             {
-                int tileX = (int)(pos.X / _tileMap.TileSize);
-                int tileY = (int)(pos.Y / _tileMap.TileSize);
-
-                if (tileX < 0 || tileY < 0 ||
-                tileX >= _tileMap.Width || tileY >= _tileMap.Height)
-                {
-                    Mouse.Capture(null);
-                    _isPainting = false;
-                    return;
-                }
-
-                _tileMap.PlayerSpawn = new Point(tileX, tileY);
-                DrawGrid();
-
-                Mouse.Capture(null);
                 _isPainting = false;
-                return;
-            }
-            else if(_currentToolMode == ToolMode.EnemySpawn)
-            {
-                int tileX = (int)(pos.X / _tileMap.TileSize);
-                int tileY = (int)(pos.Y / _tileMap.TileSize);
-
-                if (tileX < 0 || tileY < 0 ||
-                tileX >= _tileMap.Width || tileY >= _tileMap.Height)
-                {
-                    Mouse.Capture(null);
-                    _isPainting = false;
-                    return;
-                }
-
-                Point p = new Point(tileX, tileY);
-
-                if(e.LeftButton == MouseButtonState.Pressed)
-                {
-                    if (!_tileMap.EnemySpawns.Contains(p))
-                        _tileMap.EnemySpawns.Add(p);
-                }
-                else if(e.RightButton == MouseButtonState.Pressed)
-                {
-                    _tileMap.EnemySpawns.Remove(p);
-                }
-                DrawGrid();
-
                 Mouse.Capture(null);
-                _isPainting = false;
                 return;
             }
 
-
-            //Fill and Brush Tools
-            _currentBatch = new TileBatchCommand();
-
-            if (_currentToolMode == ToolMode.Fill && e.LeftButton == MouseButtonState.Pressed)
+            bool handled = _currentToolMode switch
             {
-                Fill(pos);
+                ToolMode.PlayerSpawn => HandlePlayerSpawn(pos),
+                ToolMode.EnemySpawn => HandleEnemySpawn(pos, e),
+                ToolMode.Fill => e.LeftButton == MouseButtonState.Pressed && HandleFill(pos),
+                _ => false
+            };
 
+            if (!handled)
+                HandleBrush(pos, e);
+
+            if(_currentToolMode != ToolMode.Brush)
+            {
                 Mouse.Capture(null);
                 _isPainting = false;
+            }
+        }
+
+        private void HandleSelection(int x, int y)
+        {
+            if (_tileMap.PlayerSpawn.X == x && _tileMap.PlayerSpawn.Y == y)
+            {
+                _currentSelection = new SelectionModel
+                {
+                    Type = SelectionType.Player,
+                    Spawn = new Point(x, y)
+                };
+
+                ShowInspector();
                 return;
             }
-            else
+
+            //foreach (var spawn in _tileMap.EnemySpawns)
+            //{
+            //    if (spawn.X == x && spawn.Y == y)
+            //    {
+            //        _currentSelection = new SelectionModel
+            //        {
+            //            Type = SelectionType.Enemy,
+            //            EnemySpawn = spawn
+            //        };
+
+            //        ShowInspector();
+            //        return;
+            //    }
+            //}
+
+
+            //_currentSelection = new SelectionModel
+            //{
+            //    Type = SelectionType.Tile,
+            //    TileX = x,
+            //    TileY = y
+            //};
+
+            ShowInspector();
+        }
+
+        private void ShowInspector()
+        {
+            switch (_currentSelection.Type)
             {
-                if (e.RightButton == MouseButtonState.Pressed)
-                    EraseTile(e.GetPosition(MapCanvas));
-                else if (e.LeftButton == MouseButtonState.Pressed)
-                    PaintTile(e.GetPosition(MapCanvas));
+                case SelectionType.Tile:
+
+                    break;
+                case SelectionType.Player:
+                    Inspector.SetContent(new PlayerSpawnInspector(_currentSelection.Spawn));
+                    break;
+                case SelectionType.Enemy:
+                    
+                    break;
+                default:
+                    Inspector.Clear();
+                    break;
             }
         }
 
@@ -207,18 +168,17 @@ namespace TTEngine.Editor
             _hoverRect.Visibility = Visibility.Hidden;
         }
 
-        //Text Events
-        private void BrushSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (BrushSizeLabel == null)
-                return;
+        #endregion
 
-            _brushSize = (int)e.NewValue;
-            BrushSizeLabel.Text = $"Size: {_brushSize}x{_brushSize}";
-        }
+        #region Button Events
 
-        //Button Events
-        private void SaveMap_Click(object sender, RoutedEventArgs e)
+        private void OnSaveRequested() => SaveMap(this, new RoutedEventArgs());
+        
+        private void OnLoadRequested() => LoadMap(this, new RoutedEventArgs());
+       
+        private void OnStartRequested() => StartGame(this, new RoutedEventArgs());
+
+        private void SaveMap(object sender, RoutedEventArgs e)
         {
             var data = new TileMapData
             {
@@ -234,7 +194,7 @@ namespace TTEngine.Editor
             MapFileService.Save(LIVE_MAP_PATH, data);
         }
 
-        private void LoadMap_Click(object sender, RoutedEventArgs e)
+        private void LoadMap(object sender, RoutedEventArgs e)
         {
             TileMapData data = MapFileService.Load(LIVE_MAP_PATH);
 
@@ -251,18 +211,81 @@ namespace TTEngine.Editor
             DrawGrid();
         }
 
-        private void BrushTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.Brush;
+        private void StartGame(object sender, RoutedEventArgs e) => Process.Start(ENGINE_PATH, LIVE_MAP_PATH);
 
-        private void FillTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.Fill;
+        #endregion
 
-        private void PlayerSpawnTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.PlayerSpawn;
+        #region Methods
 
-        private void EnemySpawnTool_Checked(object sender, RoutedEventArgs e) => _currentToolMode = ToolMode.EnemySpawn;
+        //Setup
+        private void WindowSetup()
+        {
+            CommandBindings.Add(new CommandBinding(
+                ApplicationCommands.Undo,
+                (_, _) => Undo()
+            ));
 
-        private void StartGame_Click(object sender, RoutedEventArgs e) => Process.Start(ENGINE_PATH, LIVE_MAP_PATH);
+            CommandBindings.Add(new CommandBinding(
+                ApplicationCommands.Redo,
+                (_, _) => Redo()
+            ));
 
+            TileTools.ToolModeChanged += mode => _currentToolMode = mode;
+            TileTools.TileTypeChanged += type => _currentTileType = type;
+            TileTools.BrushSizechanged += size => _brushSize = size;
 
-        //Methods
+            TileTools.SaveClicked += OnSaveRequested;
+            TileTools.LoadClicked += OnLoadRequested;
+            TileTools.StartGameClicked += OnStartRequested;
+        }
+
+        //Canvas Methods
+        private void DrawGrid()
+        {
+            //Mapcanvas settings
+            MapCanvas.Children.Clear();
+            MapCanvas.Width = _tileMap.Width * _tileMap.TileSize;
+            MapCanvas.Height = _tileMap.Height * _tileMap.TileSize;
+            MapCanvas.Background = Brushes.Transparent;
+
+            for (int y = 0; y < _tileMap.Height; y++)
+            {
+                for (int x = 0; x < _tileMap.Width; x++)
+                {
+                    int index = _tileMap.GetIndex(x, y);
+                    int tile = _tileMap.Tiles[index];
+
+                    Rectangle rect = new Rectangle
+                    {
+                        Width = _tileMap.TileSize,
+                        Height = _tileMap.TileSize,
+                        Stroke = Brushes.Gray,
+                        Fill = tile switch
+                        {
+                            (int)TileType.None => Brushes.DimGray,
+                            (int)TileType.Ground => Brushes.LightGreen,
+                            (int)TileType.Wall => Brushes.DarkSlateGray,
+                            _ => Brushes.Magenta
+                        },
+                        IsHitTestVisible = false
+                    };
+
+                    Canvas.SetLeft(rect, x * _tileMap.TileSize);
+                    Canvas.SetTop(rect, y * _tileMap.TileSize);
+
+                    MapCanvas.Children.Add(rect);
+                }
+            }
+
+            if (_hoverRect != null && !MapCanvas.Children.Contains(_hoverRect))
+            {
+                MapCanvas.Children.Add(_hoverRect);
+            }
+
+            DrawPlayerSpawn();
+            DrawEnemySpawns();
+        }
+
         private void CreateHoverRect()
         {
             _hoverRect = new Rectangle
@@ -348,6 +371,66 @@ namespace TTEngine.Editor
             }
         }
 
+        //Mouse Event Helpers
+        private bool TryGetTilePosition(Point pos, out int tileX, out int tileY)
+        {
+            tileX = (int)(pos.X / _tileMap.TileSize);
+            tileY = (int)(pos.Y / _tileMap.TileSize);
+
+            if (tileX < 0 || tileY < 0 ||
+            tileX >= _tileMap.Width || tileY >= _tileMap.Height)
+                return false;
+
+            return true;
+        }
+
+        private bool HandlePlayerSpawn(Point pos)
+        {
+            if (!TryGetTilePosition(pos, out int x, out int y))
+                return false;
+
+            _tileMap.PlayerSpawn = new Point(x, y);
+            DrawGrid();
+            return true;
+        }
+
+        private bool HandleEnemySpawn(Point pos, MouseButtonEventArgs e)
+        {
+            if (!TryGetTilePosition(pos, out int x, out int y))
+                return false;
+
+            Point p = new Point(x, y);
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (!_tileMap.EnemySpawns.Contains(p))
+                    _tileMap.EnemySpawns.Add(p);
+            }
+            else if (e.RightButton == MouseButtonState.Pressed)
+            {
+                _tileMap.EnemySpawns.Remove(p);
+            }
+
+            DrawGrid();
+            return true;
+        }
+
+        private bool HandleFill(Point pos)
+        {
+            _currentBatch = new TileBatchCommand();
+            Fill(pos);
+            return true;
+        }
+
+        private void HandleBrush(Point pos, MouseButtonEventArgs e)
+        {
+            _currentBatch = new TileBatchCommand();
+            if (e.RightButton == MouseButtonState.Pressed)
+                EraseTile(e.GetPosition(MapCanvas));
+            else if (e.LeftButton == MouseButtonState.Pressed)
+                PaintTile(e.GetPosition(MapCanvas));
+        }
+
         private void PaintTile(Point pos) => PaintingHelper(pos, true);
 
         private void EraseTile(Point pos) => PaintingHelper(pos, false);
@@ -362,8 +445,7 @@ namespace TTEngine.Editor
 
             int startIndex = _tileMap.GetIndex(startX, startY);
             int targetValue = _tileMap.Tiles[startIndex];
-            int newValue = WallRadio.IsChecked == true ? (int)TileType.Wall :
-                           GroundRadio.IsChecked == true ? (int)TileType.Ground : targetValue;
+            int newValue = (int)_currentTileType;
 
             if (targetValue == newValue)
                 return;
@@ -406,6 +488,52 @@ namespace TTEngine.Editor
             }
         }
 
+        private void PaintingHelper(Point pos, bool isPaint)
+        {
+            int baseX = (int)(pos.X / _tileMap.TileSize);
+            int baseY = (int)(pos.Y / _tileMap.TileSize);
+
+            for (int y = 0; y < _brushSize; y++)
+            {
+                for (int x = 0; x < _brushSize; x++)
+                {
+                    int tx = baseX + x;
+                    int ty = baseY + y;
+
+                    if (tx < 0 || ty < 0 || tx >= _tileMap.Width || ty >= _tileMap.Height)
+                        continue;
+
+                    int index = _tileMap.GetIndex(tx, ty);
+
+                    if (isPaint)
+                    {
+                        ApplyTileChange(index, (int)_currentTileType);
+                    }
+                    else
+                    {
+                        ApplyTileChange(index, (int)TileType.None);
+                    }
+
+                }
+            }
+
+            DrawGrid();
+        }
+
+        private void ApplyTileChange(int index, int newValue)
+        {
+            int oldValue = _tileMap.Tiles[index];
+
+            if (oldValue == newValue)
+                return;
+
+            var command = new TileChangeCommand(index, oldValue, newValue);
+
+            command.Redo(_tileMap.Tiles);
+            _currentBatch?.Add(command);
+        }
+
+        //Stack Methods
         private void Undo()
         {
             if (_undoStack.Count == 0)
@@ -430,53 +558,6 @@ namespace TTEngine.Editor
             DrawGrid();
         }
 
-        //Helper methods
-        private void PaintingHelper(Point pos, bool isPaint)
-        {
-            int baseX = (int)(pos.X / _tileMap.TileSize);
-            int baseY = (int)(pos.Y / _tileMap.TileSize);
-
-            for (int y = 0; y < _brushSize; y++)
-            {
-                for (int x = 0; x < _brushSize; x++)
-                {
-                    int tx = baseX + x;
-                    int ty = baseY + y;
-
-                    if (tx < 0 || ty < 0 || tx >= _tileMap.Width || ty >= _tileMap.Height)
-                        continue;
-
-                    int index = _tileMap.GetIndex(tx, ty);
-
-                    if(isPaint)
-                    {
-                        if (WallRadio.IsChecked == true)
-                            ApplyTileChange(index, (int)TileType.Wall);
-                        else if (GroundRadio.IsChecked == true)
-                            ApplyTileChange(index, (int)TileType.Ground);
-                    }
-                    else
-                    {
-                        ApplyTileChange(index, (int)TileType.None);
-                    }
-                    
-                }
-            }
-
-            DrawGrid();
-        }
-    
-        private void ApplyTileChange(int index, int newValue)
-        {
-            int oldValue = _tileMap.Tiles[index];
-
-            if (oldValue == newValue)
-                return;
-
-            var command = new TileChangeCommand(index, oldValue, newValue);
-
-            command.Redo(_tileMap.Tiles);
-            _currentBatch?.Add(command);
-        }
+        #endregion
     }
 }

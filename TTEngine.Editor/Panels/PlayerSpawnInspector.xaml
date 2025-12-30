@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="TTEngine.Editor.Panels.PlayerSpawnInspector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel>
+        <TextBlock Text="Player Spawn"
+                   FontWeight="Bold"
+                   FontSize="14"/>
+        <TextBlock x:Name="PosText"/>
+    </StackPanel>
+</UserControl>
