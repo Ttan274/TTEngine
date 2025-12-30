@@ -90,28 +90,28 @@ namespace TTEngine.Editor
                 return;
             }
 
-            //foreach (var spawn in _tileMap.EnemySpawns)
-            //{
-            //    if (spawn.X == x && spawn.Y == y)
-            //    {
-            //        _currentSelection = new SelectionModel
-            //        {
-            //            Type = SelectionType.Enemy,
-            //            EnemySpawn = spawn
-            //        };
+            foreach (var spawn in _tileMap.EnemySpawns)
+            {
+                if (spawn.X == x && spawn.Y == y)
+                {
+                    _currentSelection = new SelectionModel
+                    {
+                        Type = SelectionType.Enemy,
+                        Spawn = new Point(spawn.X, spawn.Y)
+                    };
 
-            //        ShowInspector();
-            //        return;
-            //    }
-            //}
+                    ShowInspector();
+                    return;
+                }
+            }
 
 
-            //_currentSelection = new SelectionModel
-            //{
-            //    Type = SelectionType.Tile,
-            //    TileX = x,
-            //    TileY = y
-            //};
+            _currentSelection = new SelectionModel
+            {
+                Type = SelectionType.Tile,
+                TileX = x,
+                TileY = y
+            };
 
             ShowInspector();
         }
@@ -121,13 +121,14 @@ namespace TTEngine.Editor
             switch (_currentSelection.Type)
             {
                 case SelectionType.Tile:
-
+                    int index = _tileMap.GetIndex(_currentSelection.TileX, _currentSelection.TileY);
+                    Inspector.SetContent(new TileSpawnInspector(_currentSelection.TileX, _currentSelection.TileY, _tileMap.Tiles[index]));
                     break;
                 case SelectionType.Player:
                     Inspector.SetContent(new PlayerSpawnInspector(_currentSelection.Spawn));
                     break;
                 case SelectionType.Enemy:
-                    
+                    Inspector.SetContent(new EnemySpawnInspector(_currentSelection.Spawn));
                     break;
                 default:
                     Inspector.Clear();
