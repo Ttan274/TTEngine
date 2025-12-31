@@ -16,7 +16,7 @@ namespace TTEngine.Editor.Models
         public int TileSize { get; set; } = 50;
         public int[] Tiles { get; set; }
         public Point PlayerSpawn { get; set; } = new Point(-1, -1);
-        public List<Point> EnemySpawns { get; set; } = new();
+        public List<EnemySpawnModel> EnemySpawns { get; set; } = new();
 
         public void Init()
         {

@@ -1,0 +1,16 @@
+[
+  {
+    "Id": "Samurai",
+    "Speed": 80,
+    "AttackDamage": 10,
+    "AttackInterval": 0.5,
+    "MaxHP": 70
+  },
+  {
+    "Id": "Boss",
+    "Speed": 120,
+    "AttackDamage": 30,
+    "AttackInterval": 0.5,
+    "MaxHP": 100
+  }
+]

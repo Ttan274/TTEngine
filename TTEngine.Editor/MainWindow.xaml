@@ -21,6 +21,10 @@
         <panels:TileToolPanel   x:Name="TileTools"
                                 Grid.Column="0"/>
 
+        <Button Content="Entity Definitions"
+                Margin="22,522,22,10"
+                Click="OpenDefinitiosns"/>
+
         <!-- CENTER: MAP -->
         <ScrollViewer Grid.Column="1"
                       HorizontalScrollBarVisibility="Auto"

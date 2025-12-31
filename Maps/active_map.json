@@ -1508,24 +1508,29 @@
   "PlayerSpawnY": 3,
   "EnemySpawns": [
     {
-      "X": 5,
-      "Y": 18
+      "X": 6,
+      "Y": 4,
+      "DefinitionId": "Samurai"
     },
     {
-      "X": 26,
-      "Y": 18
-    },
-    {
-      "X": 5,
-      "Y": 11
-    },
-    {
-      "X": 14,
-      "Y": 3
+      "X": 4,
+      "Y": 13,
+      "DefinitionId": "Samurai"
     },
     {
       "X": 22,
-      "Y": 11
+      "Y": 11,
+      "DefinitionId": "Samurai"
+    },
+    {
+      "X": 24,
+      "Y": 19,
+      "DefinitionId": "Samurai"
+    },
+    {
+      "X": 4,
+      "Y": 19,
+      "DefinitionId": "Samurai"
     }
   ]
 }

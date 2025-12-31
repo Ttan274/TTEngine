@@ -11,5 +11,7 @@ namespace TTEngine.Editor.Models
         public int TileY { get; set; }
 
         public Point Spawn {  get; set; }
+
+        public EnemySpawnModel EnemySpawnModel { get; set; }
     }
 }

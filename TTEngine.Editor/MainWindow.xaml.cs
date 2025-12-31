@@ -27,8 +27,9 @@ namespace TTEngine.Editor
         private ToolMode _currentToolMode = ToolMode.Brush;
         private TileType _currentTileType = TileType.Ground;
         private SelectionModel _currentSelection = new();
-        private const string LIVE_MAP_PATH = @"..\..\..\..\Maps\active_map.json";
+        private List<EntityDefinitionModel> _entityDefinitions;
         private const string ENGINE_PATH = @"..\..\..\..\x64\Debug\TTEngine.exe";
+        
 
         public MainWindow()
         {
@@ -76,65 +77,6 @@ namespace TTEngine.Editor
             }
         }
 
-        private void HandleSelection(int x, int y)
-        {
-            if (_tileMap.PlayerSpawn.X == x && _tileMap.PlayerSpawn.Y == y)
-            {
-                _currentSelection = new SelectionModel
-                {
-                    Type = SelectionType.Player,
-                    Spawn = new Point(x, y)
-                };
-
-                ShowInspector();
-                return;
-            }
-
-            foreach (var spawn in _tileMap.EnemySpawns)
-            {
-                if (spawn.X == x && spawn.Y == y)
-                {
-                    _currentSelection = new SelectionModel
-                    {
-                        Type = SelectionType.Enemy,
-                        Spawn = new Point(spawn.X, spawn.Y)
-                    };
-
-                    ShowInspector();
-                    return;
-                }
-            }
-
-
-            _currentSelection = new SelectionModel
-            {
-                Type = SelectionType.Tile,
-                TileX = x,
-                TileY = y
-            };
-
-            ShowInspector();
-        }
-
-        private void ShowInspector()
-        {
-            switch (_currentSelection.Type)
-            {
-                case SelectionType.Tile:
-                    int index = _tileMap.GetIndex(_currentSelection.TileX, _currentSelection.TileY);
-                    Inspector.SetContent(new TileSpawnInspector(_currentSelection.TileX, _currentSelection.TileY, _tileMap.Tiles[index]));
-                    break;
-                case SelectionType.Player:
-                    Inspector.SetContent(new PlayerSpawnInspector(_currentSelection.Spawn));
-                    break;
-                case SelectionType.Enemy:
-                    Inspector.SetContent(new EnemySpawnInspector(_currentSelection.Spawn));
-                    break;
-                default:
-                    Inspector.Clear();
-                    break;
-            }
-        }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
@@ -189,15 +131,20 @@ namespace TTEngine.Editor
                 Tiles = _tileMap.Tiles,
                 PlayerSpawnX = _tileMap.PlayerSpawn.X,
                 PlayerSpawnY = _tileMap.PlayerSpawn.Y,
-                EnemySpawns = _tileMap.EnemySpawns.Select(p => new SpawnDto { X = p.X, Y = p.Y }).ToList()
+                EnemySpawns = _tileMap.EnemySpawns.Select(p => new SpawnDto
+                {
+                    X = p.Position.X,
+                    Y = p.Position.Y,
+                    DefinitionId = p.DefinitionId,
+                }).ToList()
             };
 
-            MapFileService.Save(LIVE_MAP_PATH, data);
+            MapFileService.Save(data);
         }
 
         private void LoadMap(object sender, RoutedEventArgs e)
         {
-            TileMapData data = MapFileService.Load(LIVE_MAP_PATH);
+            TileMapData data = MapFileService.Load();
 
             _tileMap.Width = data.Width;
             _tileMap.Height = data.Height;
@@ -207,20 +154,30 @@ namespace TTEngine.Editor
             _tileMap.EnemySpawns.Clear();
 
             foreach (var sp in data.EnemySpawns)
-                _tileMap.EnemySpawns.Add(new Point(sp.X, sp.Y));
+            {
+                _tileMap.EnemySpawns.Add(new EnemySpawnModel
+                {
+                    Position = new Point(sp.X, sp.Y),
+                    DefinitionId = sp.DefinitionId,
+                });
+            }
 
             DrawGrid();
         }
 
-        private void StartGame(object sender, RoutedEventArgs e) => Process.Start(ENGINE_PATH, LIVE_MAP_PATH);
+        private void StartGame(object sender, RoutedEventArgs e) => Process.Start(ENGINE_PATH, MapFileService.GetMapPath());
+
+        private void OpenDefinitiosns(object sender, RoutedEventArgs e) => Inspector.SetContent(new EntityDefinitionPanel(_entityDefinitions));
 
         #endregion
 
-        #region Methods
+        #region Setup Methods
 
         //Setup
         private void WindowSetup()
         {
+            _entityDefinitions = EntityDefinitionService.Load();
+
             CommandBindings.Add(new CommandBinding(
                 ApplicationCommands.Undo,
                 (_, _) => Undo()
@@ -350,8 +307,8 @@ namespace TTEngine.Editor
         {
             foreach (var spawn in _tileMap.EnemySpawns)
             {
-                double cx = (spawn.X + 0.5) * _tileMap.TileSize;
-                double cy = (spawn.Y + 0.5) * _tileMap.TileSize;
+                double cx = (spawn.Position.X + 0.5) * _tileMap.TileSize;
+                double cy = (spawn.Position.Y + 0.5) * _tileMap.TileSize;
 
                 Ellipse e = new Ellipse
                 {
@@ -372,7 +329,74 @@ namespace TTEngine.Editor
             }
         }
 
+        #endregion
+
+        #region Mouse Event Helpers
         //Mouse Event Helpers
+        private void HandleSelection(int x, int y)
+        {
+            if (_tileMap.PlayerSpawn.X == x && _tileMap.PlayerSpawn.Y == y)
+            {
+                _currentSelection = new SelectionModel
+                {
+                    Type = SelectionType.Player,
+                    Spawn = new Point(x, y)
+                };
+
+                ShowInspector();
+                return;
+            }
+
+            foreach (var spawn in _tileMap.EnemySpawns)
+            {
+                if (spawn.Position.X == x && spawn.Position.Y == y)
+                {
+                    _currentSelection = new SelectionModel
+                    {
+                        Type = SelectionType.Enemy,
+                        EnemySpawnModel = new EnemySpawnModel
+                        {
+                            Position = spawn.Position,
+                            DefinitionId = spawn.DefinitionId
+                        }
+                    };
+
+                    ShowInspector();
+                    return;
+                }
+            }
+
+
+            _currentSelection = new SelectionModel
+            {
+                Type = SelectionType.Tile,
+                TileX = x,
+                TileY = y
+            };
+
+            ShowInspector();
+        }
+
+        private void ShowInspector()
+        {
+            switch (_currentSelection.Type)
+            {
+                case SelectionType.Tile:
+                    int index = _tileMap.GetIndex(_currentSelection.TileX, _currentSelection.TileY);
+                    Inspector.SetContent(new TileSpawnInspector(_currentSelection.TileX, _currentSelection.TileY, _tileMap.Tiles[index]));
+                    break;
+                case SelectionType.Player:
+                    Inspector.SetContent(new PlayerSpawnInspector(_currentSelection.Spawn));
+                    break;
+                case SelectionType.Enemy:
+                    Inspector.SetContent(new EnemySpawnInspector(_currentSelection.EnemySpawnModel, _entityDefinitions));
+                    break;
+                default:
+                    Inspector.Clear();
+                    break;
+            }
+        }
+
         private bool TryGetTilePosition(Point pos, out int tileX, out int tileY)
         {
             tileX = (int)(pos.X / _tileMap.TileSize);
@@ -400,16 +424,24 @@ namespace TTEngine.Editor
             if (!TryGetTilePosition(pos, out int x, out int y))
                 return false;
 
-            Point p = new Point(x, y);
+            var existing = _tileMap.EnemySpawns
+                                   .FirstOrDefault(s => s.Position.X == x && s.Position.Y == y);
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (!_tileMap.EnemySpawns.Contains(p))
-                    _tileMap.EnemySpawns.Add(p);
+                if(existing == null)
+                {
+                    _tileMap.EnemySpawns.Add(new EnemySpawnModel
+                    {
+                        Position = new Point(x, y),
+                        DefinitionId = _entityDefinitions.FirstOrDefault().Id     //need update
+                    });
+                }
             }
             else if (e.RightButton == MouseButtonState.Pressed)
             {
-                _tileMap.EnemySpawns.Remove(p);
+                if(existing != null)
+                    _tileMap.EnemySpawns.Remove(existing);
             }
 
             DrawGrid();
@@ -533,7 +565,9 @@ namespace TTEngine.Editor
             command.Redo(_tileMap.Tiles);
             _currentBatch?.Add(command);
         }
+        #endregion
 
+        #region Stack Methods
         //Stack Methods
         private void Undo()
         {
