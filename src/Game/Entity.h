@@ -7,6 +7,15 @@
 
 namespace EngineGame
 {
+	struct EntityDefs
+	{
+		std::string defId;
+		float speed;
+		float attackDamage;
+		float attackInterval;
+		float maxHp;
+	};
+
 	class Entity
 	{
 	public:
@@ -20,6 +29,7 @@ namespace EngineGame
 		//Basic Methods
 		void SetTexture(Texture2D* idleT, Texture2D* walkT, Texture2D* hurtT, Texture2D* deadT);
 		void SetWorld(TileMap* world);
+		void ApplyDefinition(const EntityDefs& def);
 		
 		//Position
 		void SetPosition(EngineMath::Vector2 pos) { m_Position.x = pos.x; m_Position.y = pos.y; };

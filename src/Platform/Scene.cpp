@@ -1,6 +1,5 @@
 #include "Platform/Scene.h"
 #include "Platform/AssetManager.h"
-#include "Game/MapLoader.h"
 #include "Core/Log.h"
 #include "Core/PathUtil.h"
 #include "Core/Math/Collision.h"
@@ -32,8 +31,7 @@ namespace EnginePlatform
 
 		//Map Loading
 		std::string mapPath = EngineCore::GetRootDirectory("Maps", "active_map.json");
-		EngineGame::MapData mapData;
-		if (!EngineGame::MapLoader::LoadFromFile(mapPath, mapData))
+		if (!EngineGame::MapLoader::LoadFromFile(mapPath, m_MapData))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Fatal,
@@ -44,12 +42,12 @@ namespace EnginePlatform
 		}
 
 		//Tilemap Creation
-		m_TileMap = std::make_unique<EngineGame::TileMap>(mapData.w, mapData.h, mapData.tSize);
+		m_TileMap = std::make_unique<EngineGame::TileMap>(m_MapData.w, m_MapData.h, m_MapData.tSize);
 		
 		std::vector<EngineGame::TileType> tiles;
-		tiles.reserve(mapData.tiles.size());
+		tiles.reserve(m_MapData.tiles.size());
 
-		for (int v : mapData.tiles)
+		for (int v : m_MapData.tiles)
 			tiles.push_back(static_cast<EngineGame::TileType>(v));
 
 		m_TileMap->SetTiles(tiles);
@@ -61,104 +59,164 @@ namespace EnginePlatform
 			"Map Loaded + TileMap initialized"
 		);
 		
-		std::string exeDir = EngineCore::GetExecutableDirectory();
-		LoadPlayer(exeDir, mapData.playerSpawn);
-		LoadEnemy(exeDir, mapData.enemySpawns);
+		//Entity Definitions loaded
+		std::string defPath = EngineCore::GetRootDirectory("Data", "entity_def.json");
+		if (!EngineGame::MapLoader::LoadEntityDefs(defPath, m_EntityDefs))
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Fatal,
+				EngineCore::LogCategory::Scene,
+				"Failed to load entity.json"
+			);
+			return;
+		}
+
+		LoadSpawnEntities();
 		LoadCamera();
 
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
-			"Camera + Player + Enemy Loaded. Scene Completed"
+			"Camera + Player + Enemies Loaded. Scene Completed"
 		);
 	}
 
-	void Scene::LoadPlayer(std::string exeDir, EngineMath::Vector2 pos)
+	void Scene::LoadSpawnEntities()
+	{
+		std::string exeDir = EngineCore::GetExecutableDirectory();
+
+		for (const auto& spawn : m_MapData.spawns)
+		{
+			auto it = m_EntityDefs.find(spawn.defId);
+			if (it == m_EntityDefs.end())
+			{
+				EngineCore::Log::Write(
+					EngineCore::LogLevel::Warning,
+					EngineCore::LogCategory::Scene,
+					"Unknown entity def : " + spawn.defId
+				);
+				continue;
+			}
+
+			const EngineGame::EntityDefs& def = it->second;
+
+			//Selecting is it player or enemy
+			if (spawn.defId == "Player")
+			{
+				if (m_PlayerSpawned)
+				{
+					EngineCore::Log::Write(
+						EngineCore::LogLevel::Warning,
+						EngineCore::LogCategory::Scene,
+						"Multiple player spawns found iggnoring the extra one"
+					);
+					continue;
+				}
+
+				LoadPlayer(exeDir, spawn, def);
+				m_PlayerSpawned = true;
+			}
+			else
+			{
+				LoadEnemy(exeDir, spawn, def);
+			}
+		}
+
+		if (!m_PlayerSpawned)
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Fatal,
+				EngineCore::LogCategory::Scene,
+				"No Player spawn found in map!"
+			);
+		}
+	}
+
+	void Scene::LoadPlayer(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
 	{
 		//Player Loading
 		std::string path = exeDir + "\\Assets/Textures";
+
+		//Set Textures
 		m_Player.SetTexture(
 			AssetManager::GetTexture(path + "\\idle.png"),
 			AssetManager::GetTexture(path + "\\walk.png"),
 			AssetManager::GetTexture(path + "\\hurt.png"),
 			AssetManager::GetTexture(path + "\\dead.png")
-			);
+		);
 		m_Player.SetAttackTexture(
 			AssetManager::GetTexture(path + "\\attack1.png"),
 			AssetManager::GetTexture(path + "\\attack2.png"),
 			AssetManager::GetTexture(path + "\\attack3.png")
-			);
+		);
+
+		//Set World Reference
 		m_Player.SetWorld(m_TileMap.get());
-		
+
+		//Set Definitions
+		m_Player.ApplyDefinition(def);
+
+		//Set Position
 		EngineMath::Vector2 newPos;
-		//Player Spawning
-		if (pos.x >= 0 && pos.y >= 0)
+		newPos.x = spawn.x * m_TileMap->GetTileSize();
+		newPos.y = spawn.y * m_TileMap->GetTileSize();
+
+		EngineCore::AABB spawnBox;
+		spawnBox.SetFromPositionSize(
+			newPos.x,
+			newPos.y,
+			m_Player.GetColliderW(),
+			m_Player.GetColliderH()
+		);
+
+		//Wall Overlap Check
+		if (m_TileMap->IsSolidX(spawnBox) || m_TileMap->IsSolidY(spawnBox, -1.0f))
 		{
-			newPos.x = pos.x * m_TileMap->GetTileSize();
-			newPos.y = pos.y * m_TileMap->GetTileSize();
-
-			EngineCore::AABB spawnBox;
-			spawnBox.SetFromPositionSize(
-				newPos.x,
-				newPos.y,
-				m_Player.GetColliderW(),
-				m_Player.GetColliderH()
-			);
-
-			//Wall Overlap Check
-			if (m_TileMap->IsSolidX(spawnBox) || m_TileMap->IsSolidY(spawnBox, -1.0f))
-			{
-				EngineCore::Log::Write(
-					EngineCore::LogLevel::Warning,
-					EngineCore::LogCategory::Scene,
-					"Player spawn is on a wall tile!"
-				);
-			}
-
-			m_Player.SetPosition(newPos);
-			m_Player.SetSpawnPoint(newPos);
 			EngineCore::Log::Write(
-				EngineCore::LogLevel::Info,
+				EngineCore::LogLevel::Warning,
 				EngineCore::LogCategory::Scene,
-				"Player pos : " + std::to_string(newPos.x) + "," + std::to_string(newPos.y)
+				"Player spawn is on a wall tile!"
 			);
 		}
-		else
-		{
-			// Fallback (spawn yoksa)
-			newPos.x = m_TileMap->GetTileSize();
-			newPos.y = m_TileMap->GetTileSize();
-			m_Player.SetPosition(newPos);
-			m_Player.SetSpawnPoint(newPos);
-		}
+
+		//Set position and spawn point
+		m_Player.SetPosition(newPos);
+		m_Player.SetSpawnPoint(newPos);
+		EngineCore::Log::Write(
+			EngineCore::LogLevel::Info,
+			EngineCore::LogCategory::Scene,
+			"Player pos : " + std::to_string(newPos.x) + "," + std::to_string(newPos.y)
+		);
 	}
 
-	void Scene::LoadEnemy(std::string exeDir, std::vector<EngineMath::Vector2> spawns)
+	void Scene::LoadEnemy(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
 	{
 		//Enemy Loading
 		std::string path = exeDir + "\\Assets/Textures";
-		EngineGame::Texture2D* enemyIdle = AssetManager::GetTexture(path + "\\idle1.png");
-		EngineGame::Texture2D* enemyWalk = AssetManager::GetTexture(path + "\\walk1.png");
-		EngineGame::Texture2D* enemyHurt = AssetManager::GetTexture(path + "\\hurt1.png");
-		EngineGame::Texture2D* enemyDeath = AssetManager::GetTexture(path + "\\dead1.png");
-		EngineGame::Texture2D* enemyAttack = AssetManager::GetTexture(path + "\\attack4.png");
+		auto enemy = std::make_unique<EngineGame::Enemy>();
 
-		//Enemy Spawning
+		//Set Textures
+		enemy->SetTexture(AssetManager::GetTexture(path + "\\idle1.png"),
+						  AssetManager::GetTexture(path + "\\walk1.png"),
+						  AssetManager::GetTexture(path + "\\hurt1.png"),
+						  AssetManager::GetTexture(path + "\\dead1.png"));
+
+		enemy->SetAttackTexture(AssetManager::GetTexture(path + "\\attack4.png"));
+
+		//Set World Reference
+		enemy->SetWorld(m_TileMap.get());
+
+		//Set Definitions
+		enemy->ApplyDefinition(def);
+
+		//Set Position
 		EngineMath::Vector2 newPos;
-		for (auto& sp : spawns)
-		{
-			auto enemy = std::make_unique<EngineGame::Enemy>();
+		newPos.x = spawn.x * m_TileMap->GetTileSize();
+		newPos.y = spawn.y * m_TileMap->GetTileSize();
+		enemy->SetPosition(newPos);
 
-			newPos.x = sp.x * m_TileMap->GetTileSize();
-			newPos.y = sp.y * m_TileMap->GetTileSize();
-
-			enemy->SetTexture(enemyIdle, enemyWalk, enemyHurt, enemyDeath);
-			enemy->SetAttackTexture(enemyAttack);
-			enemy->SetPosition(newPos);
-			enemy->SetWorld(m_TileMap.get());
-
-			m_Enemies.push_back(std::move(enemy));
-		}
+		//Add new enemy to the array
+		m_Enemies.push_back(std::move(enemy));
 	}
 
 	void Scene::LoadCamera()
@@ -343,21 +401,21 @@ namespace EnginePlatform
 	void Scene::RenderEnemyHP(EngineCore::IRenderer* renderer, EngineGame::Enemy* enemy)
 	{
 		float ratio = enemy->GetRatio();
-
 		if (ratio <= 0.0f)
 			return;
 
-		//EngineCore::Rect col = enemy->GetCollider();
+		const EngineCore::AABB& col = enemy->GetCollider();
 
-		//float x = col.x + col.w * 0.5f - HP_BAR_W_EN * 0.5f - m_Camera.GetX();
-		//float y = col.y - 10 - m_Camera.GetY();
+		float centerX = col.Left() + col.Width() * 0.5f;
+		float x = centerX - HP_BAR_W_EN * 0.5f - m_Camera.GetX();
+		float y = col.Top() - 25.0f - m_Camera.GetY();
 
-		//EngineCore::Color hpColor = { 200, 40, 40, 255 };
-		//if (enemy->IsDamageFlashing())
-		//	hpColor = { 255, 255, 255, 255 };
+		EngineCore::Color hpColor = { 200, 40, 40, 255 };
+		if (enemy->IsDamageFlashing())
+			hpColor = { 255, 255, 255, 255 };
 
-		//renderer->DrawRect({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 40, 40, 40, 255 });	//Background
-		//renderer->DrawRect({ x, y, (HP_BAR_W_EN * ratio), (float)HP_BAR_H_EN }, hpColor);	//HP area
-		//renderer->DrawRectOutline({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 255, 255, 255, 255 });
+		renderer->DrawRect({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 40, 40, 40, 255 });	//Background
+		renderer->DrawRect({ x, y, (HP_BAR_W_EN * ratio), HP_BAR_H_EN }, hpColor);	//HP area
+		renderer->DrawRectOutline({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 255, 255, 255, 255 });
 	}
 }

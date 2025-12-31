@@ -22,17 +22,11 @@ namespace EngineGame
 
 		json j;
 		file >> j;
-
+		
+		//Loading Map Data
 		outMap.w = j["Width"];
 		outMap.h = j["Height"];
 		outMap.tSize = j["TileSize"];
-		
-		if (j.contains("PlayerSpawnX") && j.contains("PlayerSpawnY"))
-		{
-			outMap.playerSpawn.x = j["PlayerSpawnX"];
-			outMap.playerSpawn.y = j["PlayerSpawnY"];
-		}
-
 		outMap.tiles = j["Tiles"].get<std::vector<int>>();
 		if ((int)outMap.tiles.size() != outMap.w * outMap.h)
 		{
@@ -44,15 +38,41 @@ namespace EngineGame
 			return false;
 		}
 
+		//Loading Spawn Data
+		outMap.spawns.clear();
+
+		//Player Spawn
+		if (j.contains("PlayerSpawn"))
+		{
+			auto& p = j["PlayerSpawn"];
+
+			SpawnData d;
+			d.x = p["X"].get<float>();
+			d.y = p["Y"].get<float>();
+			d.defId = p["DefinitionId"].get<std::string>();
+
+			outMap.spawns.push_back(d);
+		}
+		else
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Warning,
+				EngineCore::LogCategory::Scene,
+				"Map has no player spawn"
+			);
+		}
+
+		//Enemy Spawns
 		if (j.contains("EnemySpawns"))
 		{
 			for (auto& e : j["EnemySpawns"])
 			{
-				outMap.enemySpawns.push_back(
-					{
-						e["X"].get<float>(),
-						e["Y"].get<float>()
-					});
+				SpawnData d;
+				d.x = e["X"].get<float>();
+				d.y = e["Y"].get<float>();
+				d.defId = e["DefinitionId"].get<std::string>();
+
+				outMap.spawns.push_back(d);
 			}
 		}
 
@@ -60,6 +80,45 @@ namespace EngineGame
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
 			"Map loaded : " + path
+		);
+
+		return true;
+	}
+
+	bool MapLoader::LoadEntityDefs(const std::string& path, std::unordered_map<std::string, EntityDefs>& outDefs)
+	{
+		std::ifstream file(path);
+		if (!file.is_open())
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Error,
+				EngineCore::LogCategory::Scene,
+				"Failed to open definitions file: " + path
+			);
+			return false;
+		}
+
+		json j;
+		file >> j;
+
+		outDefs.clear();
+
+		for (auto& e : j)
+		{
+			EntityDefs def;
+			def.defId = e["Id"].get<std::string>();
+			def.speed = e["Speed"].get<float>();
+			def.attackDamage = e["AttackDamage"].get<float>();
+			def.attackInterval = e["AttackInterval"].get<float>();
+			def.maxHp = e["MaxHP"].get<float>();
+
+			outDefs[def.defId] = def;
+		}
+
+		EngineCore::Log::Write(
+			EngineCore::LogLevel::Info,
+			EngineCore::LogCategory::Scene,
+			"Definitions loaded : " + std::to_string(outDefs.size())
 		);
 
 		return true;

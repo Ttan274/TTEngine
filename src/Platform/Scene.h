@@ -5,6 +5,7 @@
 #include "Game/Player.h"
 #include "Game/Enemy.h"
 #include "Game/Texture.h"
+#include "Game/MapLoader.h"
 #include <memory>
 
 namespace EnginePlatform
@@ -22,8 +23,9 @@ namespace EnginePlatform
 		Scene();
 
 		void Load();
-		void LoadPlayer(std::string exeDir, EngineMath::Vector2 pos);
-		void LoadEnemy(std::string exeDir, std::vector<EngineMath::Vector2> spawns);
+		void LoadSpawnEntities();
+		void LoadPlayer(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
+		void LoadEnemy(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
 		void LoadCamera();
 		void Update(float dt);
 		void Render(EngineCore::IRenderer* renderer);
@@ -45,5 +47,10 @@ namespace EnginePlatform
 		std::unique_ptr < EngineGame::TileMap> m_TileMap;
 		EngineGame::Texture2D* m_MainMenuBg = nullptr;
 		GameState m_GameState = GameState::MainMenu;
+
+		//Load data
+		std::unordered_map<std::string, EngineGame::EntityDefs> m_EntityDefs;
+		EngineGame::MapData m_MapData;
+		bool m_PlayerSpawned = false;
 	};
 }

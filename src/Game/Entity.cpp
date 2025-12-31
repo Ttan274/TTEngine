@@ -65,6 +65,15 @@ namespace EngineGame
 		m_DeathTexture = deadT;
 	}
 
+	void Entity::ApplyDefinition(const EngineGame::EntityDefs& def)
+	{
+		m_Speed = def.speed;
+		m_AttackDamage = def.attackDamage;
+		m_AttackInterval = def.attackInterval;
+		m_MaxHP = def.maxHp;
+		m_HP = m_MaxHP;
+	}
+
 	void Entity::CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop)
 	{
 		anim->SetLoop(loop);

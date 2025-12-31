@@ -1,11 +1,18 @@
 #pragma once
-#include "Game/TileMap.h"
 #include <string>
 #include <vector>
-#include "Core/Math/Vector2.h"
+#include <unordered_map>
+#include "Entity.h"
 
 namespace EngineGame
 {
+	struct SpawnData
+	{
+		float x;
+		float y;
+		std::string defId;
+	};
+
 	struct MapData
 	{
 		int w;
@@ -13,13 +20,13 @@ namespace EngineGame
 		int tSize;
 		std::vector<int> tiles;
 
-		EngineMath::Vector2 playerSpawn;
-		std::vector<EngineMath::Vector2> enemySpawns;
+		std::vector<SpawnData> spawns;
 	};
 
 	class MapLoader
 	{
 	public:
 		static bool LoadFromFile(const std::string& path, MapData& outMap);
+		static bool LoadEntityDefs(const std::string& path, std::unordered_map<std::string, EntityDefs>& outDefs);
 	};
 }
