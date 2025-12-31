@@ -77,7 +77,6 @@ namespace TTEngine.Editor
             }
         }
 
-
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             UpdateHover(e.GetPosition(MapCanvas));
@@ -129,8 +128,12 @@ namespace TTEngine.Editor
                 Height = _tileMap.Height,
                 TileSize = _tileMap.TileSize,
                 Tiles = _tileMap.Tiles,
-                PlayerSpawnX = _tileMap.PlayerSpawn.X,
-                PlayerSpawnY = _tileMap.PlayerSpawn.Y,
+                PlayerSpawn = new SpawnDto
+                {
+                    X = _tileMap.PlayerSpawn.Position.X,
+                    Y = _tileMap.PlayerSpawn.Position.Y,
+                    DefinitionId = "Player"
+                },
                 EnemySpawns = _tileMap.EnemySpawns.Select(p => new SpawnDto
                 {
                     X = p.Position.X,
@@ -150,7 +153,11 @@ namespace TTEngine.Editor
             _tileMap.Height = data.Height;
             _tileMap.TileSize = data.TileSize;
             _tileMap.Tiles = data.Tiles;
-            _tileMap.PlayerSpawn = new Point(data.PlayerSpawnX, data.PlayerSpawnY);
+            _tileMap.PlayerSpawn = new PlayerSpawnModel
+            {
+                Position = new Point(data.PlayerSpawn.X, data.PlayerSpawn.Y),
+                DefinitionId = data.PlayerSpawn.DefinitionId
+            };
             _tileMap.EnemySpawns.Clear();
 
             foreach (var sp in data.EnemySpawns)
@@ -279,11 +286,11 @@ namespace TTEngine.Editor
 
         private void DrawPlayerSpawn()
         {
-            if (_tileMap.PlayerSpawn.X < 0)
+            if (_tileMap.PlayerSpawn == null)
                 return;
 
-            double cx = (_tileMap.PlayerSpawn.X + 0.5) * _tileMap.TileSize;
-            double cy = (_tileMap.PlayerSpawn.Y + 0.5) * _tileMap.TileSize;
+            double cx = (_tileMap.PlayerSpawn.Position.X + 0.5) * _tileMap.TileSize;
+            double cy = (_tileMap.PlayerSpawn.Position.Y + 0.5) * _tileMap.TileSize;
 
             Path star = new Path
             {
@@ -335,12 +342,15 @@ namespace TTEngine.Editor
         //Mouse Event Helpers
         private void HandleSelection(int x, int y)
         {
-            if (_tileMap.PlayerSpawn.X == x && _tileMap.PlayerSpawn.Y == y)
+            if (_tileMap.PlayerSpawn != null && _tileMap.PlayerSpawn.Position.X == x && _tileMap.PlayerSpawn.Position.Y == y)
             {
                 _currentSelection = new SelectionModel
                 {
                     Type = SelectionType.Player,
-                    Spawn = new Point(x, y)
+                    PlayerSpawnModel = new PlayerSpawnModel
+                    {
+                        Position = new Point(x, y)
+                    }
                 };
 
                 ShowInspector();
@@ -386,7 +396,7 @@ namespace TTEngine.Editor
                     Inspector.SetContent(new TileSpawnInspector(_currentSelection.TileX, _currentSelection.TileY, _tileMap.Tiles[index]));
                     break;
                 case SelectionType.Player:
-                    Inspector.SetContent(new PlayerSpawnInspector(_currentSelection.Spawn));
+                    Inspector.SetContent(new PlayerSpawnInspector(_currentSelection.PlayerSpawnModel, _entityDefinitions));
                     break;
                 case SelectionType.Enemy:
                     Inspector.SetContent(new EnemySpawnInspector(_currentSelection.EnemySpawnModel, _entityDefinitions));
@@ -414,7 +424,15 @@ namespace TTEngine.Editor
             if (!TryGetTilePosition(pos, out int x, out int y))
                 return false;
 
-            _tileMap.PlayerSpawn = new Point(x, y);
+            if(_tileMap.PlayerSpawn == null)
+            {
+                _tileMap.PlayerSpawn = new PlayerSpawnModel
+                {
+                    Position = new Point(x, y),
+                };
+            }
+
+            _tileMap.PlayerSpawn.Position = new Point(x, y);
             DrawGrid();
             return true;
         }

@@ -13,6 +13,7 @@ namespace TTEngine.Editor.Panels
     {
         private List<EntityDefinitionModel> _definitions;
         private EntityDefinitionModel _current;
+        private const string BaseId = "NewEntity";
 
         public EntityDefinitionPanel(List<EntityDefinitionModel> definitions)
         {
@@ -46,6 +47,55 @@ namespace TTEngine.Editor.Panels
             _current.MaxHP = float.Parse(MaxHpBox.Text, CultureInfo.InvariantCulture);
 
             EntityDefinitionService.Save(_definitions);
+        }
+
+        private void NewDefClicked(object sender, RoutedEventArgs e)
+        {
+            string newId = BaseId;
+            int index = 1;
+
+            while(_definitions.Any(d => d.Id == newId))
+            {
+                newId = BaseId + index;
+                index++;
+            }
+
+            var def = new EntityDefinitionModel
+            {
+                Id = newId,
+                Speed = 60f,
+                AttackDamage = 10f,
+                AttackInterval = 1.2f,
+                MaxHP = 50f
+            };
+
+            _definitions.Add(def);
+
+            DefinitionCombo.Items.Refresh();
+            DefinitionCombo.SelectedItem = def;
+        }
+
+        private void DeleteDefClicked(object sender, RoutedEventArgs e)
+        {
+            if (_current == null) return;
+
+            if(_current.Id == "Player")
+            {
+                MessageBox.Show("Player definition cannot be deleted");
+                return;
+            }
+
+            var result = MessageBox.Show($"Delete definition '{_current.Id}'?",
+                                                             "Confirm",
+                                                             MessageBoxButton.YesNo);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            _definitions.Remove(_current);
+
+            DefinitionCombo.Items.Refresh();
+            DefinitionCombo.SelectedIndex = 0;
         }
     }
 }

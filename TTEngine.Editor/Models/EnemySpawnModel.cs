@@ -7,4 +7,10 @@ namespace TTEngine.Editor.Models
         public Point Position { get; set; }
         public string DefinitionId { get; set; }
     }
+
+    public class PlayerSpawnModel
+    {
+        public Point Position { get; set; }
+        public string DefinitionId { get; set; } = "Player";
+    }
 }

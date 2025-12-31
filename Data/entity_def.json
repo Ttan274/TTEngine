@@ -7,8 +7,8 @@
     "MaxHP": 70
   },
   {
-    "Id": "Boss",
-    "Speed": 120,
+    "Id": "Player",
+    "Speed": 80,
     "AttackDamage": 30,
     "AttackInterval": 0.5,
     "MaxHP": 100

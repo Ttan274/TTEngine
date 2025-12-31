@@ -9,9 +9,7 @@ namespace TTEngine.Editor.Models
 
         public int TileX { get; set; }
         public int TileY { get; set; }
-
-        public Point Spawn {  get; set; }
-
+        public PlayerSpawnModel PlayerSpawnModel { get; set; }
         public EnemySpawnModel EnemySpawnModel { get; set; }
     }
 }
