@@ -33,6 +33,25 @@
         <TextBlock Text="Max HP" Margin="0,6,0,0"/>
         <TextBox x:Name="MaxHpBox"/>
 
+        <!-- TEXTURES -->
+        <TextBlock Text="Idle Texture" Margin="0,10,0,0"/>
+        <TextBox x:Name="IdleTextureBox"/>
+
+        <TextBlock Text="Walk Texture" Margin="0,6,0,0"/>
+        <TextBox x:Name="WalkTextureBox"/>
+
+        <TextBlock Text="Hurt Texture" Margin="0,6,0,0"/>
+        <TextBox x:Name="HurtTextureBox"/>
+
+        <TextBlock Text="Death Texture" Margin="0,6,0,0"/>
+        <TextBox x:Name="DeathTextureBox"/>
+
+        <TextBlock Text="Attack Textures (one per line)" Margin="0,10,0,0"/>
+        <TextBox    x:Name="AttackTexturesBox"
+                    AcceptsReturn="True"
+                    Height="80"/>
+
+
         <Button Content="Save Definitions"
                 Margin="0,10,0,0"
                 Click="SaveClicked"/>

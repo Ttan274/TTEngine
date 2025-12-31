@@ -9,11 +9,21 @@ namespace EngineGame
 {
 	struct EntityDefs
 	{
+		//Type
 		std::string defId;
+		
+		//Stats
 		float speed;
 		float attackDamage;
 		float attackInterval;
 		float maxHp;
+
+		//Texture paths
+		std::string idleTexture;
+		std::string walkTexture;
+		std::string hurtTexture;
+		std::string deathTexture;
+		std::vector<std::string> attackTextures;
 	};
 
 	class Entity

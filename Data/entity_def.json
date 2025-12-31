@@ -4,13 +4,29 @@
     "Speed": 80,
     "AttackDamage": 10,
     "AttackInterval": 0.5,
-    "MaxHP": 70
+    "MaxHP": 70,
+    "IdleTexture": "idle1.png",
+    "WalkTexture": "walk1.png",
+    "HurtTexture": "hurt1.png",
+    "DeathTexture": "dead1.png",
+    "AttackTextures": [
+      "attack4.png"
+    ]
   },
   {
     "Id": "Player",
     "Speed": 80,
     "AttackDamage": 30,
     "AttackInterval": 0.5,
-    "MaxHP": 100
+    "MaxHP": 100,
+    "IdleTexture": "idle.png",
+    "WalkTexture": "walk.png",
+    "HurtTexture": "hurt.png",
+    "DeathTexture": "dead.png",
+    "AttackTextures": [
+      "attack1.png",
+      "attack2.png",
+      "attack3.png"
+    ]
   }
 ]

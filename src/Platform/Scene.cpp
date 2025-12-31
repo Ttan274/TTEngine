@@ -139,15 +139,17 @@ namespace EnginePlatform
 
 		//Set Textures
 		m_Player.SetTexture(
-			AssetManager::GetTexture(path + "\\idle.png"),
-			AssetManager::GetTexture(path + "\\walk.png"),
-			AssetManager::GetTexture(path + "\\hurt.png"),
-			AssetManager::GetTexture(path + "\\dead.png")
+			AssetManager::GetTexture(path + def.idleTexture),
+			AssetManager::GetTexture(path + def.walkTexture),
+			AssetManager::GetTexture(path + def.hurtTexture),
+			AssetManager::GetTexture(path + def.deathTexture)
 		);
+
+		//this method need update
 		m_Player.SetAttackTexture(
-			AssetManager::GetTexture(path + "\\attack1.png"),
-			AssetManager::GetTexture(path + "\\attack2.png"),
-			AssetManager::GetTexture(path + "\\attack3.png")
+			AssetManager::GetTexture(path + def.attackTextures[0]),
+			AssetManager::GetTexture(path + def.attackTextures[1]),
+			AssetManager::GetTexture(path + def.attackTextures[2])
 		);
 
 		//Set World Reference
@@ -196,12 +198,12 @@ namespace EnginePlatform
 		auto enemy = std::make_unique<EngineGame::Enemy>();
 
 		//Set Textures
-		enemy->SetTexture(AssetManager::GetTexture(path + "\\idle1.png"),
-						  AssetManager::GetTexture(path + "\\walk1.png"),
-						  AssetManager::GetTexture(path + "\\hurt1.png"),
-						  AssetManager::GetTexture(path + "\\dead1.png"));
+		enemy->SetTexture(AssetManager::GetTexture(path + def.idleTexture),
+						  AssetManager::GetTexture(path + def.walkTexture),
+						  AssetManager::GetTexture(path + def.hurtTexture),
+						  AssetManager::GetTexture(path + def.deathTexture));
 
-		enemy->SetAttackTexture(AssetManager::GetTexture(path + "\\attack4.png"));
+		enemy->SetAttackTexture(AssetManager::GetTexture(path + def.attackTextures[0]));
 
 		//Set World Reference
 		enemy->SetWorld(m_TileMap.get());

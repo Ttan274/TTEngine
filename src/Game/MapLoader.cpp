@@ -107,10 +107,19 @@ namespace EngineGame
 		{
 			EntityDefs def;
 			def.defId = e["Id"].get<std::string>();
+			
 			def.speed = e["Speed"].get<float>();
 			def.attackDamage = e["AttackDamage"].get<float>();
 			def.attackInterval = e["AttackInterval"].get<float>();
 			def.maxHp = e["MaxHP"].get<float>();
+
+			def.idleTexture = e["IdleTexture"];
+			def.walkTexture = e["WalkTexture"];
+			def.hurtTexture = e["HurtTexture"];
+			def.deathTexture = e["DeathTexture"];
+
+			if (e.contains("AttackTextures"))
+				def.attackTextures = e["AttackTextures"].get<std::vector<std::string>>();
 
 			outDefs[def.defId] = def;
 		}

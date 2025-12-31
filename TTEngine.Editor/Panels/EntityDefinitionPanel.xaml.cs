@@ -31,20 +31,43 @@ namespace TTEngine.Editor.Panels
             _current = DefinitionCombo.SelectedItem as EntityDefinitionModel;
             if (_current == null) return;
 
+            //Stats
             SpeedBox.Text = _current.Speed.ToString(CultureInfo.InvariantCulture);
             AttackDamageBox.Text = _current.AttackDamage.ToString(CultureInfo.InvariantCulture);
             AttackIntervalBox.Text = _current.AttackInterval.ToString(CultureInfo.InvariantCulture);
             MaxHpBox.Text = _current.MaxHP.ToString(CultureInfo.InvariantCulture);
+
+            //Textures
+            IdleTextureBox.Text = _current.IdleTexture;
+            WalkTextureBox.Text = _current.WalkTexture;
+            HurtTextureBox.Text = _current.HurtTexture;
+            DeathTextureBox.Text = _current.DeathTexture;
+            
+            AttackTexturesBox.Text = string.Join(
+                Environment.NewLine,
+                _current.AttackTextures
+                );
         }
 
         private void SaveClicked(object sender, RoutedEventArgs e)
         {
             if (_current == null) return;
 
+            //Stats
             _current.Speed = float.Parse(SpeedBox.Text, CultureInfo.InvariantCulture);
             _current.AttackDamage = float.Parse(AttackDamageBox.Text, CultureInfo.InvariantCulture);
             _current.AttackInterval = float.Parse(AttackIntervalBox.Text, CultureInfo.InvariantCulture);
             _current.MaxHP = float.Parse(MaxHpBox.Text, CultureInfo.InvariantCulture);
+
+            //Textures
+            _current.IdleTexture = IdleTextureBox.Text;
+            _current.WalkTexture = WalkTextureBox.Text;
+            _current.HurtTexture = HurtTextureBox.Text;
+            _current.DeathTexture = DeathTextureBox.Text;
+
+            _current.AttackTextures = AttackTexturesBox.Text
+                                      .Split(new[] {'\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                                      .ToList();
 
             EntityDefinitionService.Save(_definitions);
         }
@@ -66,7 +89,12 @@ namespace TTEngine.Editor.Panels
                 Speed = 60f,
                 AttackDamage = 10f,
                 AttackInterval = 1.2f,
-                MaxHP = 50f
+                MaxHP = 50f,
+                IdleTexture = "",
+                WalkTexture = "",
+                HurtTexture = "",
+                DeathTexture = "",
+                AttackTextures = new List<string>()
             };
 
             _definitions.Add(def);
