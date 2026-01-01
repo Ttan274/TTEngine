@@ -24,4 +24,14 @@ namespace EngineCore
 
 		return mapPath;
 	}
+
+	static std::string GetRootDirectory()
+	{
+		std::string exeDir = GetExecutableDirectory();
+		std::filesystem::path root = std::filesystem::path(exeDir).parent_path().parent_path();
+
+		std::string mapPath = root.string();
+
+		return mapPath;
+	}
 }

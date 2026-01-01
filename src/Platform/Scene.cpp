@@ -83,7 +83,7 @@ namespace EnginePlatform
 
 	void Scene::LoadSpawnEntities()
 	{
-		std::string exeDir = EngineCore::GetExecutableDirectory();
+		std::string rootDir = EngineCore::GetRootDirectory();
 
 		for (const auto& spawn : m_MapData.spawns)
 		{
@@ -113,12 +113,12 @@ namespace EnginePlatform
 					continue;
 				}
 
-				LoadPlayer(exeDir, spawn, def);
+				LoadPlayer(rootDir, spawn, def);
 				m_PlayerSpawned = true;
 			}
 			else
 			{
-				LoadEnemy(exeDir, spawn, def);
+				LoadEnemy(rootDir, spawn, def);
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace EnginePlatform
 	void Scene::LoadPlayer(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
 	{
 		//Player Loading
-		std::string path = exeDir + "\\Assets/Textures";
+		std::string path = exeDir + "\\Assets/Textures\\";
 
 		//Set Textures
 		m_Player.SetTexture(
@@ -194,7 +194,7 @@ namespace EnginePlatform
 	void Scene::LoadEnemy(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
 	{
 		//Enemy Loading
-		std::string path = exeDir + "\\Assets/Textures";
+		std::string path = exeDir + "\\Assets/Textures\\";
 		auto enemy = std::make_unique<EngineGame::Enemy>();
 
 		//Set Textures

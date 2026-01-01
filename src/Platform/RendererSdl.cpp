@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "SDL3/SDL.h"
 #include "Game/Texture.h"
+#include "Core/PathUtil.h"
 #include "Core/Log.h"
 
 namespace EnginePlatform
@@ -14,8 +15,7 @@ namespace EnginePlatform
         s_Renderer = SDL_CreateRenderer(Window::Get(), nullptr);
         s_Instance = new RendererSdl();
 
-		const char* basePath = SDL_GetBasePath();
-		std::string fontPath = std::string(basePath) + "Assets/Fonts/FontTest.ttf";
+        std::string fontPath = EngineCore::GetRootDirectory() + "\\Assets/Fonts/FontTest.ttf";
         TTF_Init();
         s_Instance->m_Font = TTF_OpenFont(fontPath.c_str(), 14);
     }
