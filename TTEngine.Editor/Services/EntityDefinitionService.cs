@@ -6,11 +6,14 @@ namespace TTEngine.Editor.Services
 {
     public class EntityDefinitionService
     {
-        private const string ENTITY_DEF_PATH = @"..\..\..\..\Data\entity_def.json";
+        private const string DEF_NAME = "entity_def.json";
 
         public static List<EntityDefinitionModel> Load()
         {
-            string json = File.ReadAllText(ENTITY_DEF_PATH);
+            var path = EditorPaths.GetDataFolder();
+            var defLocation = Path.Combine(path, DEF_NAME);
+
+            string json = File.ReadAllText(defLocation);
             return JsonSerializer.Deserialize<List<EntityDefinitionModel>>(json);
         }
 
@@ -21,7 +24,10 @@ namespace TTEngine.Editor.Services
                 WriteIndented = true
             });
 
-            File.WriteAllText(ENTITY_DEF_PATH, json);
+            var path = EditorPaths.GetDataFolder();
+            var defLocation = Path.Combine(path, DEF_NAME);
+
+            File.WriteAllText(defLocation, json);
         }
     }
 }

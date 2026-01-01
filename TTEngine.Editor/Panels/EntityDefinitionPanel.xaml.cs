@@ -1,6 +1,10 @@
-﻿using System.Globalization;
+﻿using Microsoft.Win32;
+using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using TTEngine.Editor.Models;
 using TTEngine.Editor.Services;
 
@@ -26,6 +30,8 @@ namespace TTEngine.Editor.Panels
             DefinitionCombo.SelectedIndex = 0;
         }
 
+        #region OnChange Methods
+
         private void OnDefinitionChanged(object sender, SelectionChangedEventArgs e)
         {
             _current = DefinitionCombo.SelectedItem as EntityDefinitionModel;
@@ -42,12 +48,53 @@ namespace TTEngine.Editor.Panels
             WalkTextureBox.Text = _current.WalkTexture;
             HurtTextureBox.Text = _current.HurtTexture;
             DeathTextureBox.Text = _current.DeathTexture;
-            
-            AttackTexturesBox.Text = string.Join(
-                Environment.NewLine,
-                _current.AttackTextures
-                );
+
+            UpdatePreview(_current.IdleTexture, IdlePreview);
+            UpdatePreview(_current.WalkTexture, WalkPreview);
+            UpdatePreview(_current.HurtTexture, HurtPreview);
+            UpdatePreview(_current.DeathTexture, DeathPreview);
+            RefreshAttackTexturePreview();
         }
+
+        private void OnIdleTextureChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_current == null)
+                return;
+
+            _current.IdleTexture = IdleTextureBox.Text;
+            UpdatePreview(_current.IdleTexture, IdlePreview);
+        }
+
+        private void OnWalkTextureChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_current == null)
+                return;
+
+            _current.WalkTexture = WalkTextureBox.Text;
+            UpdatePreview(_current.WalkTexture, WalkPreview);
+        }
+
+        private void OnHurtTextureChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_current == null)
+                return;
+
+            _current.HurtTexture = HurtTextureBox.Text;
+            UpdatePreview(_current.HurtTexture, HurtPreview);
+        }
+
+        private void OnDeathTextureChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_current == null)
+                return;
+
+            _current.DeathTexture = DeathTextureBox.Text;
+            UpdatePreview(_current.DeathTexture, DeathPreview);
+        }
+
+        #endregion
+
+        #region Button Clicks
 
         private void SaveClicked(object sender, RoutedEventArgs e)
         {
@@ -64,10 +111,6 @@ namespace TTEngine.Editor.Panels
             _current.WalkTexture = WalkTextureBox.Text;
             _current.HurtTexture = HurtTextureBox.Text;
             _current.DeathTexture = DeathTextureBox.Text;
-
-            _current.AttackTextures = AttackTexturesBox.Text
-                                      .Split(new[] {'\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                                      .ToList();
 
             EntityDefinitionService.Save(_definitions);
         }
@@ -125,5 +168,148 @@ namespace TTEngine.Editor.Panels
             DefinitionCombo.Items.Refresh();
             DefinitionCombo.SelectedIndex = 0;
         }
+
+        private void BrowseIdleTexture(object sender, RoutedEventArgs e)
+        {
+            var file = BrowseTextureFile();
+            if (file == null)
+                return;
+
+            IdleTextureBox.Text = file;
+            UpdatePreview(file, IdlePreview);
+        }
+
+        private void BrowseWalkTexture(object sender, RoutedEventArgs e)
+        {
+            var file = BrowseTextureFile();
+            if (file == null)
+                return;
+
+            WalkTextureBox.Text = file;
+            UpdatePreview(file, WalkPreview);
+        }
+
+        private void BrowseHurtTexture(object sender, RoutedEventArgs e)
+        {
+            var file = BrowseTextureFile();
+            if (file == null)
+                return;
+
+            HurtTextureBox.Text = file;
+            UpdatePreview(file, HurtPreview);
+        }
+
+        private void BrowseDeathTexture(object sender, RoutedEventArgs e)
+        {
+            var file = BrowseTextureFile();
+            if (file == null)
+                return;
+
+            DeathTextureBox.Text = file;
+            UpdatePreview(file, DeathPreview);
+        }
+
+        private void AddAttackTexture(object sender, RoutedEventArgs e)
+        {
+            if (_current == null)
+                return;
+
+            string file = BrowseTextureFile();
+
+            _current.AttackTextures.Add(file);
+            RefreshAttackTexturePreview();
+        }
+
+        private void RemoveAttackTexture(object sender, RoutedEventArgs e)
+        {
+            if (_current == null || _current.AttackTextures.Count == 0)
+                return;
+
+            _current.AttackTextures.RemoveAt(_current.AttackTextures.Count - 1);
+            RefreshAttackTexturePreview();
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private string BrowseTextureFile()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "PNG Files (*.png)|*.png",
+                InitialDirectory = EditorPaths.GetAssetsFolder()
+            };
+
+            if (dialog.ShowDialog() != true)
+                return null;
+
+            return Path.GetFileName(dialog.FileName);
+        }
+
+        private void UpdatePreview(string fileName, Image target)
+        {
+            try
+            {
+                string assetPath = EditorPaths.GetAssetsFolder();
+
+                string targetPath = Path.Combine(assetPath, fileName);
+
+                if (!File.Exists(targetPath))
+                {
+                    target.Source = null;
+                    return;
+                }
+
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = new Uri(targetPath, UriKind.Absolute);
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.EndInit();
+
+                target.Source = bmp;
+            }
+            catch 
+            {
+                target.Source = null;
+            }
+        }
+
+        private void RefreshAttackTexturePreview()
+        {
+            if (_current == null)
+                return;
+
+            var images = _current.AttackTextures.Select(t => LoadAttackPreview(t)).ToList();
+
+            AttackTextureList.ItemsSource = images;
+        }
+
+        private BitmapImage LoadAttackPreview(string fileName)
+        {
+            try
+            {
+                string assetPath = EditorPaths.GetAssetsFolder();
+
+                string targetPath = Path.Combine(assetPath, fileName);
+
+                if (!File.Exists(targetPath))
+                    return null;
+
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = new Uri(targetPath, UriKind.Absolute);
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.EndInit();
+
+                return bmp;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        #endregion
     }
 }

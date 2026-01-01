@@ -6,8 +6,7 @@ namespace TTEngine.Editor.Services
 {
     public static class MapFileService
     {
-        private const string LIVE_MAP_PATH = @"..\..\..\..\Maps\active_map.json";
-        public static string GetMapPath() { return LIVE_MAP_PATH; }
+        private const string MAP_NAME = "active_map.json";
 
         public static void Save(TileMapData data)
         {
@@ -16,12 +15,18 @@ namespace TTEngine.Editor.Services
                 WriteIndented = true
             });
 
-            File.WriteAllText(LIVE_MAP_PATH, json); 
+            var path = EditorPaths.GetMapsFolder();
+            var mapLocation = Path.Combine(path, MAP_NAME);
+
+            File.WriteAllText(mapLocation, json); 
         }
 
         public static TileMapData Load()
         {
-            string json = File.ReadAllText(LIVE_MAP_PATH);
+            var path = EditorPaths.GetMapsFolder();
+            var mapLocation = Path.Combine(path, MAP_NAME);
+
+            string json = File.ReadAllText(mapLocation);
             return JsonSerializer.Deserialize<TileMapData>(json);
         }
     }

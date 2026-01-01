@@ -28,8 +28,6 @@ namespace TTEngine.Editor
         private TileType _currentTileType = TileType.Ground;
         private SelectionModel _currentSelection = new();
         private List<EntityDefinitionModel> _entityDefinitions;
-        private const string ENGINE_PATH = @"..\..\..\..\x64\Debug\TTEngine.exe";
-        
 
         public MainWindow()
         {
@@ -172,7 +170,7 @@ namespace TTEngine.Editor
             DrawGrid();
         }
 
-        private void StartGame(object sender, RoutedEventArgs e) => Process.Start(ENGINE_PATH, MapFileService.GetMapPath());
+        private void StartGame(object sender, RoutedEventArgs e) => Process.Start(EditorPaths.GetEngineExe());
 
         private void OpenDefinitiosns(object sender, RoutedEventArgs e) => Inspector.SetContent(new EntityDefinitionPanel(_entityDefinitions));
 
