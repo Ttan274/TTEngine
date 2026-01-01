@@ -17,9 +17,11 @@
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT: TILE TOOLS -->
-        <panels:TileToolPanel   x:Name="TileTools"
-                                Grid.Column="0"/>
+        <!-- LEFT: TILE TOOL PANEL + LAYER PANEL -->
+        <StackPanel Grid.Column="0">
+            <panels:LayerPanel      x:Name="LayerEditor"/>
+            <panels:TileToolPanel   x:Name="TileTools"/>
+        </StackPanel>
 
         <Button Content="Entity Definitions"
                 Margin="22,522,22,10"

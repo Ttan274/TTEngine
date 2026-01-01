@@ -1,9 +1,8 @@
 ﻿<Application x:Class="TTEngine.Editor.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:TTEngine.Editor"
+             xmlns:layer="clr-namespace:TTEngine.Editor"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
     </Application.Resources>
 </Application>

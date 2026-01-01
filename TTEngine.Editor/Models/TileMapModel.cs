@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using TTEngine.Editor.Enums;
 
 namespace TTEngine.Editor.Models
 {
@@ -14,15 +15,27 @@ namespace TTEngine.Editor.Models
         public int Width { get; set; } = 50;
         public int Height { get; set; } = 30;
         public int TileSize { get; set; } = 50;
-        public int[] Tiles { get; set; }
+        public Dictionary<MapLayerType, int[]> Layers { get; set; }
         public PlayerSpawnModel PlayerSpawn { get; set; }
         public List<EnemySpawnModel> EnemySpawns { get; set; } = new();
 
         public void Init()
         {
-            Tiles = new int[Width * Height];
-            for (int i = 0; i < Tiles.Length; i++)
-                Tiles[i] = (int)TileType.None;
+            Layers = new Dictionary<MapLayerType, int[]>
+            {
+                {MapLayerType.Background, CreateEmptyLayer() },
+                {MapLayerType.Collision, CreateEmptyLayer() },
+                {MapLayerType.Decoration, CreateEmptyLayer() },
+            };
+        }
+
+        private int[] CreateEmptyLayer()
+        {
+            var arr = new int[Width * Height];
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = (int)TileType.None;
+
+            return arr;
         }
 
         public int GetIndex(int x, int y) => (y * Width + x);
