@@ -143,4 +143,70 @@ Example:
   "AttackTextures": ["attack4.png"]
 }
 
+---
+
+## 🗺 Map System (Editor → JSON → Engine)
+
+The map system is fully **editor-driven** and serialized to JSON.  
+Maps are never hardcoded in the engine.
+
+### Map Authoring (Editor Side)
+
+Maps are created using a custom **WPF Tile Map Editor**.
+
+Editor features:
+- Grid-based tile painting
+- Tile types:
+  - `None`
+  - `Ground`
+  - `Wall`
+- Brush tool
+- Fill tool
+- Adjustable brush size
+- Undo / redo system
+- Visual grid rendering
+- Mouse-based painting
+
+---
+
+### Spawn Placement
+
+The editor supports explicit spawn placement:
+
+- **Player Spawn**
+  - Single spawn point
+  - Assigned a `DefinitionId` (usually `"Player"`)
+
+- **Enemy Spawns**
+  - Multiple spawn points
+  - Each spawn references an `EntityDefinitionId`
+  - Allows different enemy types in the same map
+
+Spawns are placed visually on the map canvas.
+
+---
+
+### Map JSON Format
+
+Maps are exported as JSON files and loaded directly by the engine.
+
+Example structure:
+
+```json
+{
+  "Width": 50,
+  "Height": 30,
+  "TileSize": 50,
+  "Tiles": [0, 0, 2, 2, 1, ...],
+  "PlayerSpawn": {
+    "X": 30,
+    "Y": 4,
+    "DefinitionId": "Player"
+  },
+  "EnemySpawns": [
+    { "X": 5,  "Y": 19, "DefinitionId": "Samurai" },
+    { "X": 11, "Y": 11, "DefinitionId": "Samurai" }
+  ]
+}
+
 
