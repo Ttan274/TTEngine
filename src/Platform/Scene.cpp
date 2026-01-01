@@ -337,7 +337,7 @@ namespace EnginePlatform
 				const EngineCore::Rect eAttackBox = e->GetAttackBox();
 				if (EngineMath::RectIntersectsAABB(eAttackBox, m_Player.GetCollider()))
 				{
-					if (e->IsAttacking() && e->IsDamageFrame() && !e->HasHitThisAttack())
+					if (e->CanDealDamage() && !e->HasHitThisAttack())
 					{
 						m_Player.TakeDamage(e->GetAttackDamage(), e->IsFacingRight());
 						m_Camera.StartShake(0.15f, 6.0f);
@@ -419,5 +419,8 @@ namespace EnginePlatform
 		renderer->DrawRect({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 40, 40, 40, 255 });	//Background
 		renderer->DrawRect({ x, y, (HP_BAR_W_EN * ratio), HP_BAR_H_EN }, hpColor);	//HP area
 		renderer->DrawRectOutline({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 255, 255, 255, 255 });
+
+		float textY = y - 14.0f;
+		renderer->DrawUIText(enemy->GetStateName(), x + HP_BAR_W_EN * 0.5f, textY, { 255, 255, 0, 255 });
 	}
 }

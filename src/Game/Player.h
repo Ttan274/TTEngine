@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/Texture.h"
-#include "Core/Input.h"
 #include "Core/Animation.h"
 #include "Game/Entity.h"
+#include "Core/Input.h"
 
 namespace EngineGame
 {
@@ -51,7 +51,15 @@ namespace EngineGame
 		void StartAttack(AttackStage stage);
 		void ResetCombo();
 		void Jump();
-		
+
+		float Approach(float current, float target, float delta)
+		{
+			if (current < target)
+				return std::min(current + delta, target);
+			else
+				return std::max(current - delta, target);
+		}
+
 	private:
 		//State
 		PlayerState m_State = PlayerState::Normal;
@@ -77,10 +85,13 @@ namespace EngineGame
 		EngineMath::Vector2 m_SpawnPoint;
 
 		//Physics
-		float m_JumpForce = 150.0f;
+		float m_JumpForce = 200.0f;
 		float m_CoyoteTime = 0.1f;
 		float m_CoyoteTimer = 0.0f;
 		float m_JumpBufferTimer = 0.0f;
 		float m_JumpBufferTime = 0.1f;
+		float m_Acceleration = 150.0f;
+		float m_Friction = 2000.0f;
+		float m_AirControl = 0.5f;
 	};
 }

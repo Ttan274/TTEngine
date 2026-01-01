@@ -1,5 +1,4 @@
 #include "Game/Enemy.h"
-#include "Core/Math/Collision.h"
 
 namespace EngineGame
 {
@@ -35,8 +34,8 @@ namespace EngineGame
 		if (m_DamageFlashTimer > 0.0f)
 			m_DamageFlashTimer -= dt;
 
-		if (CanAttack(playerPos, playerColldier))
-			ChangeState(EnemyState::Attack);
+		if (IsPlayerInDetectionRange(playerPos))
+			ChangeState(EnemyState::Chase);
 
 		switch (m_State)
 		{
@@ -45,6 +44,9 @@ namespace EngineGame
 			break;
 		case EnemyState::Patrol:
 			UpdatePatrol(dt);
+			break;
+		case EnemyState::Chase:
+			UpdateChase(dt, playerPos, playerColldier);
 			break;
 		case EnemyState::Attack:
 			UpdateAttack(dt);
@@ -75,6 +77,15 @@ namespace EngineGame
 	void Enemy::UpdatePatrol(float dt)
 	{
 		m_StateTimer += dt;
+		
+		if (!CanMoveForward())
+		{
+			m_FacingRight = !m_FacingRight;
+			m_Direction *= -1.0f;
+			ChangeState(EnemyState::Idle);
+			return;
+		}
+
 		m_IsMoving = true;
 
 		m_CurrentAnim = &m_WalkAnim;
@@ -97,6 +108,45 @@ namespace EngineGame
 		}
 	}
 
+	void Enemy::UpdateChase(float dt, const EngineMath::Vector2& playerPos, const EngineCore::AABB& playerCollider)
+	{
+		//Facing
+		m_Direction = (playerPos.x > m_Position.x) ? 1.0f : -1.0f;
+		m_FacingRight = m_Direction > 0;
+
+		if (!CanMoveForward())
+		{
+			ChangeState(EnemyState::Idle);
+			return;
+		}
+
+		//Animation
+		m_CurrentAnim = &m_WalkAnim;
+		m_CurrentAnim->Update(dt);
+
+		EngineMath::Vector2 move = { m_Direction * m_Speed * dt, 0.0f };
+		MoveAndCollide(move);
+
+		//Checking for attacking
+		if (CanAttack(playerPos, playerCollider))
+		{
+			ChangeState(EnemyState::Attack);
+			return;
+		}
+
+		//If Player out of range
+		if (!IsPlayerInDetectionRange(playerPos))
+			ChangeState(EnemyState::Idle);
+	}
+
+	bool Enemy::IsPlayerInDetectionRange(const EngineMath::Vector2& playerPos) const
+	{
+		if (m_State == EnemyState::Attack || m_State == EnemyState::Hurt || m_State == EnemyState::Dead)
+			return false;
+
+		return std::abs(playerPos.x - m_Position.x) <= m_DetectRange.x && std::abs(playerPos.y - m_Position.y) <= m_DetectRange.y;
+	}
+
 	void Enemy::ChangeState(EnemyState newState)
 	{
 		m_State = newState;
@@ -104,9 +154,18 @@ namespace EngineGame
 
 		switch (newState)
 		{
+		case EnemyState::Chase:
+			m_IsAttacking = false;
+			m_CurrentAnim = &m_WalkAnim;
+			break;
+
 		case EnemyState::Attack:
 			m_IsAttacking = true;
 			m_HasHitThisAttack = false;
+			
+			m_CanDealDamage = false;
+			m_AttackWindUpTimer = m_AttackWindUpTime;
+
 			m_AttackAnim.Reset();
 			m_CurrentAnim = &m_AttackAnim;
 			break;
@@ -139,15 +198,51 @@ namespace EngineGame
 			return false;
 
 		//X
-		float distX = std::abs(playerPos.x - m_Position.x);
-		if (distX > m_AttackRangeX)
+		if (std::abs(playerPos.x - m_Position.x) > m_AttackRange.x)
 			return false;
 
 		//Y
-		if (std::abs(m_Collider.Bottom() - playerCollider.Bottom()) > m_AttackRangeY)
+		if (std::abs(m_Collider.Bottom() - playerCollider.Bottom()) > m_AttackRange.y)
 			return false;
 
 		return true;
+	}
+
+	bool Enemy::CanMoveForward() const
+	{
+		if (!m_World || !m_IsGrounded)
+			return true;
+
+		EngineMath::Vector2 checkLedgePoints;
+		checkLedgePoints.x = m_FacingRight ? m_Collider.Right() + 2.0f : m_Collider.Left() - 2.0f;
+		checkLedgePoints.y = m_Collider.Bottom() + 4.0f;
+
+		EngineCore::AABB fBox;
+		fBox.SetFromPositionSize(
+			checkLedgePoints.x,
+			checkLedgePoints.y,
+			2.0f,
+			2.0f
+		);
+
+		if (!m_World->IsSolidY(fBox, -1.0f))
+			return false;
+
+		return true;
+	}
+
+	std::string Enemy::GetStateName() const
+	{
+		switch (m_State)
+		{
+		case EnemyState::Idle: return "IDLE";
+		case EnemyState::Patrol: return "WALK";
+		case EnemyState::Chase: return "CHASE";
+		case EnemyState::Attack: return "ATTACK";
+		case EnemyState::Hurt: return "HURT";
+		case EnemyState::Dead: return "DEAD";
+		default: return "UNKNOWN";
+		}
 	}
 
 	#pragma region Inherited Methods
@@ -180,6 +275,7 @@ namespace EngineGame
 		case EnemyState::Hurt:
 			currentTexture = m_HurtTexture;
 			break;
+		case EnemyState::Chase:
 		case EnemyState::Patrol:
 			currentTexture = m_WalkTexture;
 			break;
@@ -223,18 +319,26 @@ namespace EngineGame
 
 	void Enemy::UpdateAttack(float dt)
 	{
-		if (m_IsAttacking)
+		if (m_AttackWindUpTimer > 0.0f)
 		{
+			m_AttackWindUpTimer -= dt;
 			m_CurrentAnim->Update(dt);
-
-			if (m_CurrentAnim->IsFinished())
-			{
-				m_AttackCooldown = m_AttackInterval;
-				m_IsAttacking = false;
-				m_HasHitThisAttack = false;
-				ChangeState(EnemyState::Idle);
-			}
 			return;
+		}
+
+		m_CanDealDamage = true;
+		m_CurrentAnim->Update(dt);
+
+
+		if (m_CurrentAnim->IsFinished())
+		{
+			m_AttackCooldown = m_AttackInterval;
+
+			m_IsAttacking = false;
+			m_HasHitThisAttack = false;
+			m_CanDealDamage = false;
+			
+			ChangeState(EnemyState::Chase);
 		}
 	}
 

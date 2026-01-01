@@ -1,6 +1,4 @@
 #include "Game/Player.h"
-#include "Platform/AssetManager.h"
-#include "Core/Log.h"
 
 namespace EngineGame
 {
@@ -82,7 +80,13 @@ namespace EngineGame
 		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::A)) moveX -= 1.0f;
 		if (EngineCore::Input::IsKeyDown(EngineCore::KeyCode::D)) moveX += 1.0f;
 	
-		m_Velocity.x = moveX * m_Speed;
+		float targetSpeed = moveX * m_Speed;
+		float accel = m_IsGrounded ? m_Acceleration : m_Acceleration * m_AirControl;
+
+		if (moveX != 0.0f)
+			m_Velocity.x = Approach(m_Velocity.x, targetSpeed, accel * dt);
+		else
+			m_Velocity.x = Approach(m_Velocity.x, 0.0f, m_Friction * dt);
 
 		//Facing
 		if (moveX > 0.0f)
@@ -112,6 +116,7 @@ namespace EngineGame
 		m_IsAttacking = true;
 		m_ComboQueued = false;
 		m_HasHitThisAttack = false;
+		m_Velocity.x *= 0.2f;
 
 		int index = 0;
 		if (stage == AttackStage::Attack2) index = 1;
@@ -306,8 +311,8 @@ namespace EngineGame
 
 		//Knockback
 		float dir = objectDir ? 1.0f : -1.0f;
-		m_KnockbackVel.x = dir * 100.0f;
-		m_KnockbackVel.y = -100.0f;
+		m_KnockbackVel.x = dir * 150.0f;
+		m_KnockbackVel.y = -200.0f;
 	}
 
 	void Player::OnDeath()
