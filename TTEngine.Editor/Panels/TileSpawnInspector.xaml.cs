@@ -1,5 +1,5 @@
 ﻿using System.Windows.Controls;
-using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Enums;
 
 namespace TTEngine.Editor.Panels
 {
@@ -12,7 +12,7 @@ namespace TTEngine.Editor.Panels
         {
             InitializeComponent();
 
-            TileInfo.Text = $"({x},{y})\nType: {(TileType)tileType}";
+            TileInfo.Text = $"({x},{y})\nType: {(CollisionType)tileType}";
         }
     }
 }

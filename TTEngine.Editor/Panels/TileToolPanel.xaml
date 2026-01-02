@@ -11,21 +11,22 @@
                        Foreground="White"
                        Margin="0,0,0,6"/>
 
-            <RadioButton Content="Ground"
-                         GroupName="TileGroup"
-                         Foreground="White"
-                         IsChecked="True"
-                         Checked="GroundTile_Checked"/>
-
-            <RadioButton Content="Wall"
-                         GroupName="TileGroup"
-                         Foreground="White"
-                         Margin="0,2,0,8"
-                         Checked="WallTile_Checked"/>
+            <ItemsControl ItemsSource="{Binding TileDefinitions}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding Name}"
+                                Tag="{Binding Id}"
+                                Margin="0,2"
+                                Padding="6"
+                                Click="OnTileClicked"
+                                Loaded="TileButtonLoaded"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
             <Separator/>
 
-            <!-- BRUSH -->
+            <!-- BRUSH SIZE -->
             <TextBlock Text="Brush Size"
                        FontWeight="Bold"
                        Foreground="White"

@@ -30,15 +30,14 @@ namespace TTEngine.Editor
         private Stack<TileBatchCommand> _undoStack = new();
         private Stack<TileBatchCommand> _redoStack = new();
         private TileBatchCommand _currentBatch;
-        
+
         //ToolPanel
         private ToolMode _currentToolMode = ToolMode.Brush;
-        private TileType _currentTileType = TileType.Ground;
-        
+
         //Selection + Entity Def
         private SelectionModel _currentSelection = new();
         private List<EntityDefinitionModel> _entityDefinitions;
-        
+
         //Layer
         public EditorState editorState { get; } = new EditorState();
 
@@ -77,8 +76,8 @@ namespace TTEngine.Editor
                 (_, _) => Redo()
             ));
 
+            //Tile Tool Panel Events
             TileTools.ToolModeChanged += mode => _currentToolMode = mode;
-            TileTools.TileTypeChanged += type => _currentTileType = type;
             TileTools.BrushSizechanged += size => _brushSize = size;
 
             TileTools.SaveClicked += OnSaveRequested;
@@ -105,7 +104,7 @@ namespace TTEngine.Editor
             if (TryGetTilePosition(pos, out int sx, out int sy))
                 HandleSelection(sx, sy);
 
-            if(Keyboard.IsKeyDown(Key.LeftAlt))
+            if (Keyboard.IsKeyDown(Key.LeftAlt))
             {
                 _isPainting = false;
                 Mouse.Capture(null);
@@ -123,7 +122,7 @@ namespace TTEngine.Editor
             if (!handled)
                 HandleBrush(pos, e);
 
-            if(_currentToolMode != ToolMode.Brush)
+            if (_currentToolMode != ToolMode.Brush)
             {
                 Mouse.Capture(null);
                 _isPainting = false;
@@ -138,7 +137,7 @@ namespace TTEngine.Editor
 
             if (!_isPainting) return;
 
-            if(e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed)
                 PaintTile(e.GetPosition(MapCanvas));
             if (e.RightButton == MouseButtonState.Pressed)
                 EraseTile(e.GetPosition(MapCanvas));
@@ -149,7 +148,7 @@ namespace TTEngine.Editor
             _isPainting = false;
             Mouse.Capture(null);
 
-            if(_currentBatch != null && !_currentBatch.IsEmpty())
+            if (_currentBatch != null && !_currentBatch.IsEmpty())
             {
                 _undoStack.Push(_currentBatch);
                 _redoStack.Clear();
@@ -168,9 +167,9 @@ namespace TTEngine.Editor
         #region Button Events
 
         private void OnSaveRequested() => SaveMap(this, new RoutedEventArgs());
-        
+
         private void OnLoadRequested() => LoadMap(this, new RoutedEventArgs());
-       
+
         private void OnStartRequested() => StartGame(this, new RoutedEventArgs());
 
         private void OnLayerVisibilityChanged(EditorLayer layer)
@@ -179,6 +178,7 @@ namespace TTEngine.Editor
         private void StartGame(object sender, RoutedEventArgs e) => Process.Start(EditorPaths.GetEngineExe());
 
         private void OpenDefinitiosns(object sender, RoutedEventArgs e) => Inspector.SetContent(new EntityDefinitionPanel(_entityDefinitions));
+        private void OpenTileManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new TileManagementPanel(editorState));
 
         #endregion
 
@@ -247,7 +247,7 @@ namespace TTEngine.Editor
                     int index = _tileMap.GetIndex(x, y);
                     int tile = tiles[index];
 
-                    if (tile == (int)TileType.None)
+                    if (tile == 0)
                         continue;
 
                     Rectangle rect = new Rectangle
@@ -269,45 +269,36 @@ namespace TTEngine.Editor
 
         private Brush GetTileBrush(int tile, MapLayerType layer)
         {
-            switch (layer)
+            var def = TileDefinitionService.GetById(tile);
+            if (def == null)
+                return Brushes.Transparent;
+
+            if (layer == MapLayerType.Collision)
+                return Brushes.Transparent;
+
+            return def.CollisionType switch
             {
-                case MapLayerType.Background:
-                    return tile switch
-                    {
-                        (int)TileType.Ground => new SolidColorBrush(Color.FromArgb(255, 111, 163, 111)), // soft green
-                        (int)TileType.Wall => new SolidColorBrush(Color.FromArgb(255, 139, 122, 94)),  // soil
-                        _ => Brushes.Transparent
-                    };
-
-                case MapLayerType.Collision:
-                    return Brushes.Transparent;
-
-                case MapLayerType.Decoration:
-                    return tile switch
-                    {
-                        (int)TileType.Ground => new SolidColorBrush(Color.FromArgb(255, 76, 175, 80)), // vivid green
-                        (int)TileType.Wall => new SolidColorBrush(Color.FromArgb(255, 121, 85, 72)), // brown
-                        _ => Brushes.Transparent
-                    };
-
-                default:
-                    return Brushes.Transparent;
-            }
+                CollisionType.Ground => Brushes.LightGreen,
+                CollisionType.Wall => Brushes.SaddleBrown,
+                _ => Brushes.Transparent
+            };
         }
 
         private Brush GetTileStroke(int tile, MapLayerType layer)
         {
-            if(layer == MapLayerType.Collision)
-            {
-                return tile switch
-                {
-                    (int)TileType.Ground => Brushes.Red,
-                    (int)TileType.Wall => Brushes.DarkRed,
-                    _ => Brushes.Transparent
-                };
-            }
+            if (layer != MapLayerType.Collision)
+                return Brushes.Transparent;
 
-            return Brushes.Transparent;
+            var def = TileDefinitionService.GetById(tile);
+            if(def == null)
+                return Brushes.Transparent;
+
+            return def.CollisionType switch
+            {
+                CollisionType.Ground => Brushes.Orange,
+                CollisionType.Wall => Brushes.Red,
+                _ => Brushes.Transparent
+            };
         }
 
         private void DrawPlayerSpawn()
@@ -418,7 +409,7 @@ namespace TTEngine.Editor
                         continue;
 
                     int index = _tileMap.GetIndex(tx, ty);
-                    int newValue = isPaint ? (int)_currentTileType : (int)TileType.None;
+                    int newValue = isPaint ? editorState.SelectedTileId : 0;
 
                     ApplyTileChange(index, newValue);
                 }
@@ -437,7 +428,7 @@ namespace TTEngine.Editor
 
             int startIndex = _tileMap.GetIndex(startX, startY);
             int targetValue = ActiveTiles[startIndex];
-            int newValue = (int)_currentTileType;
+            int newValue = editorState.SelectedTileId;
 
             if (targetValue == newValue)
                 return;

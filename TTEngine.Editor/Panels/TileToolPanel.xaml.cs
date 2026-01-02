@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using TTEngine.Editor.Enums;
+using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Tile;
 
 namespace TTEngine.Editor.Panels
@@ -11,12 +13,13 @@ namespace TTEngine.Editor.Panels
     public partial class TileToolPanel : UserControl
     {
         public event Action<ToolMode> ToolModeChanged;
-        public event Action<TileType> TileTypeChanged;
         public event Action<int> BrushSizechanged;
 
         public event Action SaveClicked;
         public event Action LoadClicked;
         public event Action StartGameClicked;
+
+        private EditorState Editor => DataContext as EditorState;
 
         public TileToolPanel()
         {
@@ -24,10 +27,44 @@ namespace TTEngine.Editor.Panels
         }
 
         //Tile Types
-        private void GroundTile_Checked(object sender, RoutedEventArgs e)
-            => TileTypeChanged?.Invoke(TileType.Ground);
-        private void WallTile_Checked(object sender, RoutedEventArgs e)
-            => TileTypeChanged?.Invoke(TileType.Wall);
+        private void OnTileClicked(object sender, RoutedEventArgs e)
+        {
+            if(sender is Button btn && btn.DataContext is TileDefinition def && Editor != null)
+            {
+                Editor.SelectedTileId = def.Id;
+            }
+        }
+
+        private void TileButtonLoaded(object sender, RoutedEventArgs e)
+        {
+            if(sender is Button btn && Editor != null)
+            {
+                UpdateBtnVisual(btn);
+                Editor.PropertyChanged += (_, __) => UpdateBtnVisual(btn);
+            }
+        }
+
+        private void UpdateBtnVisual(Button btn)
+        {
+            if(btn.Tag is  int tileId && Editor != null)
+            {
+                bool isSelected = Editor.SelectedTileId == tileId;
+
+                btn.Background = isSelected 
+                               ? new SolidColorBrush(Color.FromArgb(255, 70, 130, 180))
+                               : new SolidColorBrush(Color.FromArgb(255, 45, 45, 45));
+
+                btn.Foreground = isSelected
+                               ? Brushes.White
+                               : Brushes.LightGray;
+
+                btn.BorderBrush = isSelected
+                                ? Brushes.Gold
+                                : Brushes.DimGray;
+
+                btn.BorderThickness = isSelected ? new Thickness(2) : new Thickness(1);
+            }
+        }
 
         //Brush Size
         private void BrushSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

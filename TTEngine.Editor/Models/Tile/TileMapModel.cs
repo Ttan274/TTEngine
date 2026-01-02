@@ -4,13 +4,6 @@ using TTEngine.Editor.Models.Entity;
 
 namespace TTEngine.Editor.Models.Tile
 {
-    public enum TileType
-    {
-        None = 0,
-        Ground,
-        Wall
-    }
-
     public class TileMapModel
     {
         public int Width { get; set; } = 50;
@@ -30,14 +23,7 @@ namespace TTEngine.Editor.Models.Tile
             };
         }
 
-        private int[] CreateEmptyLayer()
-        {
-            var arr = new int[Width * Height];
-            for (int i = 0; i < arr.Length; i++)
-                arr[i] = (int)TileType.None;
-
-            return arr;
-        }
+        private int[] CreateEmptyLayer() => new int[Width * Height];
 
         public int GetIndex(int x, int y) => (y * Width + x);
     }
