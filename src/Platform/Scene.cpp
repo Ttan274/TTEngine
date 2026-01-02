@@ -30,8 +30,8 @@ namespace EnginePlatform
 		ChangeGameState(GameState::MainMenu);
 
 		//Map Loading
-		std::string mapPath = EngineCore::GetRootDirectory("Maps", "active_map.json");
-		if (!EngineGame::MapLoader::LoadFromFile(mapPath, m_MapData))
+		if (!EngineGame::MapLoader::LoadFromFile(EngineCore::GetFile("Maps", "active_map.json"), 
+												 m_MapData))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Fatal,
@@ -60,8 +60,8 @@ namespace EnginePlatform
 		);
 		
 		//Entity Definitions loaded
-		std::string defPath = EngineCore::GetRootDirectory("Data", "entity_def.json");
-		if (!EngineGame::MapLoader::LoadEntityDefs(defPath, m_EntityDefs))
+		if (!EngineGame::MapLoader::LoadEntityDefs(EngineCore::GetFile("Data", "entity_def.json"),
+												   m_EntityDefs))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Fatal,

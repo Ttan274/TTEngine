@@ -17,7 +17,7 @@ namespace TTEngine.Editor.Services
         {
             var root = GetProjectRoot();
 
-            return Path.GetFullPath(Path.Combine(root, "Maps"));
+            return Path.GetFullPath(Path.Combine(root, "Assets", "Maps"));
         }
 
         public static string GetAssetsFolder()
@@ -31,7 +31,7 @@ namespace TTEngine.Editor.Services
         {
             var root = GetProjectRoot();
 
-            return Path.GetFullPath(Path.Combine(root, "Data"));
+            return Path.GetFullPath(Path.Combine(root, "Assets", "Data"));
         }
 
         public static string GetEngineExe()
