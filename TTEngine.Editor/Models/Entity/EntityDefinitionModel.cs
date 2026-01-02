@@ -1,4 +1,4 @@
-﻿namespace TTEngine.Editor.Models
+﻿namespace TTEngine.Editor.Models.Entity
 {
     public class EntityDefinitionModel
     {

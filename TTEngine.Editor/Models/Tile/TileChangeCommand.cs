@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TTEngine.Editor.Models
+namespace TTEngine.Editor.Models.Tile
 {
     public class TileChangeCommand
     {

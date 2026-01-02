@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Text.Json;
-using TTEngine.Editor.Models;
+using TTEngine.Editor.Models.Entity;
 
 namespace TTEngine.Editor.Services
 {

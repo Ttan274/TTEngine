@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using TTEngine.Editor.Enums;
-using TTEngine.Editor.Models;
+using TTEngine.Editor.Models.Tile;
 
 namespace TTEngine.Editor.Panels
 {

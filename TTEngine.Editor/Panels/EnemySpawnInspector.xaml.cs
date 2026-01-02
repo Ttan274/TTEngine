@@ -1,5 +1,5 @@
 ﻿using System.Windows.Controls;
-using TTEngine.Editor.Models;
+using TTEngine.Editor.Models.Entity;
 
 namespace TTEngine.Editor.Panels
 {

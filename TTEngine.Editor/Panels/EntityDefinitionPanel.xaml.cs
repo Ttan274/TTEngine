@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using TTEngine.Editor.Models;
+using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Panels

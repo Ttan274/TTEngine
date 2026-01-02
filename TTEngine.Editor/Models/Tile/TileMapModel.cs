@@ -1,7 +1,8 @@
 ﻿using System.Windows;
 using TTEngine.Editor.Enums;
+using TTEngine.Editor.Models.Entity;
 
-namespace TTEngine.Editor.Models
+namespace TTEngine.Editor.Models.Tile
 {
     public enum TileType
     {

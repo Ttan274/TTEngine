@@ -10,6 +10,8 @@ using TTEngine.Editor.Services;
 using System.Diagnostics;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Entity;
+using TTEngine.Editor.Models.Tile;
 
 namespace TTEngine.Editor
 {
