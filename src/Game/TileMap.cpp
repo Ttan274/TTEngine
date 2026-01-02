@@ -20,24 +20,6 @@ namespace EngineGame
 		m_WallTex = EnginePlatform::AssetManager::GetTexture(exeDir + "\\wall.png");
 	}
 
-	void TileMap::GenerateTestMap()
-	{
-		for (int y = 0; y < m_Height; ++y)
-		{
-			for (int x = 0; x < m_Width; ++x)
-			{
-				if (y == m_Height - 1 || y == 0 || x == 0 || x == m_Width - 1)
-				{
-					m_Tiles[y * m_Width + x] = TileType::Wall;
-				}
-				else
-				{
-					m_Tiles[y * m_Width + x] = TileType::Ground;
-				}
-			}
-		}
-	}
-
 	TileType TileMap::GetTile(int x, int y) const
 	{
 		if (x < 0 || x >= m_Width || y < 0 || y >= m_Height)

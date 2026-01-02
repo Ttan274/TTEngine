@@ -21,7 +21,6 @@ namespace EngineGame
 		TileMap(int width, int height, int tileSize);
 		
 		void LoadAssets();
-		void GenerateTestMap();
 		
 		//Tile Queries
 		TileType GetTile(int x, int y) const;

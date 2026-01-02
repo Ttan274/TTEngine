@@ -22,12 +22,23 @@ namespace EngineGame
 
 		json j;
 		file >> j;
-		
+
 		//Loading Map Data
 		outMap.w = j["Width"];
 		outMap.h = j["Height"];
 		outMap.tSize = j["TileSize"];
-		outMap.tiles = j["Tiles"].get<std::vector<int>>();
+
+		if (!j.contains("Layers") || !j["Layers"].contains("Collision"))
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Error,
+				EngineCore::LogCategory::Scene,
+				"Map has no collision layer"
+			);
+			return false;
+		}
+
+		outMap.tiles = j["Layers"]["Collision"].get<std::vector<int>>();
 		if ((int)outMap.tiles.size() != outMap.w * outMap.h)
 		{
 			EngineCore::Log::Write(
@@ -79,7 +90,7 @@ namespace EngineGame
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
-			"Map loaded : " + path
+			"Map loaded (collision layer only) : " + path
 		);
 
 		return true;
