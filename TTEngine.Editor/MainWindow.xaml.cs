@@ -178,6 +178,7 @@ namespace TTEngine.Editor
         private void StartGame(object sender, RoutedEventArgs e) => Process.Start(EditorPaths.GetEngineExe());
 
         private void OpenDefinitiosns(object sender, RoutedEventArgs e) => Inspector.SetContent(new EntityDefinitionPanel(_entityDefinitions));
+        
         private void OpenTileManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new TileManagementPanel(editorState));
 
         #endregion
@@ -395,6 +396,9 @@ namespace TTEngine.Editor
 
         private void ApplyBrush(Point pos, bool isPaint)
         {
+            if (isPaint && editorState.SelectedTile == null)
+                return;
+
             int baseX = (int)(pos.X / _tileMap.TileSize);
             int baseY = (int)(pos.Y / _tileMap.TileSize);
 
@@ -409,7 +413,7 @@ namespace TTEngine.Editor
                         continue;
 
                     int index = _tileMap.GetIndex(tx, ty);
-                    int newValue = isPaint ? editorState.SelectedTileId : 0;
+                    int newValue = isPaint ? editorState.SelectedTile.Id : 0;
 
                     ApplyTileChange(index, newValue);
                 }
@@ -420,6 +424,9 @@ namespace TTEngine.Editor
 
         private void Fill(Point pos)
         {
+            if (editorState.SelectedTile == null)
+                return;
+
             int startX = (int)(pos.X / _tileMap.TileSize);
             int startY = (int)(pos.Y / _tileMap.TileSize);
 
@@ -428,7 +435,7 @@ namespace TTEngine.Editor
 
             int startIndex = _tileMap.GetIndex(startX, startY);
             int targetValue = ActiveTiles[startIndex];
-            int newValue = editorState.SelectedTileId;
+            int newValue = editorState.SelectedTile.Id;
 
             if (targetValue == newValue)
                 return;

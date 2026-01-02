@@ -11,14 +11,22 @@
                        Foreground="White"
                        Margin="0,0,0,6"/>
 
-            <ItemsControl ItemsSource="{Binding TileDefinitions}">
+            <ItemsControl x:Name="TilePalette"
+              ItemsSource="{Binding TileDefinitions}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Content="{Binding Name}"
+                        <Border Width="40"
+                                Height="40"
+                                Margin="4"
                                 Tag="{Binding Id}"
-                                Margin="0,2"
-                                Padding="6"
-                                Click="OnTileClicked"
+                                MouseLeftButtonDown="OnTileClicked"
+                                ToolTip="{Binding Name}"
                                 Loaded="TileButtonLoaded"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
-using TTEngine.Editor.Models.Tile;
 
 namespace TTEngine.Editor.Panels
 {
@@ -29,40 +28,38 @@ namespace TTEngine.Editor.Panels
         //Tile Types
         private void OnTileClicked(object sender, RoutedEventArgs e)
         {
-            if(sender is Button btn && btn.DataContext is TileDefinition def && Editor != null)
+            if(sender is Border border && border.Tag is int tileId && Editor != null)
             {
-                Editor.SelectedTileId = def.Id;
+                Editor.SelectedTile = Editor.TileDefinitions.First(t => t.Id == tileId);
             }
         }
 
         private void TileButtonLoaded(object sender, RoutedEventArgs e)
         {
-            if(sender is Button btn && Editor != null)
+            if(sender is Border border && border.Tag is int tileId && Editor != null)
             {
-                UpdateBtnVisual(btn);
-                Editor.PropertyChanged += (_, __) => UpdateBtnVisual(btn);
+                UpdateBtnVisual(border);
+                Editor.PropertyChanged += (_, __) => UpdateBtnVisual(border);
             }
         }
 
-        private void UpdateBtnVisual(Button btn)
+        private void UpdateBtnVisual(Border border)
         {
-            if(btn.Tag is  int tileId && Editor != null)
+            if(border.Tag is int tileId && Editor != null)
             {
-                bool isSelected = Editor.SelectedTileId == tileId;
+                bool isSelected = Editor.SelectedTile?.Id == tileId;
 
-                btn.Background = isSelected 
+                border.Background = isSelected 
                                ? new SolidColorBrush(Color.FromArgb(255, 70, 130, 180))
                                : new SolidColorBrush(Color.FromArgb(255, 45, 45, 45));
 
-                btn.Foreground = isSelected
-                               ? Brushes.White
-                               : Brushes.LightGray;
-
-                btn.BorderBrush = isSelected
+                border.BorderBrush = isSelected
                                 ? Brushes.Gold
                                 : Brushes.DimGray;
 
-                btn.BorderThickness = isSelected ? new Thickness(2) : new Thickness(1);
+                border.BorderThickness = isSelected 
+                                    ? new Thickness(2) 
+                                    : new Thickness(1);
             }
         }
 

@@ -21,20 +21,6 @@ namespace TTEngine.Editor.Models.Editor
             Layers.First(l => l.IsActive);
 
         public ObservableCollection<TileDefinition> TileDefinitions { get; }
-        
-        private int _selectedTileId;
-        public int SelectedTileId
-        {
-            get => _selectedTileId;
-            set
-            {
-                if (_selectedTileId == value)
-                    return;
-
-                _selectedTileId = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedTileId)));
-            }
-        }
 
         private TileDefinition _selectedTile;
         public TileDefinition SelectedTile
@@ -61,7 +47,7 @@ namespace TTEngine.Editor.Models.Editor
         }
 
         public TileDefinition GetSelectedTile()
-            => TileDefinitions.FirstOrDefault(t => t.Id == SelectedTileId);
+            => TileDefinitions.FirstOrDefault(t => t.Id == SelectedTile.Id);
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
