@@ -1,0 +1,10 @@
+{
+  "Id": "new_anim",
+  "SpriteSheetPath": "C:\\Users\\TalhaTan\\Desktop\\TTEngine\\Assets\\Textures\\Walk.png",
+  "FrameWidth": 128,
+  "FrameHeight": 128,
+  "FrameCount": 6,
+  "FrameTime": 0.2,
+  "Loop": true,
+  "EventFrames": []
+}

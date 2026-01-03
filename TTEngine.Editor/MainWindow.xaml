@@ -35,6 +35,12 @@
                     Height="40"
                     Margin="0,20,0,0"
                     Click="OpenTileManager"/>
+
+            <Button Content="Animations"
+                    Width="100"
+                    Height="40"
+                    Margin="0,20,0,0"
+                    Click="OpenAnimationManager"/>
         </StackPanel>
         
         <!-- CENTER: MAP -->

@@ -34,6 +34,13 @@ namespace TTEngine.Editor.Services
             return Path.GetFullPath(Path.Combine(root, "Assets", "Data"));
         }
 
+        public static string GetAnimationFolder()
+        {
+            var root = GetProjectRoot();
+
+            return Path.GetFullPath(Path.Combine(root, "Assets", "Animation"));
+        }
+
         public static string GetEngineExe()
         {
             var root = GetProjectRoot();
@@ -41,5 +48,7 @@ namespace TTEngine.Editor.Services
 
             return Path.GetFullPath(Path.Combine(enginePath, ENGINE_NAME));
         }
+
+        
     }
 }

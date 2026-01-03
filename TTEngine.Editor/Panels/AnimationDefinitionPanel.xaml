@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="TTEngine.Editor.Panels.AnimationDefinitionPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10" Width="260" Background="Wheat">
+
+            <TextBlock Text="Animation Definition"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,0,0,8"/>
+
+            <!-- ANIMATION SELECTION -->
+            <TextBlock  Text="Animations"
+                        FontWeight="Bold"
+                        Margin="0,0,0,4"/>
+
+            <ComboBox   ItemsSource="{Binding Animations}"
+                        SelectedItem="{Binding SelectedAnimation}"
+                        DisplayMemberPath="Id"
+                        Margin="0,0,0,10"
+                        SelectionChanged="OnAnimationChanged"/>
+
+            <!-- ID -->
+            <TextBlock Text="Animation Id"/>
+            <TextBox Text="{Binding SelectedAnimation.Id}"
+                     Margin="0,0,0,8"/>
+
+            <!-- Sprite Sheet -->
+            <TextBlock Text="Sprite Sheet"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox    x:Name="SpritePath"
+                            Text="{Binding SelectedAnimation.SpriteSheetPath}"
+                         Width="180"/>
+                <Button Content="..."
+                        Width="40"
+                        Margin="4,0,0,0"
+                        Click="BrowseSpriteSheet"/>
+            </StackPanel>
+
+            <!-- Frame Settings -->
+            <TextBlock Text="Frame Settings"
+                       FontWeight="Bold"
+                       Margin="0,10,0,4"/>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="W"/>
+                <TextBox Width="40"
+                         Text="{Binding SelectedAnimation.FrameWidth}"/>
+                <TextBlock Text="H" Margin="6,0,0,0"/>
+                <TextBox Width="40"
+                         Text="{Binding SelectedAnimation.FrameHeight}"/>
+            </StackPanel>
+
+            <TextBlock Text="Frame Count"/>
+            <TextBox Text="{Binding SelectedAnimation.FrameCount}"/>
+
+            <TextBlock Text="Frame Time (sec)"/>
+            <TextBox Text="{Binding SelectedAnimation.FrameTime}"/>
+
+            <CheckBox Content="Loop"
+                      IsChecked="{Binding SelectedAnimation.Loop}"
+                      Margin="0,6,0,6"/>
+
+            <!-- Preview -->
+            <TextBlock Text="Preview"
+                       FontWeight="Bold"
+                       Margin="0,8,0,4"/>
+
+            <Border BorderBrush="#666"
+                    BorderThickness="1"
+                    Height="120">
+                <Image x:Name="PreviewImage"
+                       Stretch="Uniform"/>
+            </Border>
+
+            <StackPanel Orientation="Horizontal"
+                        Margin="0,6,0,0">
+                <Button Content="◀" Width="30" Click="PrevFrameClick"/>
+                <Button Content="▶" Width="30" Margin="4,0,0,0" Click="NextFrameClick"/>
+                <Button Content="Play" Width="60" Margin="6,0,0,0" Click="PlayClick"/>
+                <Button Content="Stop" Width="60" Margin="4,0,0,0" Click="StopClick"/>
+            </StackPanel>
+
+            <!-- Timeline -->
+            <TextBlock Text="Timeline"
+                       FontWeight="Bold"
+                       Margin="0,10,0,4"/>
+
+            <ItemsControl   x:Name="TimelineItemsControl"
+                            ItemsSource="{Binding TimelineFrames}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="20"
+                                Height="20"
+                                Margin="2"
+                                Background="#444"
+                                Tag="{Binding}"
+                                MouseDown="OnTimelineFrameClicked"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Button Content="Save Animation"
+                    Margin="0,10,0,0"
+                    Click="SaveClicked"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

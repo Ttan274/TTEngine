@@ -197,6 +197,8 @@ namespace TTEngine.Editor
         private void OpenDefinitiosns(object sender, RoutedEventArgs e) => Inspector.SetContent(new EntityDefinitionPanel(_entityDefinitions));
         
         private void OpenTileManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new TileManagementPanel(editorState));
+        
+        private void OpenAnimationManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new AnimationDefinitionPanel());
 
         #endregion
 
