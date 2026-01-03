@@ -14,7 +14,7 @@
   {
     "Id": 2,
     "Name": "Stone",
-    "SpritePath": "",
+    "SpritePath": "wall.png",
     "CollisionType": "Wall"
   }
 ]

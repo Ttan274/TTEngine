@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -6,12 +8,12 @@ using System.Windows.Shapes;
 using TTEngine.Editor.Dtos;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models;
-using TTEngine.Editor.Services;
-using System.Diagnostics;
-using TTEngine.Editor.Panels;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Models.Validation;
+using TTEngine.Editor.Panels;
+using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor
 {
@@ -58,6 +60,7 @@ namespace TTEngine.Editor
             //Context setup
             LayerEditor.DataContext = editorState;
             TileTools.DataContext = editorState;
+            Inspector.BindEditor(editorState);
 
             foreach (var layer in editorState.Layers)
             {
@@ -176,7 +179,15 @@ namespace TTEngine.Editor
 
         private void OnLoadRequested() => LoadMap(this, new RoutedEventArgs());
 
-        private void OnStartRequested() => StartGame(this, new RoutedEventArgs());
+        private void OnStartRequested()
+        {
+            var validation = ValidateMap();
+
+            if (!validation.IsValid)
+                return;
+
+            StartGame(this, new RoutedEventArgs());
+        }
 
         private void OnLayerVisibilityChanged(EditorLayer layer)
             => DrawGrid();
@@ -676,6 +687,11 @@ namespace TTEngine.Editor
         
         private void SaveMap(object sender, RoutedEventArgs e)
         {
+            var validation = ValidateMap();
+
+            if(!validation.IsValid)
+                return;
+
             var data = new TileMapData
             {
                 Width = _tileMap.Width,
@@ -724,6 +740,61 @@ namespace TTEngine.Editor
             }
 
             DrawGrid();
+        }
+
+        #endregion
+
+        #region Validation
+
+        private EditorValidationResult ValidateMap()
+        {
+            editorState.Console.Clear();
+            EditorValidationResult result = new EditorValidationResult();
+
+            //If player object not spawned
+            if(_tileMap.PlayerSpawn == null)
+            {
+                result.Errors.Add("Error1");
+                editorState.Console.Log("Player spawn is missing");
+                return result;
+            }
+
+            //If player object spawned on solid tile
+            if(IsOnCollision(_tileMap.PlayerSpawn.Position))
+            {
+                result.Errors.Add("Error-2");
+                editorState.Console.Log("Player spawn is placed on a solid tile");
+            }
+
+            //If any enemy object spawned on solid tile
+            foreach (var enemy in _tileMap.EnemySpawns)
+            {
+                if(IsOnCollision(enemy.Position))
+                {
+                    result.Errors.Add("Error3");
+                    editorState.Console.Log("Enemy spawn is placed on a solid tile");
+                }
+            }
+
+            return result;
+        }
+
+        private bool IsOnCollision(Point position)
+        {
+            int x = (int)position.X;
+            int y = (int)position.Y;
+
+            int index = _tileMap.GetIndex(x, y);
+            int tileId = _tileMap.Layers[MapLayerType.Collision][index];
+
+            if (tileId == 0)
+                return false;
+
+            var def = TileDefinitionService.GetById(tileId);
+            if (def == null)
+                return false;
+
+            return def.CollisionType == CollisionType.Wall;
         }
 
         #endregion

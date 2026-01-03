@@ -9,6 +9,8 @@ namespace TTEngine.Editor.Models.Editor
 {
     public class EditorState
     {
+        public EditorConsole Console { get; } = new EditorConsole();
+
         public ObservableCollection<EditorLayer> Layers { get; } =
             new ObservableCollection<EditorLayer>
             {

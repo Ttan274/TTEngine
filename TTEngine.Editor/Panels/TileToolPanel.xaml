@@ -11,8 +11,8 @@
                        Foreground="White"
                        Margin="0,0,0,6"/>
 
-            <ItemsControl x:Name="TilePalette"
-              ItemsSource="{Binding TileDefinitions}">
+            <ItemsControl   x:Name="TilePalette"
+                            ItemsSource="{Binding TileDefinitions}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="4"/>
@@ -25,9 +25,16 @@
                                 Height="40"
                                 Margin="4"
                                 Tag="{Binding Id}"
+                                BorderThickness="1"
+                                BorderBrush="DimGray"
+                                Background="#2D2D2D"
                                 MouseLeftButtonDown="OnTileClicked"
                                 ToolTip="{Binding Name}"
-                                Loaded="TileButtonLoaded"/>
+                                Loaded="TileButtonLoaded">
+                            <Image      Stretch="Uniform"
+                                        Loaded="TileImageLoaded"/>
+
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

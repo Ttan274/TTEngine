@@ -1,8 +1,12 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Panels
 {
@@ -43,15 +47,30 @@ namespace TTEngine.Editor.Panels
             }
         }
 
+        private void TileImageLoaded(object sender, RoutedEventArgs e)
+        {
+            if(sender is Image img && img.DataContext is TileDefinition tile && !string.IsNullOrEmpty(tile.SpritePath))
+            {
+                string fullPath = Path.Combine(EditorPaths.GetAssetsFolder(), tile.SpritePath);
+
+                if (!File.Exists(fullPath))
+                    return;
+
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = new Uri(fullPath, UriKind.Absolute);
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.EndInit();
+
+                img.Source = bmp;
+            }
+        }
+
         private void UpdateBtnVisual(Border border)
         {
             if(border.Tag is int tileId && Editor != null)
             {
                 bool isSelected = Editor.SelectedTile?.Id == tileId;
-
-                border.Background = isSelected 
-                               ? new SolidColorBrush(Color.FromArgb(255, 70, 130, 180))
-                               : new SolidColorBrush(Color.FromArgb(255, 45, 45, 45));
 
                 border.BorderBrush = isSelected
                                 ? Brushes.Gold
