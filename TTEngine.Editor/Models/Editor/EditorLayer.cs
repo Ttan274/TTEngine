@@ -31,9 +31,21 @@ namespace TTEngine.Editor.Models.Editor
 
         }
 
+        private bool _isLocked;
+        public bool IsLocked
+        {
+            get => _isLocked;
+            set
+            {
+                _isLocked = value;
+                OnPropertyChanged(nameof(IsLocked));
+            }
+        }
+
         public EditorLayer(MapLayerType type)
         {
             LayerType = type;
+            IsLocked = false;
         }
 
 

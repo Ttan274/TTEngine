@@ -33,6 +33,9 @@ namespace TTEngine.Editor.Models.Editor
             }
         }
 
+        public bool IsActiveLayerLocked =>
+            ActiveLayer != null && ActiveLayer.IsLocked;
+
         public EditorState()
         {
             TileDefinitions = new ObservableCollection<TileDefinition>(TileDefinitionService.Load());

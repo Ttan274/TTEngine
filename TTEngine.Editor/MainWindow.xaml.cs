@@ -96,6 +96,9 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (editorState.IsActiveLayerLocked)
+                return;
+
             _isPainting = true;
             Mouse.Capture(MapCanvas);
 
@@ -132,6 +135,9 @@ namespace TTEngine.Editor
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             UpdateHover(e.GetPosition(MapCanvas));
+
+            if (editorState.IsActiveLayerLocked)
+                return;
 
             if (_currentToolMode == ToolMode.Fill) return;
 
@@ -382,6 +388,8 @@ namespace TTEngine.Editor
 
             _hoverRect.Width = _brushSize * _tileMap.TileSize;
             _hoverRect.Height = _brushSize * _tileMap.TileSize;
+
+            _hoverRect.Stroke = editorState.IsActiveLayerLocked ? Brushes.Gray : Brushes.Yellow;
 
             Canvas.SetLeft(_hoverRect, x * _tileMap.TileSize);
             Canvas.SetTop(_hoverRect, y * _tileMap.TileSize);

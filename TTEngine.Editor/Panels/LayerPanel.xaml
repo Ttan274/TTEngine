@@ -12,7 +12,9 @@
             <ItemsControl ItemsSource="{Binding Layers}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
+
                         <Border Padding="6" Margin="0,2">
+                            <!-- ACTIVE HIGHLIGHT -->
                             <Border.Style>
                                 <Style TargetType="Border">
                                     <Setter Property="Background" Value="Transparent"/>
@@ -25,21 +27,36 @@
                             </Border.Style>
 
                             <DockPanel>
-                                <CheckBox IsChecked="{Binding IsVisible}"
-                                          Foreground="White"
-                                          Content="👁"
-                                          VerticalAlignment="Center"/>
 
+                                <!-- VISIBILITY -->
+                                <CheckBox IsChecked="{Binding IsVisible}"
+                              Content="👁"
+                              Foreground="White"
+                              VerticalAlignment="Center"
+                              Margin="0,0,6,0"/>
+
+                                <!-- LOCK -->
+                                <CheckBox IsChecked="{Binding IsLocked}"
+                              Content="🔒"
+                              Foreground="White"
+                              VerticalAlignment="Center"
+                              Margin="0,0,6,0"/>
+
+                                <!-- LAYER NAME (CLICK = SET ACTIVE) -->
                                 <TextBlock Text="{Binding LayerType}"
-                                           Foreground="White"
-                                           Margin="8,0,0,0"
-                                           VerticalAlignment="Center"
-                                           MouseDown="Layer_Click"/>
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               Cursor="Hand"
+                               MouseDown="Layer_Click"/>
                             </DockPanel>
+
                         </Border>
+
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+
         </StackPanel>
     </Border>
 </UserControl>
