@@ -1,4 +1,4 @@
-# TTEngine – Custom 2D Game Engine & Editor
+# TTEngine Custom 2D Game Engine & Editor
 
 TTEngine is a custom-built 2D game engine written in **C++**, accompanied by a **WPF-based level and entity editor** written in **C#**.  
 The project focuses on building a **data-driven game pipeline**, where maps, entities, and behaviors are authored in an editor and consumed by the engine at runtime.
@@ -7,206 +7,118 @@ The project focuses on building a **data-driven game pipeline**, where maps, ent
 
 ## 🎯 Project Goals
 
-- Build a lightweight 2D engine from scratch
-- Separate **engine**, **game logic**, and **editor**
-- Use **data-driven design** instead of hardcoded values
-- Support external **map**, **entity**, and **definition** files
-- Allow fast iteration through a custom editor
+- Build a **custom 2D game engine** using C++
+- Design a **standalone editor** for authoring game data
+- Understand **engine architecture**, rendering flow, and asset pipelines
+- Explore **tooling-first development** instead of engine-only gameplay
+- Create a clean separation between runtime and editor responsibilities
 
 ---
 
-## 🧱 Engine Architecture (C++)
+## 🧱 High-Level Architecture
 
-### Core Systems
-- Custom game loop (update / render)
-- Camera system (2D camera with world → screen transform)
-- AssetManager with texture caching
-- Logging system (Info / Warning / Error / Fatal)
-- Math utilities (Vector2, Rect, AABB)
+```tex
+TTEngine
+├── Engine Runtime (C++)
+│ ├── Core Systems
+│ ├── Platform Layer (SDL3)
+│ ├── Rendering / Input / Time
+│ └── Game Logic
+│
+├── Editor (C# / WPF)
+│ ├── Map Editor
+│ ├── Animation Editor
+│ ├── Asset Definitions
+│ └── Data Serialization
+│
+├── Assets
+│ ├── Textures
+│ ├── Animations
+│ ├── Maps
+│ └── Data Files
+│
+└── External Libraries
+```
 
-### Rendering
-- SDL3 + SDL3_image
-- Texture rendering with source/destination rectangles
-- Sprite flipping (left / right)
-- Debug rendering (colliders, tiles, attack boxes)
-
----
-
-## 🗺 TileMap System
-
-- Grid-based tile map
-- Tile types:
-  - `None`
-  - `Ground`
-  - `Wall`
-- TileMap supports:
-  - Rendering only visible tiles (camera-based culling)
-  - World size calculation
-  - Solid checks using AABB
-
-### Collision Model
-- AABB-based collision
-- X and Y axis collision handled separately
-- Ground detection
-- Solid tiles block movement from all directions
 
 ---
 
-## 🧍 Entity System
+## ⚙️ Engine Runtime (C++)
 
-### Base Entity
-- Position
-- Velocity
-- AABB collider
-- World reference (TileMap)
-- Health system
-- Damage flashing
-- Attack state handling
+The engine runtime is responsible for:
 
-### Player
-- Horizontal movement (A / D)
-- Jump + gravity-based physics
-- Grounded checks
-- Attack system
-- Hurt / Death states
-- Camera follow
+- Application lifecycle and game loop
+- Platform abstraction using **SDL3**
+- Rendering, input handling, and timing
+- Loading and interpreting externally-authored asset data
+- Executing game logic independent of editor tools
 
-### Enemy
-- AI states:
-  - Idle
-  - Patrol
-  - Attack
-  - Hurt
-  - Dead
-- Attack range & cooldown
-- Knockback handling
-- Shared physics system with player (gravity + collision)
+The engine is designed to **consume data**, not author it.
 
 ---
 
-## ⚙ Physics System
+## 🛠 Editor (C# / WPF)
 
-- Custom physics (no Rigidbody)
-- Gravity applied manually
-- Separate:
-  - Movement input
-  - Physics update
-  - Collision resolution
-- Prevents:
-  - Wall penetration
-  - Ground clipping
-  - Mid-air floating
+The editor is a separate application built to create and manage engine data:
 
----
+- Tile-based map editing
+- Sprite animation definitions and timelines
+- Asset inspection and validation
+- Data serialization for engine consumption
 
-## 🧠 Combat System
+The editor exports structured data (e.g. JSON) that the engine loads at runtime.
 
-- Attack boxes (Rect-based)
-- Facing-direction based attacks
-- Hit detection with Intersects()
-- Per-attack hit locking (cannot hit multiple times per frame)
-- Damage, knockback, death handling
+This separation allows rapid tooling iteration without affecting engine stability.
 
 ---
 
-## 🧩 Data-Driven Design
+## 📦 Asset-Driven Workflow
 
-### Entity Definitions (JSON)
+TTEngine follows a data-driven approach:
 
-Entities are no longer hardcoded.
+```tex
+Editor → Asset Files → Engine Runtime
+```
 
-Each entity definition includes:
-- `Id`
-- `Speed`
-- `AttackDamage`
-- `AttackInterval`
-- `MaxHP`
-- Textures:
-  - Idle
-  - Walk
-  - Hurt
-  - Death
-  - AttackTextures (list)
 
-Example:
-```json
-{
-  "Id": "Samurai",
-  "Speed": 80,
-  "AttackDamage": 10,
-  "AttackInterval": 0.5,
-  "MaxHP": 70,
-  "IdleTexture": "idle1.png",
-  "WalkTexture": "walk1.png",
-  "HurtTexture": "hurt1.png",
-  "DeathTexture": "dead1.png",
-  "AttackTextures": ["attack4.png"]
-}
+- The editor produces all gameplay and visual data
+- The engine loads and interprets assets at runtime
+- No gameplay logic is hard-coded into editor tools
 
 ---
 
-## 🗺 Map System (Editor → JSON → Engine)
+## 🧠 Design Philosophy
 
-The map system is fully **editor-driven** and serialized to JSON.  
-Maps are never hardcoded in the engine.
-
-### Map Authoring (Editor Side)
-
-Maps are created using a custom **WPF Tile Map Editor**.
-
-Editor features:
-- Grid-based tile painting
-- Tile types:
-  - `None`
-  - `Ground`
-  - `Wall`
-- Brush tool
-- Fill tool
-- Adjustable brush size
-- Undo / redo system
-- Visual grid rendering
-- Mouse-based painting
+- Clear separation of concerns
+- Engine-first, not game-first
+- Tooling is as important as runtime systems
+- Prefer explicit systems over hidden abstractions
+- Learn-by-building, not by wrapping existing engines
 
 ---
 
-### Spawn Placement
+## 🚀 Current Features
 
-The editor supports explicit spawn placement:
-
-- **Player Spawn**
-  - Single spawn point
-  - Assigned a `DefinitionId` (usually `"Player"`)
-
-- **Enemy Spawns**
-  - Multiple spawn points
-  - Each spawn references an `EntityDefinitionId`
-  - Allows different enemy types in the same map
-
-Spawns are placed visually on the map canvas.
+- SDL3-based windowing and input
+- Custom rendering pipeline (2D)
+- Tilemap support
+- Sprite animation system
+- Standalone editor for map and animation authoring
+- Asset serialization and loading
 
 ---
 
-### Map JSON Format
 
-Maps are exported as JSON files and loaded directly by the engine.
+## 📌 Intended Use
 
-Example structure:
+This project is primarily intended as:
 
-```json
-{
-  "Width": 50,
-  "Height": 30,
-  "TileSize": 50,
-  "Tiles": [0, 0, 2, 2, 1, ...],
-  "PlayerSpawn": {
-    "X": 30,
-    "Y": 4,
-    "DefinitionId": "Player"
-  },
-  "EnemySpawns": [
-    { "X": 5,  "Y": 19, "DefinitionId": "Samurai" },
-    { "X": 11, "Y": 11, "DefinitionId": "Samurai" }
-  ]
-}
+- A **learning-oriented engine architecture project**
+- A **portfolio showcase** for engine and tooling development
+- A foundation for experimenting with custom engine systems
+
+It is not intended to compete with production-ready engines.
+
+---
 
 
