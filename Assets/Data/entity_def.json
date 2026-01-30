@@ -5,13 +5,11 @@
     "AttackDamage": 10,
     "AttackInterval": 0.5,
     "MaxHP": 70,
-    "IdleTexture": "idle1.png",
-    "WalkTexture": "walk1.png",
-    "HurtTexture": "hurt1.png",
-    "DeathTexture": "dead1.png",
-    "AttackTextures": [
-      "attack4.png"
-    ]
+    "IdleAnimation": "Samurai_Idle",
+    "WalkAnimation": "Samurai_Walk",
+    "HurtAnimation": "Samurai_Hurt",
+    "DeathAnimation": "Samurai_Death",
+    "AttackAnimations": null
   },
   {
     "Id": "Player",
@@ -19,14 +17,10 @@
     "AttackDamage": 30,
     "AttackInterval": 0.5,
     "MaxHP": 100,
-    "IdleTexture": "idle.png",
-    "WalkTexture": "walk.png",
-    "HurtTexture": "hurt.png",
-    "DeathTexture": "dead.png",
-    "AttackTextures": [
-      "attack1.png",
-      "attack2.png",
-      "attack3.png"
-    ]
+    "IdleAnimation": "Player_Idle",
+    "WalkAnimation": "Player_Walk",
+    "HurtAnimation": "Player_Hurt",
+    "DeathAnimation": "Player_Death",
+    "AttackAnimations": null
   }
 ]

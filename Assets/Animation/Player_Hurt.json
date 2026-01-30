@@ -1,0 +1,10 @@
+{
+  "Id": "Player_Hurt",
+  "SpriteSheetPath": "C:\\Users\\TalhaTan\\Desktop\\TTEngine\\Assets\\Textures\\hurt.png",
+  "FrameWidth": 128,
+  "FrameHeight": 128,
+  "FrameCount": 2,
+  "FrameTime": 0.12,
+  "Loop": false,
+  "EventFrames": []
+}

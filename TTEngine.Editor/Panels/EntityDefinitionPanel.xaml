@@ -15,13 +15,13 @@
                 <Button Content="Delete" Width="60" Click="DeleteDefClicked" />
             </StackPanel>
 
-            <!-- Dropdown -->
+            <!-- ENTITY SELECTION -->
             <TextBlock Text="Entity Type"/>
             <ComboBox x:Name="DefinitionCombo"
                       SelectionChanged="OnDefinitionChanged"
                       Margin="0,0,0,8"/>
 
-            <!-- Stats -->
+            <!-- STATS -->
             <TextBlock Text="Speed"/>
             <TextBox x:Name="SpeedBox"/>
 
@@ -34,147 +34,60 @@
             <TextBlock Text="Max HP" Margin="0,6,0,0"/>
             <TextBox x:Name="MaxHpBox"/>
 
-            <!-- TEXTURES -->
+            <!-- ANIMATIONS -->
+            <TextBlock  Text="Animations"
+                        FontWeight="Bold"
+                        Margin="0,10,0,6"/>
 
-            <!--Idle Texture Area-->
-            <TextBlock Text="Idle Texture" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="IdleTextureBox"
-                         Width="200"
-                         TextChanged="OnIdleTextureChanged"/>
-
-                <Button  Content="..."
-                         Width="50"
-                         Margin="4,0,0,0"
-                         Click="BrowseIdleTexture"/>
-            </StackPanel>
+            <TextBlock  Text="Idle Animation"/>
+            <ComboBox x:Name="IdleAnimCombo" Margin="0,0,0,6"/>
             
-            <Border BorderThickness="1.5"
-                    Margin="0, 5, 0, 5"
-                    BorderBrush="#666">
-                
-                <Image  x:Name="IdlePreview"
-                    Width="256"
-                    Height="128"
-                    Margin="0,4,0,0"
-                    Stretch="Uniform"
-                    StretchDirection="DownOnly"/>
-            </Border>
+            <TextBlock  Text="Walk Animation"/>
+            <ComboBox x:Name="WalkAnimCombo" Margin="0,0,0,6"/>
             
-            <!--Walk Texture Area-->
-            <TextBlock Text="Walk Texture" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="WalkTextureBox"
-                         Width="200"
-                         TextChanged="OnWalkTextureChanged"/>
-
-                <Button  Content="..."
-                         Width="50"
-                         Margin="4,0,0,0"
-                         Click="BrowseWalkTexture"/>
-            </StackPanel>
-            <Border     BorderThickness="1.5"
-                        Margin="0, 5, 0, 5"
-                        BorderBrush="#666">
-                        <Image  x:Name="WalkPreview"
-                                Width="256"
-                                Height="128"
-                                Margin="0,4,0,0"
-                                Stretch="Uniform"
-                                StretchDirection="DownOnly"/>
-            </Border>
+            <TextBlock  Text="Hurt Animation"/>
+            <ComboBox x:Name="HurtAnimCombo" Margin="0,0,0,6"/>
             
-            <!--Hurt Texture Area-->
-            <TextBlock Text="Hurt Texture" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal">
-                <TextBox    x:Name="HurtTextureBox"
-                            Width="200"
-                            TextChanged="OnHurtTextureChanged"/>
-
-                <Button     Content="..."
-                            Width="50"
-                            Margin="4,0,0,0"
-                            Click="BrowseHurtTexture"/>
-            </StackPanel>
-            <Border     BorderThickness="1.5"
-                        Margin="0, 5, 0, 5"
-                        BorderBrush="#666">
-                <Image      x:Name="HurtPreview"
-                        Width="128"
-                        Height="128"
-                        Margin="0,4,0,0"
-                        Stretch="Uniform"
-                        StretchDirection="DownOnly"/>
-            </Border>
+            <TextBlock  Text="Death Animation"/>
+            <ComboBox x:Name="DeathAnimCombo" Margin="0,0,0,6"/>
             
-            
-            <!--Death Texture Area-->
-            <TextBlock Text="Death Texture" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal">
-                <TextBox    x:Name="DeathTextureBox"
-                            Width="200"
-                            TextChanged="OnDeathTextureChanged"/>
+            <!--ATTACK ANIMATIONS SPESIFIC-->
+            <TextBlock Text="Attack Animations"
+           FontWeight="Bold"
+           Margin="0,12,0,4"/>
 
-                <Button     Content="..."
-                            Width="50"
-                            Margin="4,0,0,0"
-                            Click="BrowseDeathTexture"/>
-            </StackPanel>
-            <Border BorderThickness="1.5"
-                    Margin="0, 5, 0, 5"
-                    BorderBrush="#666">
-                <Image      x:Name="DeathPreview"
-                        Width="128"
-                        Height="128"
-                        Margin="0,4,0,0"
-                        Stretch="Uniform"
-                        StretchDirection="DownOnly"/>
-            </Border>
+            <ListBox x:Name="AttackAnimList"
+         Height="120"
+         DisplayMemberPath="."
+         Margin="0,0,0,6"/>
 
-            <!--Attack Textures-->
-            <TextBlock Text="Attack Textures" Margin="0,10,0,0"/>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                <Button  Content="Add"
-                         Width="120"
-                         Margin="5,0,6,0"
-                         Click="AddAttackTexture"/>
+                <ComboBox x:Name="AttackAnimCombo"
+              Width="160"
+              DisplayMemberPath="Id"/>
 
-                <Button  Content="Remove"
-                         Width="120"
-                         Margin="0,0,6,0"
-                         Click="RemoveAttackTexture"/>
-
+                <Button Content="Add"
+            Width="60"
+            Margin="6,0,0,0"
+            Click="AddAttackAnim"/>
             </StackPanel>
 
-            <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Disabled"
-                          Height="150">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="▲"
+            Width="30"
+            Click="MoveAttackUp"/>
 
-                <ItemsControl x:Name="AttackTextureList">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+                <Button Content="▼"
+            Width="30"
+            Margin="4,0,0,0"
+            Click="MoveAttackDown"/>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border BorderBrush="#666"
-                        BorderThickness="1"
-                        Margin="4"
-                        Padding="4"
-                        Background="#222">
-                                <Image Source="{Binding}"
-                           Width="96"
-                           Height="96"
-                           Stretch="Uniform"/>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
+                <Button Content="Remove"
+            Width="80"
+            Margin="6,0,0,0"
+            Click="RemoveAttackAnim"/>
+            </StackPanel>
 
-                </ItemsControl>
-            </ScrollViewer>
-            
             <!--Save Button-->
             <Button Content="Save Definitions"
                     Margin="0,10,0,0"

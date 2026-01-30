@@ -57,7 +57,8 @@ namespace TTEngine.Editor.Services
                 FrameHeight = 128,
                 FrameCount = 1,
                 FrameTime = 0.1f,
-                Loop = true
+                Loop = true,
+                EventFrames = new()
             };
 
             _cache[id] = anim;

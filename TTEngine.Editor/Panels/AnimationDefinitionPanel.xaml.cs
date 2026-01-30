@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,7 +15,7 @@ namespace TTEngine.Editor.Panels
     /// <summary>
     /// Interaction logic for AnimationDefinitionPanel.xaml
     /// </summary>
-    public partial class AnimationDefinitionPanel : UserControl
+    public partial class AnimationDefinitionPanel : UserControl, INotifyPropertyChanged
     {
         private int _currentFrame = 0;
         private BitmapImage _spriteSheet;
@@ -22,13 +23,27 @@ namespace TTEngine.Editor.Panels
 
         public ObservableCollection<AnimationDefinition> Animations { get; }
         public ObservableCollection<int> TimelineFrames { get; } = new();
-        public AnimationDefinition SelectedAnimation { get; set; }
+
+        private AnimationDefinition _selectedAnimation;
+        public AnimationDefinition SelectedAnimation 
+        {
+            get => _selectedAnimation; 
+            set
+            {
+                _selectedAnimation = value;
+                OnPropertyChanged(nameof(SelectedAnimation));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string name)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         public AnimationDefinitionPanel()
         {
             InitializeComponent();
 
-            AnimationDefinitionService.LoadAll();
+            
             Animations = new ObservableCollection<AnimationDefinition>(
                     AnimationDefinitionService.All
                 );
@@ -47,7 +62,10 @@ namespace TTEngine.Editor.Panels
         private void LoadSpriteSheet()
         {
             if (string.IsNullOrWhiteSpace(SelectedAnimation.SpriteSheetPath))
+            {
+                _spriteSheet = null;
                 return;
+            }
 
             try
             {
@@ -221,12 +239,14 @@ namespace TTEngine.Editor.Panels
         {
             _currentFrame = Math.Max(0, _currentFrame - 1);
             UpdatePreviewFrame();
+            UpdateTimelineVisuals();
         }
 
         private void NextFrameClick(object sender, RoutedEventArgs e)
         {
             _currentFrame = Math.Min(SelectedAnimation.FrameCount - 1, _currentFrame + 1);
             UpdatePreviewFrame();
+            UpdateTimelineVisuals();
         }
 
         private void SaveClicked(object sender, RoutedEventArgs e)
@@ -245,6 +265,32 @@ namespace TTEngine.Editor.Panels
 
                 UpdateTimelineVisuals();
             }
+        }
+
+        #endregion
+
+        #region Add/Delete Anim
+
+        private void AddAnimationClick(object sender, RoutedEventArgs e)
+        {
+            var anim = AnimationDefinitionService.Create();
+
+            _spriteSheet = null;
+            Animations.Add(anim);
+            SelectedAnimation = anim;
+            ReloadAnimation();
+        }
+
+        private void DeleteAnimationClick(object sender, RoutedEventArgs e)
+        {
+            if (SelectedAnimation == null)
+                return;
+
+            AnimationDefinitionService.Delete(SelectedAnimation.Id);
+            Animations.Remove(SelectedAnimation);
+
+            SelectedAnimation = AnimationDefinitionService.All.FirstOrDefault();
+            ReloadAnimation();
         }
 
         #endregion

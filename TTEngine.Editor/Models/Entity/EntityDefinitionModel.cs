@@ -11,11 +11,11 @@
         public float AttackInterval { get; set; } 
         public float MaxHP { get; set; }
 
-        //Visuals (Textures)
-        public string IdleTexture { get; set; } = "";
-        public string WalkTexture { get; set; } = "";
-        public string HurtTexture { get; set; } = "";
-        public string DeathTexture { get; set; } = "";
-        public List<string> AttackTextures { get; set; } = new();
+        //Animation Storage (New) -- Later will dropped into a dictionary
+        public string IdleAnimation { get; set; }
+        public string WalkAnimation { get; set; }
+        public string HurtAnimation { get; set; }
+        public string DeathAnimation { get; set; }
+        public List<string> AttackAnimations { get; set; }
     }
 }

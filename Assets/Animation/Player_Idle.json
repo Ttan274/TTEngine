@@ -1,0 +1,10 @@
+{
+  "Id": "Player_Idle",
+  "SpriteSheetPath": "C:\\Users\\TalhaTan\\Desktop\\TTEngine\\Assets\\Textures\\Idle.png",
+  "FrameWidth": 128,
+  "FrameHeight": 128,
+  "FrameCount": 6,
+  "FrameTime": 0.25,
+  "Loop": true,
+  "EventFrames": []
+}

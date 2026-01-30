@@ -4,7 +4,18 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="10" Width="260" Background="Wheat">
+            <StackPanel Orientation="Horizontal"
+                        Margin="0,0,0,8">
 
+                <Button Content="Add"
+                        Width="80"
+                        Margin="0,0,6,0"
+                        Click="AddAnimationClick"/>
+
+                <Button Content="Delete"
+                        Width="80"
+                        Click="DeleteAnimationClick"/>
+            </StackPanel>
             <TextBlock Text="Animation Definition"
                        FontSize="14"
                        FontWeight="Bold"

@@ -1,0 +1,10 @@
+{
+  "Id": "Samurai_Attack",
+  "SpriteSheetPath": "C:\\Users\\TalhaTan\\Desktop\\TTEngine\\Assets\\Textures\\attack4.png",
+  "FrameWidth": 128,
+  "FrameHeight": 128,
+  "FrameCount": 6,
+  "FrameTime": 0.05,
+  "Loop": false,
+  "EventFrames": []
+}

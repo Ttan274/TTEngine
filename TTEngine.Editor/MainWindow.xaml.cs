@@ -58,6 +58,7 @@ namespace TTEngine.Editor
         private void WindowSetup()
         {
             //Context setup
+            AnimationDefinitionService.LoadAll();
             LayerEditor.DataContext = editorState;
             TileTools.DataContext = editorState;
             Inspector.BindEditor(editorState);
