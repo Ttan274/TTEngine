@@ -1,4 +1,5 @@
 #include "Game/Enemy.h"
+#include "Platform/AnimationLibrary.h"
 
 namespace EngineGame
 {
@@ -7,23 +8,27 @@ namespace EngineGame
 		m_Position = { 0.0f, 0.0f };
 		m_Speed = 100.0f;
 		
-		//Idle Anim
-		CreateAnim(&m_IdleAnim, 0.25f, 6, true);
-
-		//Walk Anim
-		CreateAnim(&m_WalkAnim, 0.12f, 8, true);
-
-		//Hurt Anim
-		CreateAnim(&m_HurtAnim, 0.12f, 2, false);
-
-		//Dead Anim
-		CreateAnim(&m_DeathAnim, 0.3f, 3, false);
-
-		//Attack Anim
-		CreateAnim(&m_AttackAnim, 0.05f, 6, false);
-
-		m_CurrentAnim = &m_IdleAnim;
+		m_CurrentAnim = nullptr;
 		UpdateCollider();
+	}
+
+	void Enemy::ApplyDefinition(const EntityDefs& def)
+	{
+		//Base settings
+		m_Speed = def.speed;
+		m_AttackDamage = def.attackDamage;
+		m_AttackInterval = def.attackInterval;
+		m_MaxHP = def.maxHp;
+		m_HP = m_MaxHP;
+
+		//Animations
+		m_IdleAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.idleAnim);
+		m_WalkAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.walkAnim);
+		m_HurtAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.hurtAnim);
+		m_DeathAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.deathAnim);
+		m_AttackAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.attackAnims[0]);
+	
+		m_CurrentAnim = &m_IdleAnim;
 	}
 
 	void Enemy::Update(float dt, const EngineMath::Vector2& playerPos, const EngineCore::AABB& playerColldier)
@@ -266,26 +271,7 @@ namespace EngineGame
 		};
 		EngineCore::SpriteFlip flip = m_FacingRight ? EngineCore::SpriteFlip::None : EngineCore::SpriteFlip::Horizontal;
 
-		Texture2D* currentTexture = nullptr;
-		switch (m_State)
-		{
-		case EnemyState::Dead:
-			currentTexture = m_DeathTexture;
-			break;
-		case EnemyState::Hurt:
-			currentTexture = m_HurtTexture;
-			break;
-		case EnemyState::Chase:
-		case EnemyState::Patrol:
-			currentTexture = m_WalkTexture;
-			break;
-		case EnemyState::Attack:
-			currentTexture = m_AttackTexture;
-			break;
-		default:
-			currentTexture = m_IdleTexture;
-			break;
-		}
+		Texture2D* currentTexture = m_CurrentAnim->GetTexture();
 
 		renderer->DrawTexture(
 			currentTexture,

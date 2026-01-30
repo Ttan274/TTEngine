@@ -1,5 +1,5 @@
 #include "Platform/Scene.h"
-#include "Platform/AssetManager.h"
+#include "Platform/AnimationLibrary.h"
 #include "Core/Log.h"
 #include "Core/PathUtil.h"
 #include "Core/Math/Collision.h"
@@ -59,6 +59,18 @@ namespace EnginePlatform
 			"Map Loaded + TileMap initialized"
 		);
 		
+		//Animation Library loaded
+		std::string animDir = EngineCore::GetRootDirectory() + "\\Assets\\Animation";
+		if (!EnginePlatform::AnimationLibrary::LoadAllAnims(animDir))
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Fatal,
+				EngineCore::LogCategory::Scene,
+				"Failed to load all animation files"
+			);
+			return;
+		}
+
 		//Entity Definitions loaded
 		if (!EngineGame::MapLoader::LoadEntityDefs(EngineCore::GetFile("Data", "entity_def.json"),
 												   m_EntityDefs))
@@ -113,12 +125,12 @@ namespace EnginePlatform
 					continue;
 				}
 
-				LoadPlayer(rootDir, spawn, def);
+				LoadPlayer(spawn, def);
 				m_PlayerSpawned = true;
 			}
 			else
 			{
-				LoadEnemy(rootDir, spawn, def);
+				LoadEnemy(spawn, def);
 			}
 		}
 
@@ -132,26 +144,8 @@ namespace EnginePlatform
 		}
 	}
 
-	void Scene::LoadPlayer(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
+	void Scene::LoadPlayer(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
 	{
-		//Player Loading
-		std::string path = exeDir + "\\Assets/Textures\\";
-
-		//Set Textures
-		m_Player.SetTexture(
-			AssetManager::GetTexture(path + def.idleTexture),
-			AssetManager::GetTexture(path + def.walkTexture),
-			AssetManager::GetTexture(path + def.hurtTexture),
-			AssetManager::GetTexture(path + def.deathTexture)
-		);
-
-		//this method need update
-		m_Player.SetAttackTexture(
-			AssetManager::GetTexture(path + def.attackTextures[0]),
-			AssetManager::GetTexture(path + def.attackTextures[1]),
-			AssetManager::GetTexture(path + def.attackTextures[2])
-		);
-
 		//Set World Reference
 		m_Player.SetWorld(m_TileMap.get());
 
@@ -191,19 +185,10 @@ namespace EnginePlatform
 		);
 	}
 
-	void Scene::LoadEnemy(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
+	void Scene::LoadEnemy(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
 	{
 		//Enemy Loading
-		std::string path = exeDir + "\\Assets/Textures\\";
 		auto enemy = std::make_unique<EngineGame::Enemy>();
-
-		//Set Textures
-		enemy->SetTexture(AssetManager::GetTexture(path + def.idleTexture),
-						  AssetManager::GetTexture(path + def.walkTexture),
-						  AssetManager::GetTexture(path + def.hurtTexture),
-						  AssetManager::GetTexture(path + def.deathTexture));
-
-		enemy->SetAttackTexture(AssetManager::GetTexture(path + def.attackTextures[0]));
 
 		//Set World Reference
 		enemy->SetWorld(m_TileMap.get());

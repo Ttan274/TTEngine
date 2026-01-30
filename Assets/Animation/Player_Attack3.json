@@ -1,0 +1,10 @@
+{
+  "Id": "Player_Attack3",
+  "SpriteSheetPath": "C:\\Users\\TalhaTan\\Desktop\\TTEngine\\Assets\\Textures\\attack3.png",
+  "FrameWidth": 128,
+  "FrameHeight": 128,
+  "FrameCount": 4,
+  "FrameTime": 0.14,
+  "Loop": false,
+  "EventFrames": []
+}

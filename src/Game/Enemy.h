@@ -22,10 +22,10 @@ namespace EngineGame
 		void Render(EngineCore::IRenderer* renderer,
 			const Camera2D& camera) override;
 		void TakeDamage(float amount, bool objectDir) override;
+		void ApplyDefinition(const EntityDefs& def) override;
 
 		//Enemy Spesific Methods
 		void Update(float dt, const EngineMath::Vector2& playerPos, const EngineCore::AABB& playerCollider);
-		void SetAttackTexture(Texture2D* aT) { m_AttackTexture = aT; }
 		bool CanAttack(const EngineMath::Vector2& playerPos, 
 					   const EngineCore::AABB& playerCollider) const;
 		bool CanDealDamage() const { return m_CanDealDamage; }
@@ -60,9 +60,6 @@ namespace EngineGame
 
 		//Animation
 		EngineCore::Animation m_AttackAnim;
-
-		//Sprite
-		Texture2D* m_AttackTexture = nullptr;
 
 		//Attack Detection
 		EngineMath::Vector2 m_AttackRange = { 60.0f, 20.0f };

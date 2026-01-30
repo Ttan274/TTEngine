@@ -57,33 +57,6 @@ namespace EngineGame
 		);
 	}
 	
-	void Entity::SetTexture(Texture2D* idleT, Texture2D* walkT, Texture2D* hurtT, Texture2D* deadT)
-	{
-		m_IdleTexture = idleT;
-		m_WalkTexture = walkT;
-		m_HurtTexture = hurtT;
-		m_DeathTexture = deadT;
-	}
-
-	void Entity::ApplyDefinition(const EngineGame::EntityDefs& def)
-	{
-		m_Speed = def.speed;
-		m_AttackDamage = def.attackDamage;
-		m_AttackInterval = def.attackInterval;
-		m_MaxHP = def.maxHp;
-		m_HP = m_MaxHP;
-	}
-
-	void Entity::CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop)
-	{
-		anim->SetLoop(loop);
-		anim->SetFrameTime(frameTime);
-		for (int i = 0; i < frameSize; i++)
-		{
-			anim->AddFrame({ i * m_SpriteW, 0.0f, m_SpriteW, m_SpriteH });
-		}
-	}
-
 	EngineCore::Rect Entity::GetAttackBox() const
 	{
 		EngineCore::Rect attackBox;

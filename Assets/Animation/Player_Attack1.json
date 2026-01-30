@@ -5,6 +5,6 @@
   "FrameHeight": 128,
   "FrameCount": 5,
   "FrameTime": 0.12,
-  "Loop": true,
+  "Loop": false,
   "EventFrames": []
 }

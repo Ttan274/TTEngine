@@ -1,4 +1,5 @@
 #include "Game/Player.h"
+#include "Platform/AnimationLibrary.h"
 
 namespace EngineGame
 {
@@ -7,34 +8,31 @@ namespace EngineGame
 		m_Position = { 0.0f, 0.0f};
 		m_Speed = 150.0f;
 		m_AttackDamage = 20.0f;	
-
-		//Idle Anim
-		CreateAnim(&m_IdleAnim, 0.25f, 6, true);
 		
-		//Walk Anim
-		CreateAnim(&m_WalkAnim, 0.12f, 8, true);
+		m_CurrentAnim = nullptr;
+		UpdateCollider();
+	}
 
-		//Attack Animations
-		EngineCore::Animation attack1;
-		CreateAnim(&attack1, 0.12f, 5, false);
-		m_AttackAnims.push_back(attack1);
+	void Player::ApplyDefinition(const EntityDefs& def)
+	{
+		//Base settings
+		m_Speed = def.speed;
+		m_AttackDamage = def.attackDamage;
+		m_AttackInterval = def.attackInterval;
+		m_MaxHP = def.maxHp;
+		m_HP = m_MaxHP;
 
-		EngineCore::Animation attack2;
-		CreateAnim(&attack2, 0.18f, 3, false);
-		m_AttackAnims.push_back(attack2);
-
-		EngineCore::Animation attack3;
-		CreateAnim(&attack3, 0.14f, 4, false);
-		m_AttackAnims.push_back(attack3);
-
-		//Hurt Animation
-		CreateAnim(&m_HurtAnim, 0.12f, 2, false);
-
-		//Death Animation
-		CreateAnim(&m_DeathAnim, 0.3f, 4, false);
+		//Animations
+		m_IdleAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.idleAnim);
+		m_WalkAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.walkAnim);
+		m_HurtAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.hurtAnim);
+		m_DeathAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.deathAnim);
+		
+		m_AttackAnims.clear();
+		for (const auto& animId : def.attackAnims)
+			m_AttackAnims.push_back(EnginePlatform::AnimationLibrary::CreateAnimation(animId));
 
 		m_CurrentAnim = &m_IdleAnim;
-		UpdateCollider();
 	}
 
 	void Player::Update(float dt)
@@ -57,13 +55,6 @@ namespace EngineGame
 		}
 
 		UpdatePhysics(dt);
-	}
-
-	void Player::SetAttackTexture(Texture2D* aT1, Texture2D* aT2, Texture2D* aT3)
-	{
-		m_AttackTextures.push_back(aT1);
-		m_AttackTextures.push_back(aT2);
-		m_AttackTextures.push_back(aT3);
 	}
 
 	void Player::UpdateMovement(float dt)
@@ -179,21 +170,7 @@ namespace EngineGame
 		};
 		EngineCore::SpriteFlip flip = m_FacingRight ? EngineCore::SpriteFlip::None : EngineCore::SpriteFlip::Horizontal;
 
-		Texture2D* currentTexture = nullptr;
-		if (m_CurrentAnim == &m_IdleAnim)
-			currentTexture = m_IdleTexture;
-		else if (m_CurrentAnim == &m_WalkAnim)
-			currentTexture = m_WalkTexture;
-		else if (m_CurrentAnim == &m_AttackAnims[0])
-			currentTexture = m_AttackTextures[0];
-		else if (m_CurrentAnim == &m_AttackAnims[1])
-			currentTexture = m_AttackTextures[1];
-		else if (m_CurrentAnim == &m_AttackAnims[2])
-			currentTexture = m_AttackTextures[2];
-		else if (m_CurrentAnim == &m_HurtAnim)
-			currentTexture = m_HurtTexture;
-		else if (m_CurrentAnim == &m_DeathAnim)
-			currentTexture = m_DeathTexture;
+		Texture2D* currentTexture = m_CurrentAnim->GetTexture();
 
 		renderer->DrawTexture(
 			currentTexture,

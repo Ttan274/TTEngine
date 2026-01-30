@@ -30,10 +30,10 @@ namespace EngineGame
 		void Render(EngineCore::IRenderer* renderer,
 					const Camera2D& camera) override;
 		void TakeDamage(float amount, bool objectDir) override;
+		void ApplyDefinition(const EntityDefs& def) override;
 
 		//Player Spesific Methods
 		void Update(float dt);
-		void SetAttackTexture(Texture2D* aT1, Texture2D* aT2, Texture2D* aT3);
 		void SetSpawnPoint(const EngineMath::Vector2& pos) { m_SpawnPoint = pos; }
 		void Respawn();
 

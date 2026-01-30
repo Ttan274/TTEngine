@@ -24,8 +24,8 @@ namespace EnginePlatform
 
 		void Load();
 		void LoadSpawnEntities();
-		void LoadPlayer(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
-		void LoadEnemy(const std::string& exeDir, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
+		void LoadPlayer(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
+		void LoadEnemy(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
 		void LoadCamera();
 		void Update(float dt);
 		void Render(EngineCore::IRenderer* renderer);

@@ -9,7 +9,9 @@
     "WalkAnimation": "Samurai_Walk",
     "HurtAnimation": "Samurai_Hurt",
     "DeathAnimation": "Samurai_Death",
-    "AttackAnimations": null
+    "AttackAnimations": [
+      "Samurai_Attack"
+    ]
   },
   {
     "Id": "Player",
@@ -21,6 +23,10 @@
     "WalkAnimation": "Player_Walk",
     "HurtAnimation": "Player_Hurt",
     "DeathAnimation": "Player_Death",
-    "AttackAnimations": null
+    "AttackAnimations": [
+      "Player_Attack1",
+      "Player_Attack2",
+      "Player_Attack3"
+    ]
   }
 ]

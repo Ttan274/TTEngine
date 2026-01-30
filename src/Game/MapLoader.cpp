@@ -124,13 +124,13 @@ namespace EngineGame
 			def.attackInterval = e["AttackInterval"].get<float>();
 			def.maxHp = e["MaxHP"].get<float>();
 
-			def.idleTexture = e["IdleTexture"];
-			def.walkTexture = e["WalkTexture"];
-			def.hurtTexture = e["HurtTexture"];
-			def.deathTexture = e["DeathTexture"];
+			def.idleAnim = e["IdleAnimation"];
+			def.walkAnim = e["WalkAnimation"];
+			def.hurtAnim = e["HurtAnimation"];
+			def.deathAnim = e["DeathAnimation"];
 
-			if (e.contains("AttackTextures"))
-				def.attackTextures = e["AttackTextures"].get<std::vector<std::string>>();
+			if (e.contains("AttackAnimations"))
+				def.attackAnims = e["AttackAnimations"].get<std::vector<std::string>>();
 
 			outDefs[def.defId] = def;
 		}

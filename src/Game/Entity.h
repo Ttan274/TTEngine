@@ -19,11 +19,11 @@ namespace EngineGame
 		float maxHp;
 
 		//Texture paths
-		std::string idleTexture;
-		std::string walkTexture;
-		std::string hurtTexture;
-		std::string deathTexture;
-		std::vector<std::string> attackTextures;
+		std::string idleAnim;
+		std::string walkAnim;
+		std::string hurtAnim;
+		std::string deathAnim;
+		std::vector<std::string> attackAnims;
 	};
 
 	class Entity
@@ -35,11 +35,10 @@ namespace EngineGame
 		//Virtual methods
 		virtual void Render(EngineCore::IRenderer* renderer,
 			const Camera2D& camera) = 0;
-		
+		virtual void ApplyDefinition(const EntityDefs& def) = 0;
+
 		//Basic Methods
-		void SetTexture(Texture2D* idleT, Texture2D* walkT, Texture2D* hurtT, Texture2D* deadT);
 		void SetWorld(TileMap* world);
-		void ApplyDefinition(const EntityDefs& def);
 		
 		//Position
 		void SetPosition(EngineMath::Vector2 pos) { m_Position.x = pos.x; m_Position.y = pos.y; };
@@ -73,7 +72,6 @@ namespace EngineGame
 	protected:
 		void MoveAndCollide(const EngineMath::Vector2& velocity);
 		void UpdateCollider();
-		void CreateAnim(EngineCore::Animation* anim, float frameTime, int frameSize, bool loop);
 
 		virtual void OnDeath() = 0;
 		virtual void TakeDamage(float amount, bool objectDir) = 0;
@@ -107,10 +105,6 @@ namespace EngineGame
 		bool m_IsMoving = false;
 
 		//Sprite
-		Texture2D* m_IdleTexture = nullptr;
-		Texture2D* m_WalkTexture = nullptr;
-		Texture2D* m_HurtTexture = nullptr;
-		Texture2D* m_DeathTexture = nullptr;
 		float m_SpriteW = 128.0f;
 		float m_SpriteH = 128.0f;
 
