@@ -23,6 +23,7 @@ namespace EngineCore
 		if (m_Timer >= m_FrameTime)
 		{
 			m_Timer -= m_FrameTime;
+			m_PreviousFrame = m_CurrentFrame;
 
 			if (m_CurrentFrame < (int)m_Frames.size() - 1)
 			{
@@ -44,6 +45,7 @@ namespace EngineCore
 	{
 		m_CurrentFrame = 0;
 		m_Timer = 0.0f;
+		m_PreviousFrame = -1;
 	}
 
 	bool Animation::IsFinished() const
@@ -60,5 +62,22 @@ namespace EngineCore
 	int Animation::GetFrameCount() const
 	{
 		return static_cast<int>(m_Frames.size());
+	}
+
+	bool Animation::IsEventTriggered() const
+	{
+		if (m_CurrentFrame == m_PreviousFrame)
+			return false;
+
+		return std::find(m_EventFrames.begin(),
+			m_EventFrames.end(),
+			m_CurrentFrame) != m_EventFrames.end();
+	}
+
+	bool Animation::IsInEventWindow() const
+	{
+		return std::find(m_EventFrames.begin(),
+			m_EventFrames.end(),
+			m_CurrentFrame) != m_EventFrames.end();
 	}
 }

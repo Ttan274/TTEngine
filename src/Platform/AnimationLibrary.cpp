@@ -35,8 +35,8 @@ namespace EnginePlatform
 			anim.frameTime = j["FrameTime"].get<float>();
 			anim.loop = j["Loop"];
 
-			/*if (j.contains("EventFrames"))
-				anim.eventFrames = j["EventFrames"].get<std::vector<int>>();*/
+			if (j.contains("EventFrames"))
+				anim.eventFrames = j["EventFrames"].get<std::vector<int>>();
 
 			s_Animations[anim.id] = anim;
 		}
@@ -76,6 +76,8 @@ namespace EnginePlatform
 		{
 			anim.AddFrame({ i * data.frameW, 0.0f, data.frameW, data.frameH });
 		}
+
+		anim.SetEventFrames(data.eventFrames);
 
 		return anim;
 	}

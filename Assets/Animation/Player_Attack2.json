@@ -6,5 +6,7 @@
   "FrameCount": 3,
   "FrameTime": 0.18,
   "Loop": false,
-  "EventFrames": []
+  "EventFrames": [
+    1
+  ]
 }

@@ -74,15 +74,6 @@ namespace EngineGame
 		if (!m_IsAttacking || m_CurrentAnim == nullptr)
 			return false;
 
-		int frame = m_CurrentAnim->GetCurrentFrameIndex();
-		int count = m_CurrentAnim->GetFrameCount();
-
-		int center = count / 2;
-		int halfwidth = (count <= 3) ? 0 : 1;
-
-		int start = std::max(0, center - halfwidth);
-		int end = std::min(count - 1, center + halfwidth);
-
-		return frame >= start && frame <= end;
+		return m_CurrentAnim->IsEventTriggered();
 	}
 }

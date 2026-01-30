@@ -166,6 +166,9 @@ namespace TTEngine.Editor.Panels
             LoadSpriteSheet();
             RebuildTimeline();
             UpdatePreviewFrame();
+
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded,
+                                   new Action(UpdateTimelineVisuals));
         }
 
         private void RebuildTimeline()
@@ -187,7 +190,7 @@ namespace TTEngine.Editor.Panels
                                .ItemContainerGenerator
                                .ContainerFromItem(item) as ContentPresenter;
 
-                if (container == null) continue;
+                if (container == null || VisualTreeHelper.GetChildrenCount(container) == 0) continue;
 
                 var border = VisualTreeHelper.GetChild(container, 0) as Border;
                 if (border == null) continue;

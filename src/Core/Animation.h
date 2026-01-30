@@ -21,6 +21,10 @@ namespace EngineCore
 		void Reset();
 		bool IsFinished() const;
 
+		void SetEventFrames(const std::vector<int>& frames) { m_EventFrames = frames; }
+		bool IsEventTriggered() const;
+		bool IsInEventWindow() const;
+
 		void SetTexture(EngineGame::Texture2D* tex) { m_Texture = tex; }
 		EngineGame::Texture2D* GetTexture() const { return m_Texture; }
 	private:
@@ -28,7 +32,9 @@ namespace EngineCore
 		float m_Timer = 0.0f;
 		float m_FrameTime = 0.15f;
 		int m_CurrentFrame = 0;
+		int m_PreviousFrame = -1;
 		bool m_Loop = true;
 		EngineGame::Texture2D* m_Texture = nullptr;
+		std::vector<int> m_EventFrames;
 	};
 }

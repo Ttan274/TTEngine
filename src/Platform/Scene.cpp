@@ -322,7 +322,7 @@ namespace EnginePlatform
 				const EngineCore::Rect eAttackBox = e->GetAttackBox();
 				if (EngineMath::RectIntersectsAABB(eAttackBox, m_Player.GetCollider()))
 				{
-					if (e->CanDealDamage() && !e->HasHitThisAttack())
+					if (e->CanDealDamage() && !e->HasHitThisAttack() && e->IsDamageFrame())
 					{
 						m_Player.TakeDamage(e->GetAttackDamage(), e->IsFacingRight());
 						m_Camera.StartShake(0.15f, 6.0f);
