@@ -30,7 +30,7 @@ namespace EnginePlatform
 		ChangeGameState(GameState::MainMenu);
 
 		//Map Loading
-		if (!EngineGame::MapLoader::LoadFromFile(EngineCore::GetFile("Maps", "active_map.json"), 
+		if (!EngineGame::MapLoader::LoadFromFile(EngineCore::GetFile("Data", "active_map.json"), 
 												 m_MapData))
 		{
 			EngineCore::Log::Write(
