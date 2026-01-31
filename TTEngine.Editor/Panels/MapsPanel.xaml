@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="TTEngine.Editor.Panels.MapsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="10" Background="Wheat">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT : MAP LIST -->
+        <StackPanel Grid.Column="0">
+
+            <TextBlock Text="Maps"
+                       FontWeight="Bold"
+                       Margin="0,0,0,6"/>
+
+            <ListBox ItemsSource="{Binding Maps}"
+                     SelectedItem="{Binding SelectedMap}"
+                     DisplayMemberPath="Id"
+                     Height="220"/>
+
+            <StackPanel Orientation="Horizontal"
+                        Margin="0,6,0,0">
+                <Button Content="Add"
+                        Width="60"
+                        Margin="0,0,6,0"
+                        Click="AddMapClick"/>
+                <Button Content="Delete"
+                        Width="60"
+                        Click="DeleteMapClick"/>
+            </StackPanel>
+
+        </StackPanel>
+
+        <!-- RIGHT : MAP DETAILS -->
+        <StackPanel Grid.Column="1"
+                    Margin="10,0,0,0">
+
+            <TextBlock Text="Map Settings"
+                       FontWeight="Bold"
+                       Margin="0,0,0,8"/>
+
+            <TextBlock Text="Map Id"/>
+            <TextBox Text="{Binding SelectedMap.Id}"
+                     Margin="0,0,0,8"/>
+
+            <TextBlock Text="Width"/>
+            <TextBox Text="{Binding SelectedMap.Width}"
+                     Margin="0,0,0,8"/>
+
+            <TextBlock Text="Height"/>
+            <TextBox Text="{Binding SelectedMap.Height}"
+                     Margin="0,0,0,8"/>
+
+            <TextBlock Text="Tile Editor"
+                       FontWeight="Bold"
+                       Margin="0,12,0,4"/>
+
+            <TextBlock Text="Selected map is now editable in the Tile Editor."
+                       FontStyle="Italic"
+                       Foreground="Gray"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

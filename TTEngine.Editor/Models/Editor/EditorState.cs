@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
@@ -37,6 +36,28 @@ namespace TTEngine.Editor.Models.Editor
 
         public bool IsActiveLayerLocked =>
             ActiveLayer != null && ActiveLayer.IsLocked;
+
+        private TileMapModel _activeMap;
+        public TileMapModel ActiveMap
+        {
+            get => _activeMap;
+            set
+            {
+                _activeMap = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveMap)));
+            }
+        }
+
+        private string _activeMapId;
+        public string ActiveMapId
+        {
+            get => _activeMapId;
+            set
+            {
+                _activeMapId = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveMapId)));
+            }
+        }
 
         public EditorState()
         {

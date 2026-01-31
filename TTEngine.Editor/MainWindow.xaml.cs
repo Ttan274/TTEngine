@@ -23,10 +23,11 @@ namespace TTEngine.Editor
     public partial class MainWindow : Window
     {
         //Map
-        private TileMapModel _tileMap = new();
+        private TileMapModel ActiveMap => editorState.ActiveMap;
         private bool _isPainting = false;
         private int _brushSize = 1;
         private Rectangle _hoverRect;
+        public const string DEFAULT_MAP_ID = "Map_Default";
 
         //Stack
         private Stack<TileBatchCommand> _undoStack = new();
@@ -44,7 +45,7 @@ namespace TTEngine.Editor
         public EditorState editorState { get; } = new EditorState();
 
         //Active Tiles
-        private int[] ActiveTiles => _tileMap.Layers[editorState.ActiveLayer.LayerType];
+        private int[] ActiveTiles => ActiveMap?.Layers[editorState.ActiveLayer.LayerType];
 
         public MainWindow()
         {
@@ -62,6 +63,12 @@ namespace TTEngine.Editor
             LayerEditor.DataContext = editorState;
             TileTools.DataContext = editorState;
             Inspector.BindEditor(editorState);
+
+            editorState.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(editorState.ActiveMap))
+                    DrawGrid();
+            };
 
             foreach (var layer in editorState.Layers)
             {
@@ -88,8 +95,7 @@ namespace TTEngine.Editor
             TileTools.LoadClicked += OnLoadRequested;
             TileTools.StartGameClicked += OnStartRequested;
 
-            _tileMap.Init();
-
+            EnsureDefaultMap();
             DrawGrid();
             CreateHoverRect();
         }
@@ -197,9 +203,9 @@ namespace TTEngine.Editor
 
         private void OpenDefinitiosns(object sender, RoutedEventArgs e) => Inspector.SetContent(new EntityDefinitionPanel(_entityDefinitions));
         
-        private void OpenTileManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new TileManagementPanel(editorState));
+        private void OpenTileManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new LevelsPanel(editorState));
         
-        private void OpenAnimationManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new AnimationDefinitionPanel());
+        private void OpenAnimationManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new MapsPanel(editorState)); //Inspector.SetContent(new AnimationDefinitionPanel());
 
         #endregion
 
@@ -209,8 +215,13 @@ namespace TTEngine.Editor
         {
             //Mapcanvas settings
             MapCanvas.Children.Clear();
-            MapCanvas.Width = _tileMap.Width * _tileMap.TileSize;
-            MapCanvas.Height = _tileMap.Height * _tileMap.TileSize;
+            if (ActiveMap == null)
+            {
+                MapCanvas.Children.Clear();
+                return;    
+            }
+            MapCanvas.Width = ActiveMap.Width * ActiveMap.TileSize;
+            MapCanvas.Height = ActiveMap.Height * ActiveMap.TileSize;
 
             //Grid overlay
             DrawGridOverlay();
@@ -235,22 +246,22 @@ namespace TTEngine.Editor
 
         private void DrawGridOverlay()
         {
-            for (int y = 0; y < _tileMap.Height; y++)
+            for (int y = 0; y < ActiveMap.Height; y++)
             {
-                for (int x = 0; x < _tileMap.Width; x++)
+                for (int x = 0; x < ActiveMap.Width; x++)
                 {
                     Rectangle grid = new Rectangle
                     {
-                        Width = _tileMap.TileSize,
-                        Height = _tileMap.TileSize,
+                        Width = ActiveMap.TileSize,
+                        Height = ActiveMap.TileSize,
                         Stroke = Brushes.DimGray,
                         StrokeThickness = 0.5,
                         Fill = Brushes.DimGray,
                         IsHitTestVisible = false
                     };
 
-                    Canvas.SetLeft(grid, x * _tileMap.TileSize);
-                    Canvas.SetTop(grid, y * _tileMap.TileSize);
+                    Canvas.SetLeft(grid, x * ActiveMap.TileSize);
+                    Canvas.SetTop(grid, y * ActiveMap.TileSize);
 
                     MapCanvas.Children.Add(grid);
                 }
@@ -259,13 +270,13 @@ namespace TTEngine.Editor
 
         private void DrawLayer(MapLayerType layerType)
         {
-            var tiles = _tileMap.Layers[layerType];
+            var tiles = ActiveMap.Layers[layerType];
 
-            for (int y = 0; y < _tileMap.Height; y++)
+            for (int y = 0; y < ActiveMap.Height; y++)
             {
-                for (int x = 0; x < _tileMap.Width; x++)
+                for (int x = 0; x < ActiveMap.Width; x++)
                 {
-                    int index = _tileMap.GetIndex(x, y);
+                    int index = ActiveMap.GetIndex(x, y);
                     int tile = tiles[index];
 
                     if (tile == 0)
@@ -273,16 +284,16 @@ namespace TTEngine.Editor
 
                     Rectangle rect = new Rectangle
                     {
-                        Width = _tileMap.TileSize,
-                        Height = _tileMap.TileSize,
+                        Width = ActiveMap.TileSize,
+                        Height = ActiveMap.TileSize,
                         Stroke = GetTileStroke(tile, layerType),
                         StrokeThickness = (layerType == MapLayerType.Collision) ? 2.0 : 0.0,
                         Fill = GetTileBrush(tile, layerType),
                         IsHitTestVisible = false
                     };
 
-                    Canvas.SetLeft(rect, x * _tileMap.TileSize);
-                    Canvas.SetTop(rect, y * _tileMap.TileSize);
+                    Canvas.SetLeft(rect, x * ActiveMap.TileSize);
+                    Canvas.SetTop(rect, y * ActiveMap.TileSize);
                     MapCanvas.Children.Add(rect);
                 }
             }
@@ -324,11 +335,11 @@ namespace TTEngine.Editor
 
         private void DrawPlayerSpawn()
         {
-            if (_tileMap.PlayerSpawn == null)
+            if (ActiveMap.PlayerSpawn == null)
                 return;
 
-            double cx = (_tileMap.PlayerSpawn.Position.X + 0.5) * _tileMap.TileSize;
-            double cy = (_tileMap.PlayerSpawn.Position.Y + 0.5) * _tileMap.TileSize;
+            double cx = (ActiveMap.PlayerSpawn.Position.X + 0.5) * ActiveMap.TileSize;
+            double cy = (ActiveMap.PlayerSpawn.Position.Y + 0.5) * ActiveMap.TileSize;
 
             Path star = new Path
             {
@@ -350,15 +361,15 @@ namespace TTEngine.Editor
 
         private void DrawEnemySpawns()
         {
-            foreach (var spawn in _tileMap.EnemySpawns)
+            foreach (var spawn in ActiveMap.EnemySpawns)
             {
-                double cx = (spawn.Position.X + 0.5) * _tileMap.TileSize;
-                double cy = (spawn.Position.Y + 0.5) * _tileMap.TileSize;
+                double cx = (spawn.Position.X + 0.5) * ActiveMap.TileSize;
+                double cy = (spawn.Position.Y + 0.5) * ActiveMap.TileSize;
 
                 Ellipse e = new Ellipse
                 {
-                    Width = _tileMap.TileSize * 0.5,
-                    Height = _tileMap.TileSize * 0.5,
+                    Width = ActiveMap.TileSize * 0.5,
+                    Height = ActiveMap.TileSize * 0.5,
                     Stroke = Brushes.Red,
                     StrokeThickness = 2,
                     Fill = Brushes.Transparent,
@@ -389,10 +400,13 @@ namespace TTEngine.Editor
 
         private void UpdateHover(Point pos)
         {
-            int x = (int)(pos.X / _tileMap.TileSize);
-            int y = (int)(pos.Y / _tileMap.TileSize);
+            if (ActiveMap == null)
+                return;
 
-            if (x < 0 || y < 0 || x >= _tileMap.Width || y >= _tileMap.Height)
+            int x = (int)(pos.X / ActiveMap.TileSize);
+            int y = (int)(pos.Y / ActiveMap.TileSize);
+
+            if (x < 0 || y < 0 || x >= ActiveMap.Width || y >= ActiveMap.Height)
             {
                 _hoverRect.Visibility = Visibility.Hidden;
                 return;
@@ -400,13 +414,13 @@ namespace TTEngine.Editor
 
             _hoverRect.Visibility = Visibility.Visible;
 
-            _hoverRect.Width = _brushSize * _tileMap.TileSize;
-            _hoverRect.Height = _brushSize * _tileMap.TileSize;
+            _hoverRect.Width = _brushSize * ActiveMap.TileSize;
+            _hoverRect.Height = _brushSize * ActiveMap.TileSize;
 
             _hoverRect.Stroke = editorState.IsActiveLayerLocked ? Brushes.Gray : Brushes.Yellow;
 
-            Canvas.SetLeft(_hoverRect, x * _tileMap.TileSize);
-            Canvas.SetTop(_hoverRect, y * _tileMap.TileSize);
+            Canvas.SetLeft(_hoverRect, x * ActiveMap.TileSize);
+            Canvas.SetTop(_hoverRect, y * ActiveMap.TileSize);
         }
 
         #endregion
@@ -421,8 +435,8 @@ namespace TTEngine.Editor
             if (isPaint && editorState.SelectedTile == null)
                 return;
 
-            int baseX = (int)(pos.X / _tileMap.TileSize);
-            int baseY = (int)(pos.Y / _tileMap.TileSize);
+            int baseX = (int)(pos.X / ActiveMap.TileSize);
+            int baseY = (int)(pos.Y / ActiveMap.TileSize);
 
             for (int y = 0; y < _brushSize; y++)
             {
@@ -431,10 +445,10 @@ namespace TTEngine.Editor
                     int tx = baseX + x;
                     int ty = baseY + y;
 
-                    if (tx < 0 || ty < 0 || tx >= _tileMap.Width || ty >= _tileMap.Height)
+                    if (tx < 0 || ty < 0 || tx >= ActiveMap.Width || ty >= ActiveMap.Height)
                         continue;
 
-                    int index = _tileMap.GetIndex(tx, ty);
+                    int index = ActiveMap.GetIndex(tx, ty);
                     int newValue = isPaint ? editorState.SelectedTile.Id : 0;
 
                     ApplyTileChange(index, newValue);
@@ -449,13 +463,13 @@ namespace TTEngine.Editor
             if (editorState.SelectedTile == null)
                 return;
 
-            int startX = (int)(pos.X / _tileMap.TileSize);
-            int startY = (int)(pos.Y / _tileMap.TileSize);
+            int startX = (int)(pos.X / ActiveMap.TileSize);
+            int startY = (int)(pos.Y / ActiveMap.TileSize);
 
-            if (startX < 0 || startY < 0 || startX >= _tileMap.Width || startY >= _tileMap.Height)
+            if (startX < 0 || startY < 0 || startX >= ActiveMap.Width || startY >= ActiveMap.Height)
                 return;
 
-            int startIndex = _tileMap.GetIndex(startX, startY);
+            int startIndex = ActiveMap.GetIndex(startX, startY);
             int targetValue = ActiveTiles[startIndex];
             int newValue = editorState.SelectedTile.Id;
 
@@ -483,10 +497,10 @@ namespace TTEngine.Editor
             {
                 var (cx, cy) = stack.Pop();
 
-                if (cx < 0 || cy < 0 || cx >= _tileMap.Width || cy >= _tileMap.Height)
+                if (cx < 0 || cy < 0 || cx >= ActiveMap.Width || cy >= ActiveMap.Height)
                     continue;
 
-                int index = _tileMap.GetIndex(cx, cy);
+                int index = ActiveMap.GetIndex(cx, cy);
 
                 if (ActiveTiles[index] != target)
                     continue;
@@ -516,7 +530,7 @@ namespace TTEngine.Editor
         //Mouse Event Helpers
         private void HandleSelection(int x, int y)
         {
-            if (_tileMap.PlayerSpawn != null && _tileMap.PlayerSpawn.Position.X == x && _tileMap.PlayerSpawn.Position.Y == y)
+            if (ActiveMap.PlayerSpawn != null && ActiveMap.PlayerSpawn.Position.X == x && ActiveMap.PlayerSpawn.Position.Y == y)
             {
                 _currentSelection = new SelectionModel
                 {
@@ -531,7 +545,7 @@ namespace TTEngine.Editor
                 return;
             }
 
-            foreach (var spawn in _tileMap.EnemySpawns)
+            foreach (var spawn in ActiveMap.EnemySpawns)
             {
                 if (spawn.Position.X == x && spawn.Position.Y == y)
                 {
@@ -566,7 +580,7 @@ namespace TTEngine.Editor
             switch (_currentSelection.Type)
             {
                 case SelectionType.Tile:
-                    int index = _tileMap.GetIndex(_currentSelection.TileX, _currentSelection.TileY);
+                    int index = ActiveMap.GetIndex(_currentSelection.TileX, _currentSelection.TileY);
                     Inspector.SetContent(new TileSpawnInspector(_currentSelection.TileX, _currentSelection.TileY, ActiveTiles[index]));
                     break;
                 case SelectionType.Player:
@@ -583,11 +597,11 @@ namespace TTEngine.Editor
 
         private bool TryGetTilePosition(Point pos, out int tileX, out int tileY)
         {
-            tileX = (int)(pos.X / _tileMap.TileSize);
-            tileY = (int)(pos.Y / _tileMap.TileSize);
+            tileX = (int)(pos.X / ActiveMap.TileSize);
+            tileY = (int)(pos.Y / ActiveMap.TileSize);
 
             if (tileX < 0 || tileY < 0 ||
-            tileX >= _tileMap.Width || tileY >= _tileMap.Height)
+            tileX >= ActiveMap.Width || tileY >= ActiveMap.Height)
                 return false;
 
             return true;
@@ -598,15 +612,15 @@ namespace TTEngine.Editor
             if (!TryGetTilePosition(pos, out int x, out int y))
                 return false;
 
-            if(_tileMap.PlayerSpawn == null)
+            if(ActiveMap.PlayerSpawn == null)
             {
-                _tileMap.PlayerSpawn = new PlayerSpawnModel
+                ActiveMap.PlayerSpawn = new PlayerSpawnModel
                 {
                     Position = new Point(x, y),
                 };
             }
 
-            _tileMap.PlayerSpawn.Position = new Point(x, y);
+            ActiveMap.PlayerSpawn.Position = new Point(x, y);
             DrawGrid();
             return true;
         }
@@ -616,14 +630,14 @@ namespace TTEngine.Editor
             if (!TryGetTilePosition(pos, out int x, out int y))
                 return false;
 
-            var existing = _tileMap.EnemySpawns
+            var existing = ActiveMap.EnemySpawns
                                    .FirstOrDefault(s => s.Position.X == x && s.Position.Y == y);
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 if(existing == null)
                 {
-                    _tileMap.EnemySpawns.Add(new EnemySpawnModel
+                    ActiveMap.EnemySpawns.Add(new EnemySpawnModel
                     {
                         Position = new Point(x, y),
                         DefinitionId = _entityDefinitions.FirstOrDefault().Id     //need update
@@ -633,7 +647,7 @@ namespace TTEngine.Editor
             else if (e.RightButton == MouseButtonState.Pressed)
             {
                 if(existing != null)
-                    _tileMap.EnemySpawns.Remove(existing);
+                    ActiveMap.EnemySpawns.Remove(existing);
             }
 
             DrawGrid();
@@ -690,59 +704,76 @@ namespace TTEngine.Editor
         
         private void SaveMap(object sender, RoutedEventArgs e)
         {
-            var validation = ValidateMap();
+            //var validation = ValidateMap();
 
-            if(!validation.IsValid)
-                return;
+            //if(!validation.IsValid)
+            //    return;
 
-            var data = new TileMapData
-            {
-                Width = _tileMap.Width,
-                Height = _tileMap.Height,
-                TileSize = _tileMap.TileSize,
-                Layers = _tileMap.Layers,
-                PlayerSpawn = new SpawnDto
-                {
-                    X = _tileMap.PlayerSpawn.Position.X,
-                    Y = _tileMap.PlayerSpawn.Position.Y,
-                    DefinitionId = "Player"
-                },
-                EnemySpawns = _tileMap.EnemySpawns.Select(p => new SpawnDto
-                {
-                    X = p.Position.X,
-                    Y = p.Position.Y,
-                    DefinitionId = p.DefinitionId,
-                }).ToList()
-            };
+            //var data = new TileMapData
+            //{
+            //    Width = _tileMap.Width,
+            //    Height = _tileMap.Height,
+            //    TileSize = _tileMap.TileSize,
+            //    Layers = _tileMap.Layers,
+            //    PlayerSpawn = new SpawnDto
+            //    {
+            //        X = _tileMap.PlayerSpawn.Position.X,
+            //        Y = _tileMap.PlayerSpawn.Position.Y,
+            //        DefinitionId = "Player"
+            //    },
+            //    EnemySpawns = _tileMap.EnemySpawns.Select(p => new SpawnDto
+            //    {
+            //        X = p.Position.X,
+            //        Y = p.Position.Y,
+            //        DefinitionId = p.DefinitionId,
+            //    }).ToList()
+            //};
 
-            MapFileService.Save(data);
+            //MapFileService.Save(data);
         }
 
         private void LoadMap(object sender, RoutedEventArgs e)
         {
-            TileMapData data = MapFileService.Load();
+            //TileMapData data = MapFileService.Load();
 
-            _tileMap.Width = data.Width;
-            _tileMap.Height = data.Height;
-            _tileMap.TileSize = data.TileSize;
-            _tileMap.Layers = data.Layers;
-            _tileMap.PlayerSpawn = new PlayerSpawnModel
-            {
-                Position = new Point(data.PlayerSpawn.X, data.PlayerSpawn.Y),
-                DefinitionId = data.PlayerSpawn.DefinitionId
-            };
-            _tileMap.EnemySpawns.Clear();
+            //_tileMap.Width = data.Width;
+            //_tileMap.Height = data.Height;
+            //_tileMap.TileSize = data.TileSize;
+            //_tileMap.Layers = data.Layers;
+            //_tileMap.PlayerSpawn = new PlayerSpawnModel
+            //{
+            //    Position = new Point(data.PlayerSpawn.X, data.PlayerSpawn.Y),
+            //    DefinitionId = data.PlayerSpawn.DefinitionId
+            //};
+            //_tileMap.EnemySpawns.Clear();
 
-            foreach (var sp in data.EnemySpawns)
+            //foreach (var sp in data.EnemySpawns)
+            //{
+            //    _tileMap.EnemySpawns.Add(new EnemySpawnModel
+            //    {
+            //        Position = new Point(sp.X, sp.Y),
+            //        DefinitionId = sp.DefinitionId,
+            //    });
+            //}
+
+            //DrawGrid();
+        }
+
+        private void EnsureDefaultMap()
+        {
+            if(!MapFileService.Exists(DEFAULT_MAP_ID))
             {
-                _tileMap.EnemySpawns.Add(new EnemySpawnModel
-                {
-                    Position = new Point(sp.X, sp.Y),
-                    DefinitionId = sp.DefinitionId,
-                });
+                var model = new TileMapModel();
+                model.Init();
+
+                MapFileService.Save(DEFAULT_MAP_ID, MapFileService.ToDto(model));
             }
 
-            DrawGrid();
+            var data = MapFileService.Load(DEFAULT_MAP_ID);
+            var mapModel = MapFileService.FromDto(data);
+
+            editorState.ActiveMapId = DEFAULT_MAP_ID;
+            editorState.ActiveMap = mapModel;
         }
 
         #endregion
@@ -755,7 +786,7 @@ namespace TTEngine.Editor
             EditorValidationResult result = new EditorValidationResult();
 
             //If player object not spawned
-            if(_tileMap.PlayerSpawn == null)
+            if(ActiveMap.PlayerSpawn == null)
             {
                 result.Errors.Add("Error1");
                 editorState.Console.Log("Player spawn is missing");
@@ -763,14 +794,14 @@ namespace TTEngine.Editor
             }
 
             //If player object spawned on solid tile
-            if(IsOnCollision(_tileMap.PlayerSpawn.Position))
+            if(IsOnCollision(ActiveMap.PlayerSpawn.Position))
             {
                 result.Errors.Add("Error-2");
                 editorState.Console.Log("Player spawn is placed on a solid tile");
             }
 
             //If any enemy object spawned on solid tile
-            foreach (var enemy in _tileMap.EnemySpawns)
+            foreach (var enemy in ActiveMap.EnemySpawns)
             {
                 if(IsOnCollision(enemy.Position))
                 {
@@ -787,8 +818,8 @@ namespace TTEngine.Editor
             int x = (int)position.X;
             int y = (int)position.Y;
 
-            int index = _tileMap.GetIndex(x, y);
-            int tileId = _tileMap.Layers[MapLayerType.Collision][index];
+            int index = ActiveMap.GetIndex(x, y);
+            int tileId = ActiveMap.Layers[MapLayerType.Collision][index];
 
             if (tileId == 0)
                 return false;

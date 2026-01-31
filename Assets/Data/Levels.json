@@ -1,0 +1,19 @@
+{
+  "Levels": [
+    {
+      "Id": "Level3",
+      "MapId": "Map_Default",
+      "IsActive": true
+    },
+    {
+      "Id": "Level1",
+      "MapId": "Map_Default",
+      "IsActive": true
+    },
+    {
+      "Id": "Level2",
+      "MapId": "Map_Default",
+      "IsActive": false
+    }
+  ]
+}
