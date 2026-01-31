@@ -93,14 +93,6 @@
             <Separator/>
 
             <!-- ACTIONS -->
-            <Button Content="Save Map"
-                    Margin="0,8,0,0"
-                    Click="SaveMap_Click"/>
-
-            <Button Content="Load Map"
-                    Margin="0,4,0,0"
-                    Click="LoadMap_Click"/>
-
             <Button Content="Start Game"
                     Margin="0,10,0,0"
                     Click="StartGame_Click"/>

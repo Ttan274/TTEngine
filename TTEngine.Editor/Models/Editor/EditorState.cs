@@ -59,6 +59,9 @@ namespace TTEngine.Editor.Models.Editor
             }
         }
 
+        public const string DEFAULT_MAP_ID = "Map_Default";
+        public bool IsDefaultMap => ActiveMapId == DEFAULT_MAP_ID;
+
         public EditorState()
         {
             TileDefinitions = new ObservableCollection<TileDefinition>(TileDefinitionService.Load());
@@ -70,6 +73,20 @@ namespace TTEngine.Editor.Models.Editor
                 l.IsActive = false;
 
             layer.IsActive = true;
+        }
+
+        public void SaveActiveMap()
+        {
+            if (IsDefaultMap)
+                return;
+
+            if (ActiveMap == null || string.IsNullOrEmpty(ActiveMapId))
+                return;
+
+            var dto = MapFileService.ToDto(ActiveMap);
+            MapFileService.Save(ActiveMapId, dto);
+
+            Console.Log($"{ActiveMapId} saved");
         }
 
         public TileDefinition GetSelectedTile()

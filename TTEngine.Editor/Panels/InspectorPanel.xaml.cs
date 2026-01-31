@@ -1,5 +1,4 @@
 ﻿using System.Windows.Controls;
-using TTEngine.Editor.Models.Editor;
 
 namespace TTEngine.Editor.Panels
 {
@@ -21,11 +20,6 @@ namespace TTEngine.Editor.Panels
         public void Clear()
         {
             InspectorContent.Content = null;
-        }
-
-        public void BindEditor(EditorState editor)
-        {
-            ConsolePanel.DataContext = editor;
         }
     }
 }

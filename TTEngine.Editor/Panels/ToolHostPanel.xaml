@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="TTEngine.Editor.Panels.ToolHostPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <DockPanel Background="#222">
+
+        <!-- TAB BAR -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Background="#333"
+                    Height="32">
+
+            <Button Content="Tiles"    Click="OpenTiles"/>
+            <Button Content="Maps"     Click="OpenMaps"/>
+            <Button Content="Levels"   Click="OpenLevels"/>
+            <Button Content="Entities" Click="OpenEntities"/>
+            <Button Content="Anim"     Click="OpenAnimations"/>
+        </StackPanel>
+
+        <!-- CONTENT -->
+        <Border Background="#2A2A2A">
+            <ContentControl x:Name="ContentHost"/>
+        </Border>
+
+    </DockPanel>
+</UserControl>

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using TTEngine.Editor.Dtos;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models;
 using TTEngine.Editor.Models.Editor;
@@ -62,7 +60,8 @@ namespace TTEngine.Editor
             AnimationDefinitionService.LoadAll();
             LayerEditor.DataContext = editorState;
             TileTools.DataContext = editorState;
-            Inspector.BindEditor(editorState);
+            ConsoleEditor.DataContext = editorState;
+            ToolHost.BindEditor(editorState);
 
             editorState.PropertyChanged += (_, e) =>
             {
@@ -71,9 +70,7 @@ namespace TTEngine.Editor
             };
 
             foreach (var layer in editorState.Layers)
-            {
                 layer.VisibilityChanged += OnLayerVisibilityChanged;
-            }
 
             _entityDefinitions = EntityDefinitionService.Load();
 
@@ -87,12 +84,14 @@ namespace TTEngine.Editor
                 (_, _) => Redo()
             ));
 
+            CommandBindings.Add(new CommandBinding(
+                ApplicationCommands.Save,
+                (_, _) => editorState.SaveActiveMap()
+            ));
+
             //Tile Tool Panel Events
             TileTools.ToolModeChanged += mode => _currentToolMode = mode;
             TileTools.BrushSizechanged += size => _brushSize = size;
-
-            TileTools.SaveClicked += OnSaveRequested;
-            TileTools.LoadClicked += OnLoadRequested;
             TileTools.StartGameClicked += OnStartRequested;
 
             EnsureDefaultMap();
@@ -106,6 +105,9 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (editorState.IsDefaultMap)
+                return;
+
             if (editorState.IsActiveLayerLocked)
                 return;
 
@@ -144,6 +146,9 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
+            if (editorState.IsDefaultMap)
+                return;
+
             UpdateHover(e.GetPosition(MapCanvas));
 
             if (editorState.IsActiveLayerLocked)
@@ -182,10 +187,6 @@ namespace TTEngine.Editor
 
         #region Button Events
 
-        private void OnSaveRequested() => SaveMap(this, new RoutedEventArgs());
-
-        private void OnLoadRequested() => LoadMap(this, new RoutedEventArgs());
-
         private void OnStartRequested()
         {
             var validation = ValidateMap();
@@ -200,12 +201,6 @@ namespace TTEngine.Editor
             => DrawGrid();
 
         private void StartGame(object sender, RoutedEventArgs e) => Process.Start(EditorPaths.GetEngineExe());
-
-        private void OpenDefinitiosns(object sender, RoutedEventArgs e) => Inspector.SetContent(new EntityDefinitionPanel(_entityDefinitions));
-        
-        private void OpenTileManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new LevelsPanel(editorState));
-        
-        private void OpenAnimationManager(object sender, RoutedEventArgs e) => Inspector.SetContent(new MapsPanel(editorState)); //Inspector.SetContent(new AnimationDefinitionPanel());
 
         #endregion
 
@@ -609,6 +604,9 @@ namespace TTEngine.Editor
 
         private bool HandlePlayerSpawn(Point pos)
         {
+            if (editorState.IsDefaultMap)
+                return false;
+
             if (!TryGetTilePosition(pos, out int x, out int y))
                 return false;
 
@@ -627,6 +625,9 @@ namespace TTEngine.Editor
 
         private bool HandleEnemySpawn(Point pos, MouseButtonEventArgs e)
         {
+            if (editorState.IsDefaultMap)
+                return false;
+
             if (!TryGetTilePosition(pos, out int x, out int y))
                 return false;
 
@@ -700,64 +701,7 @@ namespace TTEngine.Editor
 
         #endregion
 
-        #region Save & Load
-        
-        private void SaveMap(object sender, RoutedEventArgs e)
-        {
-            //var validation = ValidateMap();
-
-            //if(!validation.IsValid)
-            //    return;
-
-            //var data = new TileMapData
-            //{
-            //    Width = _tileMap.Width,
-            //    Height = _tileMap.Height,
-            //    TileSize = _tileMap.TileSize,
-            //    Layers = _tileMap.Layers,
-            //    PlayerSpawn = new SpawnDto
-            //    {
-            //        X = _tileMap.PlayerSpawn.Position.X,
-            //        Y = _tileMap.PlayerSpawn.Position.Y,
-            //        DefinitionId = "Player"
-            //    },
-            //    EnemySpawns = _tileMap.EnemySpawns.Select(p => new SpawnDto
-            //    {
-            //        X = p.Position.X,
-            //        Y = p.Position.Y,
-            //        DefinitionId = p.DefinitionId,
-            //    }).ToList()
-            //};
-
-            //MapFileService.Save(data);
-        }
-
-        private void LoadMap(object sender, RoutedEventArgs e)
-        {
-            //TileMapData data = MapFileService.Load();
-
-            //_tileMap.Width = data.Width;
-            //_tileMap.Height = data.Height;
-            //_tileMap.TileSize = data.TileSize;
-            //_tileMap.Layers = data.Layers;
-            //_tileMap.PlayerSpawn = new PlayerSpawnModel
-            //{
-            //    Position = new Point(data.PlayerSpawn.X, data.PlayerSpawn.Y),
-            //    DefinitionId = data.PlayerSpawn.DefinitionId
-            //};
-            //_tileMap.EnemySpawns.Clear();
-
-            //foreach (var sp in data.EnemySpawns)
-            //{
-            //    _tileMap.EnemySpawns.Add(new EnemySpawnModel
-            //    {
-            //        Position = new Point(sp.X, sp.Y),
-            //        DefinitionId = sp.DefinitionId,
-            //    });
-            //}
-
-            //DrawGrid();
-        }
+        #region Load Map
 
         private void EnsureDefaultMap()
         {
@@ -774,6 +718,7 @@ namespace TTEngine.Editor
 
             editorState.ActiveMapId = DEFAULT_MAP_ID;
             editorState.ActiveMap = mapModel;
+            editorState.Console.Log($"{DEFAULT_MAP_ID} is loaded.");
         }
 
         #endregion

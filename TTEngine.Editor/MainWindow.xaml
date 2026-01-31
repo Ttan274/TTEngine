@@ -17,32 +17,27 @@
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT: TILE TOOL PANEL + LAYER PANEL -->
-        <StackPanel Grid.Column="0">
-            <panels:LayerPanel      x:Name="LayerEditor"/>
-            <panels:TileToolPanel   x:Name="TileTools"/>
-        </StackPanel>
+        <!-- LEFT: TILE TOOL PANEL + LAYER PANEL + CONSOLE PANEL -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Layers -->
+                <RowDefinition Height="Auto"/>
+                <!-- Tile Tools -->
+                <RowDefinition Height="*"/>
+                <!-- Spacer -->
+                <RowDefinition Height="180"/>
+                <!-- Console -->
+            </Grid.RowDefinitions>
 
-        <StackPanel Height="200" Margin="0, 350, 0, 0" Background="AliceBlue">
-            <Button Content="Entity Definitions"
-                    Width="100"
-                    Height="40"
-                    Margin="0,20,0,0"
-                    Click="OpenDefinitiosns"/>
-            
-            <Button Content="Tile Definitions"
-                    Width="100"
-                    Height="40"
-                    Margin="0,20,0,0"
-                    Click="OpenTileManager"/>
+            <panels:LayerPanel x:Name="LayerEditor" Grid.Row="0"/>
+            <panels:TileToolPanel x:Name="TileTools" Grid.Row="1"/>
 
-            <Button Content="Animations"
-                    Width="100"
-                    Height="40"
-                    Margin="0,20,0,0"
-                    Click="OpenAnimationManager"/>
-        </StackPanel>
-        
+            <!-- CONSOLE -->
+            <panels:EditorConsolePanel x:Name="ConsoleEditor" Grid.Row="3"/>
+        </Grid>
+
+
         <!-- CENTER: MAP -->
         <ScrollViewer Grid.Column="1"
                       HorizontalScrollBarVisibility="Auto"
@@ -56,7 +51,14 @@
         </ScrollViewer>
 
         <!-- RIGHT: INSPECTOR -->
-        <panels:InspectorPanel  x:Name="Inspector"
-                                Grid.Column="2"/>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <panels:InspectorPanel  x:Name="Inspector" Grid.Row="0"/>
+            <panels:ToolHostPanel  x:Name="ToolHost" Grid.Row="1"/>
+        </Grid>
     </Grid>
 </Window>

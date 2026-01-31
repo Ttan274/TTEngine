@@ -17,9 +17,6 @@ namespace TTEngine.Editor.Panels
     {
         public event Action<ToolMode> ToolModeChanged;
         public event Action<int> BrushSizechanged;
-
-        public event Action SaveClicked;
-        public event Action LoadClicked;
         public event Action StartGameClicked;
 
         private EditorState Editor => DataContext as EditorState;
@@ -103,12 +100,6 @@ namespace TTEngine.Editor.Panels
             => ToolModeChanged?.Invoke(ToolMode.EnemySpawn);
 
         //Button Clicks
-        private void SaveMap_Click(object sender, RoutedEventArgs e)
-            => SaveClicked?.Invoke();
-
-        private void LoadMap_Click(object sender, RoutedEventArgs e)
-            => LoadClicked?.Invoke();
-
         private void StartGame_Click(object sender, RoutedEventArgs e)
             => StartGameClicked?.Invoke();
     }

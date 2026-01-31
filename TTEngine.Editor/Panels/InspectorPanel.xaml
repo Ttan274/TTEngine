@@ -1,22 +1,9 @@
 ﻿<UserControl x:Class="TTEngine.Editor.Panels.InspectorPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:panels="clr-namespace:TTEngine.Editor.Panels">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <!-- Inspector -->
-            <RowDefinition Height="160"/>
-            <!-- Console -->
-        </Grid.RowDefinitions>
-
         <!-- INSPECTOR CONTENT -->
-        <ContentControl x:Name="InspectorContent"
-                        Grid.Row="0"/>
-
-        <!-- CONSOLE -->
-        <panels:EditorConsolePanel x:Name="ConsolePanel"
-                                   Grid.Row="1"/>
+        <ContentControl x:Name="InspectorContent"/>
     </Grid>
 </UserControl>
