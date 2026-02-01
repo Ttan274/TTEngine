@@ -59,7 +59,7 @@ namespace EngineGame
 		bool IsDead() const { return m_IsDead; }
 
 		//Damage Flashing
-		float GetDamageFlashTimer() { return m_DamageFlashTimer; }
+		float GetDamageFlashTimer() const { return m_DamageFlashTimer; }
 		bool IsDamageFlashing() const { return m_DamageFlashTimer > 0.0f; }
 		
 		//Attacking

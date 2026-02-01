@@ -1,23 +1,11 @@
 #pragma once
 #include "Game/TileMap.h"
-#include "Core/IRenderer.h"
-#include "Game/Camera.h"
-#include "Game/Player.h"
-#include "Game/Enemy.h"
 #include "Game/Texture.h"
 #include "Game/MapLoader.h"
-#include <memory>
+#include "Platform/HUD.h"
 
 namespace EnginePlatform
 {
-	enum class GameState
-	{
-		MainMenu,
-		Playing,
-		LevelComplete,
-		DeathScreen
-	};
-
 	class Scene
 	{
 	public:
@@ -72,5 +60,8 @@ namespace EnginePlatform
 		bool m_FadeOut = true;
 		float m_LevelTextScale = 0.0f;
 		float m_LevelTextTimer = 0.0f;
+
+		//HUD
+		HUD m_HUD;
 	};
 }

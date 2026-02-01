@@ -7,13 +7,6 @@
 
 namespace EnginePlatform
 {
-	//HP bar constants
-	const int HP_BAR_X = 20;
-	const int HP_BAR_Y = 20;
-	const int HP_BAR_W = 200;
-	const int HP_BAR_H = 20;
-	const int HP_BAR_W_EN = 40;
-	const int HP_BAR_H_EN = 6;
 	constexpr float LEVEL_COMPLETE_DELAY = 0.8f;
 	constexpr float FADE_SPEED = 1.5f;
 	constexpr float TEXT_POP_SPEED = 6.0f;
@@ -384,82 +377,26 @@ namespace EnginePlatform
 		}
 	}
 
+	//Render
 	void Scene::Render(EngineCore::IRenderer* renderer)
 	{
-		EngineCore::Color fadeColor;
-		EngineMath::Vector2 center;
 		switch (m_GameState)
 		{
-		case GameState::MainMenu:
-			renderer->DrawUIText("PRESS F5 TO START", 300, 310, { 255, 255, 255, 255 });
-			break;
 		case GameState::Playing:
 			m_TileMap->Draw(renderer, m_Camera);
 			m_TileMap->DrawCollisionDebug(renderer, m_Camera);
 			m_Player.Render(renderer, m_Camera);
-			RenderPlayerHP(renderer);
 			for (auto& e : m_Enemies)
-			{
 				e->Render(renderer, m_Camera);
-				RenderEnemyHP(renderer, e.get());
-			}
 			break;
-		case GameState::LevelComplete:
-			fadeColor = { 0, 0, 0, static_cast<uint8_t>(m_FadeAlpha * 255) };
-			renderer->DrawRect({ 0, 0, 800, 600 }, fadeColor);
-
-			center = { 400.0f, 200.0f };
-			renderer->DrawUIText("Level Completed", center.x, center.y, { 255, 215, 0, 255 });
-			break;
-		case GameState::DeathScreen:
-			renderer->DrawUIText("PRESS F5 TO RESTART", 300, 400, { 255, 255, 255, 255 });
-			renderer->DrawUIText("PRESS F9 TO MAIN MENU", 300, 300, { 255, 255, 255, 255 });
+		default:
 			break;
 		}
+
+		m_HUD.Render(renderer, m_Player, m_Enemies, m_Camera, m_GameState, m_FadeAlpha);
 	}
 
-	void Scene::RenderPlayerHP(EngineCore::IRenderer* renderer)
-	{
-		float ratio = m_Player.GetRatio();
-		ratio = std::clamp(ratio, 0.0f, 1.0f);
-
-		EngineCore::Color hpColor = { 200, 40, 40, 255 };
-		if (m_Player.IsDamageFlashing())
-		{
-			float t = fmod(m_Player.GetDamageFlashTimer() * 10.0f, 1.0f);
-			if (t < 0.5f)
-				hpColor = { 255, 255, 255, 255 };
-		}
-
-		renderer->DrawRect({ HP_BAR_X, HP_BAR_Y, HP_BAR_W, HP_BAR_H }, { 60, 60, 60, 255 });	//Background
-		renderer->DrawRect({ (float)HP_BAR_X, (float)HP_BAR_Y, (HP_BAR_W * ratio), (float)HP_BAR_H }, hpColor);	//HP area
-		renderer->DrawRectOutline({ HP_BAR_X, HP_BAR_Y, HP_BAR_W, HP_BAR_H }, { 255, 255, 255, 255 });
-	}
-
-	void Scene::RenderEnemyHP(EngineCore::IRenderer* renderer, EngineGame::Enemy* enemy)
-	{
-		float ratio = enemy->GetRatio();
-		if (ratio <= 0.0f)
-			return;
-
-		const EngineCore::AABB& col = enemy->GetCollider();
-
-		float centerX = col.Left() + col.Width() * 0.5f;
-		float x = centerX - HP_BAR_W_EN * 0.5f - m_Camera.GetX();
-		float y = col.Top() - 25.0f - m_Camera.GetY();
-
-		EngineCore::Color hpColor = { 200, 40, 40, 255 };
-		if (enemy->IsDamageFlashing())
-			hpColor = { 255, 255, 255, 255 };
-
-		renderer->DrawRect({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 40, 40, 40, 255 });	//Background
-		renderer->DrawRect({ x, y, (HP_BAR_W_EN * ratio), HP_BAR_H_EN }, hpColor);	//HP area
-		renderer->DrawRectOutline({ x, y, HP_BAR_W_EN, HP_BAR_H_EN }, { 255, 255, 255, 255 });
-
-		float textY = y - 14.0f;
-		renderer->DrawUIText(enemy->GetStateName(), x + HP_BAR_W_EN * 0.5f, textY, { 255, 255, 0, 255 });
-	}
-
+	//Level Area
 	void Scene::LoadCurrentLevel()
 	{
 		const LevelData* level = LevelManager::Get().GetCurrentLevel();
