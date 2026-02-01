@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/Entity.h"
+#include <functional>
 
 namespace EngineGame
 {
@@ -32,6 +33,7 @@ namespace EngineGame
 	
 		//Debug Helper
 		std::string GetStateName() const;
+		std::function<void()> OnKilled;
 	protected:
 		//Base Class Methods
 		void OnDeath() override;

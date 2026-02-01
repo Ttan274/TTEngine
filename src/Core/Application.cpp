@@ -7,6 +7,8 @@
 #include "Platform/Window.h"
 #include "Platform/AssetManager.h"
 #include "Platform/RendererSdl.h"
+#include "Platform/LevelManager.h"
+#include "Core/PathUtil.h"
 
 namespace EngineCore
 {
@@ -20,7 +22,11 @@ namespace EngineCore
 		DebugOverlay::Init(m_Renderer);
 		EnginePlatform::AssetManager::Init(EnginePlatform::RendererSdl::GetSdl());
 	
+		EnginePlatform::LevelManager::Get().LoadAllLevels(EngineCore::GetFile("Data", "Levels.json"));
+		EnginePlatform::LevelManager::Get().StartLevelByIndex(0);
+
 		m_Scene.Load();
+		m_Scene.LoadCurrentLevel();
 	}
 
 	Application::~Application()
@@ -75,6 +81,7 @@ namespace EngineCore
 		{
 			DebugOverlay::AddLine("FPS: " + std::to_string(Debug::GetFPS()));
 			DebugOverlay::AddLine("Player hp: " + std::to_string(m_Scene.GetPlayer().GetHp()));
+			DebugOverlay::AddLine("Alive enemy count: " + std::to_string(m_Scene.GetAliveEnemyCount()));
 		}
 
 		//Input::Update();

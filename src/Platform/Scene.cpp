@@ -3,6 +3,7 @@
 #include "Core/Log.h"
 #include "Core/PathUtil.h"
 #include "Core/Math/Collision.h"
+#include "Platform/LevelManager.h"
 
 namespace EnginePlatform
 {
@@ -29,36 +30,6 @@ namespace EnginePlatform
 
 		ChangeGameState(GameState::MainMenu);
 
-		//Map Loading
-		if (!EngineGame::MapLoader::LoadFromFile(EngineCore::GetFile("Data", "active_map.json"), 
-												 m_MapData))
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Fatal,
-				EngineCore::LogCategory::Scene,
-				"Failed to load map.json"
-			);
-			return;
-		}
-
-		//Tilemap Creation
-		m_TileMap = std::make_unique<EngineGame::TileMap>(m_MapData.w, m_MapData.h, m_MapData.tSize);
-		
-		std::vector<EngineGame::TileType> tiles;
-		tiles.reserve(m_MapData.tiles.size());
-
-		for (int v : m_MapData.tiles)
-			tiles.push_back(static_cast<EngineGame::TileType>(v));
-
-		m_TileMap->SetTiles(tiles);
-		m_TileMap->LoadAssets();
-
-		EngineCore::Log::Write(
-			EngineCore::LogLevel::Info,
-			EngineCore::LogCategory::Scene,
-			"Map Loaded + TileMap initialized"
-		);
-		
 		//Animation Library loaded
 		std::string animDir = EngineCore::GetRootDirectory() + "\\Assets\\Animation";
 		if (!EnginePlatform::AnimationLibrary::LoadAllAnims(animDir))
@@ -83,19 +54,17 @@ namespace EnginePlatform
 			return;
 		}
 
-		LoadSpawnEntities();
-		LoadCamera();
-
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
-			"Camera + Player + Enemies Loaded. Scene Completed"
+			"Scene basics have been loaded"
 		);
 	}
 
 	void Scene::LoadSpawnEntities()
 	{
 		std::string rootDir = EngineCore::GetRootDirectory();
+		m_AliveEnemyCount = 0;
 
 		for (const auto& spawn : m_MapData.spawns)
 		{
@@ -131,6 +100,7 @@ namespace EnginePlatform
 			else
 			{
 				LoadEnemy(spawn, def);
+				m_AliveEnemyCount++;
 			}
 		}
 
@@ -202,6 +172,12 @@ namespace EnginePlatform
 		newPos.y = spawn.y * m_TileMap->GetTileSize();
 		enemy->SetPosition(newPos);
 
+		//Set Death Callback
+		enemy->OnKilled = [this]()
+			{
+				OnEnemyKilled();
+			};
+
 		//Add new enemy to the array
 		m_Enemies.push_back(std::move(enemy));
 	}
@@ -213,6 +189,16 @@ namespace EnginePlatform
 		m_Camera.Follow(m_Player.GetPosition().x, m_Player.GetPosition().y);
 		m_Camera.SetSmoothness(20.0f);
 	}
+
+	void Scene::OnEnemyKilled()
+	{
+		m_AliveEnemyCount--;
+
+		if (m_AliveEnemyCount <= 0)
+			m_LevelCompleted = true;
+	}
+
+	#pragma region Update Region
 
 	void Scene::Update(float dt)
 	{
@@ -226,31 +212,6 @@ namespace EnginePlatform
 			break;
 		case GameState::DeathScreen:
 			UpdateDeathScreen(dt);
-			break;
-		}
-	}
-
-	void Scene::Render(EngineCore::IRenderer* renderer)
-	{
-		switch (m_GameState)
-		{
-		case GameState::MainMenu:
-			renderer->DrawUIText("PRESS F5 TO START", 300, 310, { 255, 255, 255, 255 });
-			break;
-		case GameState::Playing:
-			m_TileMap->Draw(renderer, m_Camera);
-			m_TileMap->DrawCollisionDebug(renderer, m_Camera);
-			m_Player.Render(renderer, m_Camera);
-			RenderPlayerHP(renderer);
-			for (auto& e : m_Enemies)
-			{
-				e->Render(renderer, m_Camera);
-				RenderEnemyHP(renderer, e.get());
-			}
-			break;
-		case GameState::DeathScreen:
-			renderer->DrawUIText("PRESS F5 TO RESTART", 300, 400, { 255, 255, 255, 255 });
-			renderer->DrawUIText("PRESS F9 TO MAIN MENU", 300, 300, { 255, 255, 255, 255 });
 			break;
 		}
 	}
@@ -344,6 +305,13 @@ namespace EnginePlatform
 			++it;
 		}
 
+		if (m_LevelCompleted)
+		{
+			m_LevelCompleted = false;
+			OnLevelCompleted();
+			return;
+		}
+
 		m_Camera.FollowSmooth(
 			m_Player.GetPosition().x,
 			m_Player.GetPosition().y,
@@ -367,6 +335,35 @@ namespace EnginePlatform
 		}
 	}
 
+	#pragma endregion
+	
+	#pragma region Render Region
+
+	void Scene::Render(EngineCore::IRenderer* renderer)
+	{
+		switch (m_GameState)
+		{
+		case GameState::MainMenu:
+			renderer->DrawUIText("PRESS F5 TO START", 300, 310, { 255, 255, 255, 255 });
+			break;
+		case GameState::Playing:
+			m_TileMap->Draw(renderer, m_Camera);
+			m_TileMap->DrawCollisionDebug(renderer, m_Camera);
+			m_Player.Render(renderer, m_Camera);
+			RenderPlayerHP(renderer);
+			for (auto& e : m_Enemies)
+			{
+				e->Render(renderer, m_Camera);
+				RenderEnemyHP(renderer, e.get());
+			}
+			break;
+		case GameState::DeathScreen:
+			renderer->DrawUIText("PRESS F5 TO RESTART", 300, 400, { 255, 255, 255, 255 });
+			renderer->DrawUIText("PRESS F9 TO MAIN MENU", 300, 300, { 255, 255, 255, 255 });
+			break;
+		}
+	}
+
 	void Scene::RenderPlayerHP(EngineCore::IRenderer* renderer)
 	{
 		float ratio = m_Player.GetRatio();
@@ -376,7 +373,7 @@ namespace EnginePlatform
 		if (m_Player.IsDamageFlashing())
 		{
 			float t = fmod(m_Player.GetDamageFlashTimer() * 10.0f, 1.0f);
-			if(t < 0.5f)
+			if (t < 0.5f)
 				hpColor = { 255, 255, 255, 255 };
 		}
 
@@ -408,4 +405,88 @@ namespace EnginePlatform
 		float textY = y - 14.0f;
 		renderer->DrawUIText(enemy->GetStateName(), x + HP_BAR_W_EN * 0.5f, textY, { 255, 255, 0, 255 });
 	}
+
+	#pragma endregion
+
+	#pragma region Level Region
+
+	void Scene::LoadCurrentLevel()
+	{
+		const LevelData* level = LevelManager::Get().GetCurrentLevel();
+
+		if (!level)
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Error,
+				EngineCore::LogCategory::Scene,
+				"No active level to load"
+			);
+			return;
+		}
+
+		LoadMap(level->mapId);
+	}
+
+	void Scene::ReloadLevel()
+	{
+		LoadCurrentLevel();
+	}
+
+	void Scene::OnLevelCompleted()
+	{
+		LevelManager::Get().LoadNextLevel();
+
+		if (LevelManager::Get().GetCurrentLevel() != nullptr)
+		{
+			LoadCurrentLevel();
+		}
+		else
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Info,
+				EngineCore::LogCategory::Scene,
+				"All levels have been completed"
+			);
+
+			ChangeGameState(GameState::MainMenu);
+		}
+	}
+
+	void Scene::LoadMap(const std::string& mapId)
+	{
+		std::string targetPath = EngineCore::GetFile("Maps", mapId);
+
+		//Map Loading 
+		if (!EngineGame::MapLoader::LoadFromFile(targetPath, m_MapData))
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Fatal,
+				EngineCore::LogCategory::Scene,
+				"Failed to load map.json"
+			);
+			return;
+		}
+		//Tilemap Creation
+		m_TileMap = std::make_unique<EngineGame::TileMap>(m_MapData.w, m_MapData.h, m_MapData.tSize);
+
+		std::vector<EngineGame::TileType> tiles;
+		tiles.reserve(m_MapData.tiles.size());
+
+		for (int v : m_MapData.tiles)
+			tiles.push_back(static_cast<EngineGame::TileType>(v));
+
+		m_TileMap->SetTiles(tiles);
+		m_TileMap->LoadAssets();
+
+		LoadSpawnEntities();
+		LoadCamera();
+
+		EngineCore::Log::Write(
+			EngineCore::LogLevel::Info,
+			EngineCore::LogCategory::Scene,
+			"Map Loaded + TileMap initialized + Player-Enemies have been spawned + Camera loaded."
+		);
+	}
+
+	#pragma endregion
 }

@@ -21,12 +21,14 @@ namespace EnginePlatform
 	{
 	public:
 		Scene();
-
+		
+		//Loading Objects
 		void Load();
 		void LoadSpawnEntities();
 		void LoadPlayer(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
 		void LoadEnemy(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
 		void LoadCamera();
+		
 		void Update(float dt);
 		void Render(EngineCore::IRenderer* renderer);
 		void ChangeGameState(GameState newState);
@@ -34,12 +36,19 @@ namespace EnginePlatform
 		void RenderPlayerHP(EngineCore::IRenderer* renderer);
 		void RenderEnemyHP(EngineCore::IRenderer* renderer, EngineGame::Enemy* enemy);
 
+		void LoadCurrentLevel();
+		void ReloadLevel();
+		void OnLevelCompleted();
+
 		EngineGame::Player& GetPlayer() { return m_Player; }
 		EngineGame::Camera2D& GetCamera() { return m_Camera; }
+		int GetAliveEnemyCount() { return m_AliveEnemyCount; }
+		void OnEnemyKilled();
 	private:
 		void UpdateMainMenu(float dt);
 		void UpdatePlaying(float dt);
 		void UpdateDeathScreen(float dt);
+		void LoadMap(const std::string& mapId);
 	private:
 		EngineGame::Player m_Player;
 		std::vector<std::unique_ptr<EngineGame::Enemy>> m_Enemies;
@@ -52,5 +61,7 @@ namespace EnginePlatform
 		std::unordered_map<std::string, EngineGame::EntityDefs> m_EntityDefs;
 		EngineGame::MapData m_MapData;
 		bool m_PlayerSpawned = false;
+		int m_AliveEnemyCount = 0;
+		bool m_LevelCompleted = false;
 	};
 }

@@ -9,7 +9,7 @@ namespace EngineGame
 {
 	bool MapLoader::LoadFromFile(const std::string& path, MapData& outMap)
 	{
-		std::ifstream file(path);
+		std::ifstream file(path + ".json");
 		if (!file.is_open())
 		{
 			EngineCore::Log::Write(
