@@ -333,4 +333,15 @@ namespace EngineGame
 
 	#pragma endregion
 
+	void Player::Reset()
+	{
+		m_HP = m_MaxHP;
+		m_IsDead = false;
+		m_IsAttacking = false;
+		m_HasHitThisAttack = false;
+
+		m_Velocity = { 0.0f, 0.0f };
+		m_CurrentAnim = &m_IdleAnim;
+		m_CurrentAnim->Reset();
+	}
 }

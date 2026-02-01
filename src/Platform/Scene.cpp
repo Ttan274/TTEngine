@@ -14,6 +14,10 @@ namespace EnginePlatform
 	const int HP_BAR_H = 20;
 	const int HP_BAR_W_EN = 40;
 	const int HP_BAR_H_EN = 6;
+	constexpr float LEVEL_COMPLETE_DELAY = 0.8f;
+	constexpr float FADE_SPEED = 1.5f;
+	constexpr float TEXT_POP_SPEED = 6.0f;
+	constexpr float TEXT_MAX_SCALE = 1.2f;
 
 	Scene::Scene()
 		: m_Camera(800.0f, 600.0f)
@@ -210,6 +214,9 @@ namespace EnginePlatform
 		case GameState::Playing:
 			UpdatePlaying(dt);
 			break;
+		case GameState::LevelComplete:
+			UpdateLevelComplete(dt);
+			break;
 		case GameState::DeathScreen:
 			UpdateDeathScreen(dt);
 			break;
@@ -237,7 +244,13 @@ namespace EnginePlatform
 				"State changed to PLAYING"
 			);
 			break;
-
+		case GameState::LevelComplete:
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Info,
+				EngineCore::LogCategory::Scene,
+				"State changed to Level Complete"
+			);
+			break;
 		case GameState::DeathScreen:
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Info,
@@ -252,6 +265,41 @@ namespace EnginePlatform
 	{
 		if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
 			ChangeGameState(GameState::Playing);
+	}
+
+	void Scene::UpdateLevelComplete(float dt)
+	{
+		m_LevelCompleteTimer += dt;
+		m_LevelTextTimer += dt;
+
+		//Text Scale
+		m_LevelTextScale += dt * TEXT_POP_SPEED;
+		if (m_LevelTextScale > TEXT_MAX_SCALE)
+			m_LevelTextScale = TEXT_MAX_SCALE;
+
+		//Delay
+		if (m_LevelCompleteTimer < LEVEL_COMPLETE_DELAY)
+			return;
+
+		if (m_FadeOut)	//Fade Out
+		{
+			m_FadeAlpha += dt * FADE_SPEED;
+			if (m_FadeAlpha >= 1.0f)
+			{
+				m_FadeAlpha = 1.0f;
+				OnLevelCompleted();
+				m_FadeOut = false;
+			}
+		}
+		else			//Fade IN
+		{
+			m_FadeAlpha -= dt * FADE_SPEED;
+			if (m_FadeAlpha <= 0.0f)
+			{
+				m_FadeAlpha = 0.0f;
+				ChangeGameState(GameState::Playing);
+			}
+		}
 	}
 
 	void Scene::UpdatePlaying(float dt)
@@ -307,8 +355,9 @@ namespace EnginePlatform
 
 		if (m_LevelCompleted)
 		{
-			m_LevelCompleted = false;
-			OnLevelCompleted();
+			ChangeGameState(GameState::LevelComplete);
+			m_LevelCompleteTimer = 0.0f;
+			m_FadeOut = true;
 			return;
 		}
 
@@ -335,12 +384,10 @@ namespace EnginePlatform
 		}
 	}
 
-	#pragma endregion
-	
-	#pragma region Render Region
-
 	void Scene::Render(EngineCore::IRenderer* renderer)
 	{
+		EngineCore::Color fadeColor;
+		EngineMath::Vector2 center;
 		switch (m_GameState)
 		{
 		case GameState::MainMenu:
@@ -356,6 +403,13 @@ namespace EnginePlatform
 				e->Render(renderer, m_Camera);
 				RenderEnemyHP(renderer, e.get());
 			}
+			break;
+		case GameState::LevelComplete:
+			fadeColor = { 0, 0, 0, static_cast<uint8_t>(m_FadeAlpha * 255) };
+			renderer->DrawRect({ 0, 0, 800, 600 }, fadeColor);
+
+			center = { 400.0f, 200.0f };
+			renderer->DrawUIText("Level Completed", center.x, center.y, { 255, 215, 0, 255 });
 			break;
 		case GameState::DeathScreen:
 			renderer->DrawUIText("PRESS F5 TO RESTART", 300, 400, { 255, 255, 255, 255 });
@@ -406,10 +460,6 @@ namespace EnginePlatform
 		renderer->DrawUIText(enemy->GetStateName(), x + HP_BAR_W_EN * 0.5f, textY, { 255, 255, 0, 255 });
 	}
 
-	#pragma endregion
-
-	#pragma region Level Region
-
 	void Scene::LoadCurrentLevel()
 	{
 		const LevelData* level = LevelManager::Get().GetCurrentLevel();
@@ -454,6 +504,11 @@ namespace EnginePlatform
 
 	void Scene::LoadMap(const std::string& mapId)
 	{
+		m_Enemies.clear();
+		m_LevelCompleted = false;
+		m_PlayerSpawned = false;
+		m_Player.Reset();
+
 		std::string targetPath = EngineCore::GetFile("Maps", mapId);
 
 		//Map Loading 
@@ -487,6 +542,4 @@ namespace EnginePlatform
 			"Map Loaded + TileMap initialized + Player-Enemies have been spawned + Camera loaded."
 		);
 	}
-
-	#pragma endregion
 }

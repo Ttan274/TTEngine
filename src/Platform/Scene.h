@@ -14,6 +14,7 @@ namespace EnginePlatform
 	{
 		MainMenu,
 		Playing,
+		LevelComplete,
 		DeathScreen
 	};
 
@@ -48,6 +49,7 @@ namespace EnginePlatform
 		void UpdateMainMenu(float dt);
 		void UpdatePlaying(float dt);
 		void UpdateDeathScreen(float dt);
+		void UpdateLevelComplete(float dt);
 		void LoadMap(const std::string& mapId);
 	private:
 		EngineGame::Player m_Player;
@@ -63,5 +65,12 @@ namespace EnginePlatform
 		bool m_PlayerSpawned = false;
 		int m_AliveEnemyCount = 0;
 		bool m_LevelCompleted = false;
+
+		//Level Complete Transition
+		float m_LevelCompleteTimer = 0.0f;
+		float m_FadeAlpha = 0.0f;
+		bool m_FadeOut = true;
+		float m_LevelTextScale = 0.0f;
+		float m_LevelTextTimer = 0.0f;
 	};
 }

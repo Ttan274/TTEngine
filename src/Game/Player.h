@@ -36,6 +36,7 @@ namespace EngineGame
 		void Update(float dt);
 		void SetSpawnPoint(const EngineMath::Vector2& pos) { m_SpawnPoint = pos; }
 		void Respawn();
+		void Reset();
 
 	protected:
 		//Base Class Methods
