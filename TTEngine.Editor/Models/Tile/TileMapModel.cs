@@ -1,5 +1,6 @@
 ﻿using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Entity;
+using TTEngine.Editor.Models.Interactable;
 
 namespace TTEngine.Editor.Models.Tile
 {
@@ -11,6 +12,7 @@ namespace TTEngine.Editor.Models.Tile
         public Dictionary<MapLayerType, int[]> Layers { get; set; }
         public PlayerSpawnModel PlayerSpawn { get; set; }
         public List<EnemySpawnModel> EnemySpawns { get; set; } = new();
+        public List<InteractableModel> Interactables { get; set; } = new();
 
         public void Init()
         {
@@ -19,6 +21,7 @@ namespace TTEngine.Editor.Models.Tile
                 {MapLayerType.Background, CreateEmptyLayer() },
                 {MapLayerType.Collision, CreateEmptyLayer() },
                 {MapLayerType.Decoration, CreateEmptyLayer() },
+                {MapLayerType.Interactable, CreateEmptyLayer() }
             };
         }
 

@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Windows;
 using TTEngine.Editor.Dtos;
 using TTEngine.Editor.Models.Entity;
+using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
 
 namespace TTEngine.Editor.Services
@@ -69,7 +70,14 @@ namespace TTEngine.Editor.Services
                     X = p.Position.X,
                     Y = p.Position.Y,
                     DefinitionId = p.DefinitionId,
-                }).ToList()
+                }).ToList(),
+                Interactables = model.Interactables.
+                         Select(i => new InteractableDto
+                         {
+                             X = i.X,
+                             Y = i.Y,
+                             DefinitionId = i.DefinitionId
+                         }).ToList()
             };
 
             return data;
@@ -105,6 +113,21 @@ namespace TTEngine.Editor.Services
                     {
                         Position = new Point(sp.X, sp.Y),
                         DefinitionId = sp.DefinitionId,
+                    });
+                }
+            }
+
+            model.Interactables.Clear();
+
+            if(data.Interactables != null)
+            {
+                foreach (var dto in data.Interactables)
+                {
+                    model.Interactables.Add(new InteractableModel
+                    {
+                        X = dto.X,
+                        Y = dto.Y,
+                        DefinitionId = dto.DefinitionId
                     });
                 }
             }

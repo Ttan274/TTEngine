@@ -10,6 +10,7 @@ namespace TTEngine.Editor.Dtos
         public int TileSize { get; set; }
         public Dictionary<MapLayerType, int[]> Layers { get; set; }
         public SpawnDto PlayerSpawn { get; set; }
-        public List<SpawnDto> EnemySpawns { get; set; } 
+        public List<SpawnDto> EnemySpawns { get; set; }
+        public List<InteractableDto> Interactables { get; set; } = new();
     }
 }

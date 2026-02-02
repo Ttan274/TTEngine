@@ -8,6 +8,7 @@ using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Entity;
+using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Validation;
 using TTEngine.Editor.Panels;
@@ -133,6 +134,12 @@ namespace TTEngine.Editor
                 ToolMode.Fill => e.LeftButton == MouseButtonState.Pressed && HandleFill(pos),
                 _ => false
             };
+
+            if (editorState.ActivePlacementMode == PlacementMode.Interactable)
+            {
+                HandleInteractablePlacement(pos, e);
+                return;
+            }
 
             if (!handled)
                 HandleBrush(pos, e);
@@ -303,6 +310,9 @@ namespace TTEngine.Editor
             if (layer == MapLayerType.Collision)
                 return Brushes.Transparent;
 
+            if (layer == MapLayerType.Interactable)
+                return Brushes.MediumPurple;
+
             return def.CollisionType switch
             {
                 CollisionType.Ground => Brushes.LightGreen,
@@ -427,6 +437,9 @@ namespace TTEngine.Editor
 
         private void ApplyBrush(Point pos, bool isPaint)
         {
+            if (editorState.ActivePlacementMode != PlacementMode.Tile)
+                return;
+
             if (isPaint && editorState.SelectedTile == null)
                 return;
 
@@ -669,6 +682,48 @@ namespace TTEngine.Editor
                 EraseTile(e.GetPosition(MapCanvas));
             else if (e.LeftButton == MouseButtonState.Pressed)
                 PaintTile(e.GetPosition(MapCanvas));
+        }
+
+        private void HandleInteractablePlacement(Point pos, MouseButtonEventArgs e)
+        {
+            if (editorState.ActivePlacementMode != PlacementMode.Interactable || editorState.ActiveLayer.LayerType != MapLayerType.Interactable)
+                return;
+
+            if (editorState.SelectedInteractable == null)
+                return;
+
+            if (!TryGetTilePosition(pos, out int x, out int y))
+                return;
+
+            int index = ActiveMap.GetIndex(x, y);
+
+            if(e.LeftButton == MouseButtonState.Pressed)
+            {
+                ActiveMap.Layers[MapLayerType.Interactable][index] = 1;
+
+                var existing = ActiveMap.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
+
+                if(existing == null)
+                {
+                    ActiveMap.Interactables.Add(new InteractableModel
+                    {
+                        X = x,
+                        Y = y,
+                        DefinitionId = editorState.SelectedInteractable.Id
+                    });
+                }
+            }
+            else if(e.LeftButton == MouseButtonState.Released)
+            {
+                ActiveMap.Layers[MapLayerType.Interactable][index] = 0;
+
+                var existing = ActiveMap.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
+
+                if (existing != null)
+                    ActiveMap.Interactables.Remove(existing);
+            }
+
+            DrawGrid();
         }
 
         #endregion
