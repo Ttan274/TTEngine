@@ -389,9 +389,6 @@ namespace EngineGame
 		m_CurrentAnim = &m_DeathAnim;
 
 		m_ColliderEnabled = false;
-
-		if (OnKilled)
-			OnKilled();
 	}
 
 	void Enemy::UpdatePhysics(float dt)

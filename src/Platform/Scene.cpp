@@ -1,5 +1,4 @@
 #include "Platform/Scene.h"
-#include "Platform/AnimationLibrary.h"
 #include "Core/Log.h"
 #include "Core/PathUtil.h"
 #include "Core/Math/Collision.h"
@@ -26,176 +25,9 @@ namespace EnginePlatform
 		);
 
 		ChangeGameState(GameState::MainMenu);
-
-		//Animation Library loaded
-		std::string animDir = EngineCore::GetRootDirectory() + "\\Assets\\Animation";
-		if (!EnginePlatform::AnimationLibrary::LoadAllAnims(animDir))
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Fatal,
-				EngineCore::LogCategory::Scene,
-				"Failed to load all animation files"
-			);
-			return;
-		}
-
-		//Entity Definitions loaded
-		if (!EngineGame::MapLoader::LoadEntityDefs(EngineCore::GetFile("Data", "entity_def.json"),
-												   m_EntityDefs))
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Fatal,
-				EngineCore::LogCategory::Scene,
-				"Failed to load entity.json"
-			);
-			return;
-		}
-
-		EngineCore::Log::Write(
-			EngineCore::LogLevel::Info,
-			EngineCore::LogCategory::Scene,
-			"Scene basics have been loaded"
-		);
+		m_Loader.LoadBasics(m_EntityDefs);
+		LoadCurrentLevel();
 	}
-
-	void Scene::LoadSpawnEntities()
-	{
-		std::string rootDir = EngineCore::GetRootDirectory();
-		m_AliveEnemyCount = 0;
-
-		for (const auto& spawn : m_MapData.spawns)
-		{
-			auto it = m_EntityDefs.find(spawn.defId);
-			if (it == m_EntityDefs.end())
-			{
-				EngineCore::Log::Write(
-					EngineCore::LogLevel::Warning,
-					EngineCore::LogCategory::Scene,
-					"Unknown entity def : " + spawn.defId
-				);
-				continue;
-			}
-
-			const EngineGame::EntityDefs& def = it->second;
-
-			//Selecting is it player or enemy
-			if (spawn.defId == "Player")
-			{
-				if (m_PlayerSpawned)
-				{
-					EngineCore::Log::Write(
-						EngineCore::LogLevel::Warning,
-						EngineCore::LogCategory::Scene,
-						"Multiple player spawns found iggnoring the extra one"
-					);
-					continue;
-				}
-
-				LoadPlayer(spawn, def);
-				m_PlayerSpawned = true;
-			}
-			else
-			{
-				LoadEnemy(spawn, def);
-				m_AliveEnemyCount++;
-			}
-		}
-
-		if (!m_PlayerSpawned)
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Fatal,
-				EngineCore::LogCategory::Scene,
-				"No Player spawn found in map!"
-			);
-		}
-	}
-
-	void Scene::LoadPlayer(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
-	{
-		//Set World Reference
-		m_Player.SetWorld(m_TileMap.get());
-
-		//Set Definitions
-		m_Player.ApplyDefinition(def);
-
-		//Set Position
-		EngineMath::Vector2 newPos;
-		newPos.x = spawn.x * m_TileMap->GetTileSize();
-		newPos.y = spawn.y * m_TileMap->GetTileSize();
-
-		EngineCore::AABB spawnBox;
-		spawnBox.SetFromPositionSize(
-			newPos.x,
-			newPos.y,
-			m_Player.GetColliderW(),
-			m_Player.GetColliderH()
-		);
-
-		//Wall Overlap Check
-		if (m_TileMap->IsSolidX(spawnBox) || m_TileMap->IsSolidY(spawnBox, -1.0f))
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Warning,
-				EngineCore::LogCategory::Scene,
-				"Player spawn is on a wall tile!"
-			);
-		}
-
-		//Set position and spawn point
-		m_Player.SetPosition(newPos);
-		m_Player.SetSpawnPoint(newPos);
-		EngineCore::Log::Write(
-			EngineCore::LogLevel::Info,
-			EngineCore::LogCategory::Scene,
-			"Player pos : " + std::to_string(newPos.x) + "," + std::to_string(newPos.y)
-		);
-	}
-
-	void Scene::LoadEnemy(const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
-	{
-		//Enemy Loading
-		auto enemy = std::make_unique<EngineGame::Enemy>();
-
-		//Set World Reference
-		enemy->SetWorld(m_TileMap.get());
-
-		//Set Definitions
-		enemy->ApplyDefinition(def);
-
-		//Set Position
-		EngineMath::Vector2 newPos;
-		newPos.x = spawn.x * m_TileMap->GetTileSize();
-		newPos.y = spawn.y * m_TileMap->GetTileSize();
-		enemy->SetPosition(newPos);
-
-		//Set Death Callback
-		enemy->OnKilled = [this]()
-			{
-				OnEnemyKilled();
-			};
-
-		//Add new enemy to the array
-		m_Enemies.push_back(std::move(enemy));
-	}
-
-	void Scene::LoadCamera()
-	{
-		//Camera loading
-		m_Camera.SetWorldBounds(m_TileMap->GetWorldWidth(), m_TileMap->GetWorldHeight());
-		m_Camera.Follow(m_Player.GetPosition().x, m_Player.GetPosition().y);
-		m_Camera.SetSmoothness(20.0f);
-	}
-
-	void Scene::OnEnemyKilled()
-	{
-		m_AliveEnemyCount--;
-
-		if (m_AliveEnemyCount <= 0)
-			m_LevelCompleted = true;
-	}
-
-	#pragma region Update Region
 
 	void Scene::Update(float dt)
 	{
@@ -219,39 +51,6 @@ namespace EnginePlatform
 	void Scene::ChangeGameState(GameState newState)
 	{
 		m_GameState = newState;
-
-		switch (m_GameState)
-		{
-		case GameState::MainMenu:
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Info,
-				EngineCore::LogCategory::Scene,
-				"State changed to MAIN MENU"
-			);
-			break;
-
-		case GameState::Playing:
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Info,
-				EngineCore::LogCategory::Scene,
-				"State changed to PLAYING"
-			);
-			break;
-		case GameState::LevelComplete:
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Info,
-				EngineCore::LogCategory::Scene,
-				"State changed to Level Complete"
-			);
-			break;
-		case GameState::DeathScreen:
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Info,
-				EngineCore::LogCategory::Scene,
-				"State changed to DEATH SCREEN"
-			);
-			break;
-		}
 	}
 
 	void Scene::UpdateMainMenu(float dt)
@@ -399,19 +198,8 @@ namespace EnginePlatform
 	//Level Area
 	void Scene::LoadCurrentLevel()
 	{
-		const LevelData* level = LevelManager::Get().GetCurrentLevel();
-
-		if (!level)
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Error,
-				EngineCore::LogCategory::Scene,
-				"No active level to load"
-			);
-			return;
-		}
-
-		LoadMap(level->mapId);
+		LoadContext ctx = GetLoadContext();
+		m_Loader.LoadCurrentLevel(ctx);
 	}
 
 	void Scene::ReloadLevel()
@@ -439,44 +227,17 @@ namespace EnginePlatform
 		}
 	}
 
-	void Scene::LoadMap(const std::string& mapId)
+	LoadContext Scene::GetLoadContext()
 	{
-		m_Enemies.clear();
-		m_LevelCompleted = false;
-		m_PlayerSpawned = false;
-		m_Player.Reset();
-
-		std::string targetPath = EngineCore::GetFile("Maps", mapId);
-
-		//Map Loading 
-		if (!EngineGame::MapLoader::LoadFromFile(targetPath, m_MapData))
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Fatal,
-				EngineCore::LogCategory::Scene,
-				"Failed to load map.json"
-			);
-			return;
-		}
-		//Tilemap Creation
-		m_TileMap = std::make_unique<EngineGame::TileMap>(m_MapData.w, m_MapData.h, m_MapData.tSize);
-
-		std::vector<EngineGame::TileType> tiles;
-		tiles.reserve(m_MapData.tiles.size());
-
-		for (int v : m_MapData.tiles)
-			tiles.push_back(static_cast<EngineGame::TileType>(v));
-
-		m_TileMap->SetTiles(tiles);
-		m_TileMap->LoadAssets();
-
-		LoadSpawnEntities();
-		LoadCamera();
-
-		EngineCore::Log::Write(
-			EngineCore::LogLevel::Info,
-			EngineCore::LogCategory::Scene,
-			"Map Loaded + TileMap initialized + Player-Enemies have been spawned + Camera loaded."
+		return LoadContext(
+			m_Player,
+			m_Enemies,
+			m_EntityDefs,
+			m_TileMap,
+			m_MapData,
+			m_Camera,
+			m_PlayerSpawned,
+			m_LevelCompleted
 		);
 	}
 }

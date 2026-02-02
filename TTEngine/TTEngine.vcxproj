@@ -150,6 +150,7 @@
     <ClCompile Include="..\src\Platform\AssetManager.cpp" />
     <ClCompile Include="..\src\Platform\HUD.cpp" />
     <ClCompile Include="..\src\Platform\LevelManager.cpp" />
+    <ClCompile Include="..\src\Platform\Loader.cpp" />
     <ClCompile Include="..\src\Platform\RendererSdl.cpp" />
     <ClCompile Include="..\src\Platform\Scene.cpp" />
     <ClCompile Include="..\src\Platform\Window.cpp" />
@@ -179,6 +180,8 @@
     <ClInclude Include="..\src\Platform\GameState.h" />
     <ClInclude Include="..\src\Platform\HUD.h" />
     <ClInclude Include="..\src\Platform\LevelManager.h" />
+    <ClInclude Include="..\src\Platform\LoadContext.h" />
+    <ClInclude Include="..\src\Platform\Loader.h" />
     <ClInclude Include="..\src\Platform\RendererSdl.h" />
     <ClInclude Include="..\src\Platform\Scene.h" />
     <ClInclude Include="..\src\Platform\Window.h" />

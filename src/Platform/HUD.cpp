@@ -44,6 +44,8 @@ namespace EnginePlatform
 		renderer->DrawUIText("PRESS F5 TO START", 300.0f, 310.0f, { 255, 255, 255, 255 });
 	}
 
+	//Pause Menu eklenmeli
+
 	void HUD::RenderLevelComplete(EngineCore::IRenderer* renderer, float fadeAlpha)
 	{
 		EngineCore::Color fadeColor = { 0, 0, 0, static_cast<uint8_t>(fadeAlpha * 255) };

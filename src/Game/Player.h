@@ -56,9 +56,9 @@ namespace EngineGame
 		float Approach(float current, float target, float delta)
 		{
 			if (current < target)
-				return std::min(current + delta, target);
+				return (std::min)(current + delta, target);
 			else
-				return std::max(current - delta, target);
+				return (std::max)(current - delta, target);
 		}
 
 	private:

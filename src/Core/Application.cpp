@@ -26,7 +26,6 @@ namespace EngineCore
 		EnginePlatform::LevelManager::Get().StartLevelByIndex(0);
 
 		m_Scene.Load();
-		m_Scene.LoadCurrentLevel();
 	}
 
 	Application::~Application()
@@ -81,7 +80,6 @@ namespace EngineCore
 		{
 			DebugOverlay::AddLine("FPS: " + std::to_string(Debug::GetFPS()));
 			DebugOverlay::AddLine("Player hp: " + std::to_string(m_Scene.GetPlayer().GetHp()));
-			DebugOverlay::AddLine("Alive enemy count: " + std::to_string(m_Scene.GetAliveEnemyCount()));
 		}
 
 		//Input::Update();
