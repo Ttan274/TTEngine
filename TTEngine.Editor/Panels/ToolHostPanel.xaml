@@ -11,11 +11,12 @@
                     Background="#333"
                     Height="32">
 
-            <Button Content="Tiles"    Click="OpenTiles"/>
-            <Button Content="Maps"     Click="OpenMaps"/>
-            <Button Content="Levels"   Click="OpenLevels"/>
-            <Button Content="Entities" Click="OpenEntities"/>
-            <Button Content="Anim"     Click="OpenAnimations"/>
+            <Button Content="Tiles"         Click="OpenTiles"/>
+            <Button Content="Maps"          Click="OpenMaps"/>
+            <Button Content="Levels"        Click="OpenLevels"/>
+            <Button Content="Entities"      Click="OpenEntities"/>
+            <Button Content="Anim"          Click="OpenAnimations"/>
+            <Button Content="Interactables" Click="OpenInteractables"/>
         </StackPanel>
 
         <!-- CONTENT -->

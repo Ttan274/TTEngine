@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="TTEngine.Editor.Panels.InteractableManagementPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10"
+                    Width="260"
+                    Background="Wheat">
+
+            <!-- ADD / DELETE -->
+            <StackPanel Orientation="Horizontal"
+                        Margin="0,0,0,8">
+
+                <Button Content="Add"
+                        Width="80"
+                        Margin="0,0,6,0"
+                        Click="AddClick"/>
+
+                <Button Content="Delete"
+                        Width="80"
+                        Click="DeleteClick"/>
+            </StackPanel>
+
+            <TextBlock Text="Interactable Definitions"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,0,0,8"/>
+
+            <!-- LIST -->
+            <ListBox ItemsSource="{Binding Interactables}"
+                     SelectedItem="{Binding SelectedInteractable}"
+                     DisplayMemberPath="Id"
+                     Height="120"
+                     Margin="0,0,0,10"/>
+
+            <!-- DETAILS -->
+            <TextBlock Text="Id"/>
+            <TextBox Text="{Binding SelectedInteractable.Id}"
+                     Margin="0,0,0,6"/>
+
+            <TextBlock Text="Type"/>
+            <TextBox Text="{Binding SelectedInteractable.Type}"
+                     Margin="0,0,0,10"/>
+
+            <!-- IMAGE PATH -->
+            <TextBlock Text="Image"
+                   FontWeight="Bold"
+                   Margin="0,6,0,4"/>
+
+            <StackPanel Orientation="Horizontal"
+                        Margin="0,0,0,6">
+
+                <TextBox Text="{Binding SelectedInteractable.ImagePath}"
+                         Width="180"
+                         IsReadOnly="True"/>
+
+                <Button Content="..."
+                        Width="40"
+                        Margin="4,0,0,0"
+                        Click="BrowseImageClick"/>
+            </StackPanel>
+
+            <!-- PREVIEW -->
+            <Border BorderBrush="#666"
+                    BorderThickness="1"
+                    Height="100"
+                    Margin="0,0,0,10">
+
+                <Image x:Name="PreviewImage"
+                    Stretch="Uniform"/>
+            </Border>
+
+            <Button Content="Save"
+                    Click="SaveClick"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

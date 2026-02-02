@@ -4,6 +4,7 @@
     {
         Background,
         Collision,
-        Decoration
+        Decoration,
+        Interactable
     }
 }

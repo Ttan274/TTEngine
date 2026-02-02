@@ -39,7 +39,42 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <Separator/>
+            <Separator Margin="0,8,0,8"/>
+
+            <!-- INTERACTABLE SELECTION -->
+            <TextBlock  Text="Interactables"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Margin="0,0,0,6"/>
+
+            <ItemsControl ItemsSource="{Binding InteractableDefinitions}">
+                
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="40"
+                                Height="40"
+                                Margin="4"
+                                BorderThickness="1"
+                                Tag="{Binding Id}"
+                                BorderBrush="DimGray"
+                                Background="#2D2D2D"
+                                MouseLeftButtonDown="OnInteractableClicked"
+                                ToolTip="{Binding Name}"
+                                Loaded="InteractableButtonLoaded">
+                            <Image  Stretch="Uniform"
+                                    Loaded="InteractableImageLoaded"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Separator Margin="0,8,0,8"/>
 
             <!-- BRUSH SIZE -->
             <TextBlock Text="Brush Size"

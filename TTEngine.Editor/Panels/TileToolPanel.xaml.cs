@@ -1,10 +1,12 @@
 ﻿using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
@@ -26,57 +28,105 @@ namespace TTEngine.Editor.Panels
             InitializeComponent();
         }
 
-        //Tile Types
+        #region Tile Methods
+
         private void OnTileClicked(object sender, RoutedEventArgs e)
         {
-            if(sender is Border border && border.Tag is int tileId && Editor != null)
+            if (sender is Border border && border.Tag is int tileId && Editor != null)
             {
                 Editor.SelectedTile = Editor.TileDefinitions.First(t => t.Id == tileId);
             }
         }
-
         private void TileButtonLoaded(object sender, RoutedEventArgs e)
         {
-            if(sender is Border border && border.Tag is int tileId && Editor != null)
+            if (sender is Border border && border.Tag is int tileId && Editor != null)
             {
-                UpdateBtnVisual(border);
-                Editor.PropertyChanged += (_, __) => UpdateBtnVisual(border);
+                UpdateTileBtnVisual(border);
+                Editor.PropertyChanged += (_, __) => UpdateTileBtnVisual(border);
             }
         }
 
-        private void TileImageLoaded(object sender, RoutedEventArgs e)
+        private void UpdateTileBtnVisual(Border border)
         {
-            if(sender is Image img && img.DataContext is TileDefinition tile && !string.IsNullOrEmpty(tile.SpritePath))
-            {
-                string fullPath = Path.Combine(EditorPaths.GetAssetsFolder(), tile.SpritePath);
-
-                if (!File.Exists(fullPath))
-                    return;
-
-                var bmp = new BitmapImage();
-                bmp.BeginInit();
-                bmp.UriSource = new Uri(fullPath, UriKind.Absolute);
-                bmp.CacheOption = BitmapCacheOption.OnLoad;
-                bmp.EndInit();
-
-                img.Source = bmp;
-            }
-        }
-
-        private void UpdateBtnVisual(Border border)
-        {
-            if(border.Tag is int tileId && Editor != null)
+            if (border.Tag is int tileId && Editor != null)
             {
                 bool isSelected = Editor.SelectedTile?.Id == tileId;
+                UpdateBtnVisual(border, isSelected);
+            }
+        }
+        private void TileImageLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is Image img && img.DataContext is TileDefinition tile && !string.IsNullOrEmpty(tile.SpritePath))
+            {
+                LoadImage(img, tile.SpritePath);
+            }
+        }
+        #endregion
 
-                border.BorderBrush = isSelected
+        #region Interactable Methods
+
+        private void OnInteractableClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender is Border border && border.Tag is string interactableId && Editor != null)
+            {
+                Editor.SelectedInteractable = Editor.InteractableDefinitions.First(t => t.Id == interactableId);
+            }
+        }
+
+        private void InteractableButtonLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is Border border && border.Tag is string interactableId && Editor != null)
+            {
+                UpdateInteractableBtnVisual(border);
+                Editor.PropertyChanged += (_, __) => UpdateInteractableBtnVisual(border);
+            }
+        }
+
+        private void UpdateInteractableBtnVisual(Border border)
+        {
+            if (border.Tag is string interactableId && Editor != null)
+            {
+                bool isSelected = Editor.SelectedInteractable?.Id == interactableId;
+                UpdateBtnVisual(border, isSelected);
+            }
+        }
+
+        private void InteractableImageLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is Image img && img.DataContext is InteractableDefinition def && !string.IsNullOrEmpty(def.ImagePath))
+            {
+                LoadImage(img, def.ImagePath);
+            }
+        }
+
+        #endregion
+
+        //Helpers
+        private void UpdateBtnVisual(Border border, bool status)
+        {
+            border.BorderBrush = status
                                 ? Brushes.Gold
                                 : Brushes.DimGray;
 
-                border.BorderThickness = isSelected 
-                                    ? new Thickness(2) 
-                                    : new Thickness(1);
-            }
+            border.BorderThickness = status
+                                ? new Thickness(2)
+                                : new Thickness(1);
+        }
+
+        private void LoadImage(Image img, string fileName)
+        {
+            string path = Path.Combine(EditorPaths.GetAssetsFolder(), fileName);
+
+            if (!File.Exists(path))
+                return;
+
+            var bmp = new BitmapImage();
+            bmp.BeginInit();
+            bmp.UriSource = new Uri(path, UriKind.Absolute);
+            bmp.CacheOption = BitmapCacheOption.OnLoad;
+            bmp.EndInit();
+
+            img.Source = bmp;
         }
 
         //Brush Size

@@ -30,5 +30,7 @@ namespace TTEngine.Editor.Panels
             => ContentHost.Content = new MapsPanel(_editorState);
         private void OpenLevels(object sender, RoutedEventArgs e)
             => ContentHost.Content = new LevelsPanel(_editorState);
+        private void OpenInteractables(object sender, RoutedEventArgs e)
+            => ContentHost.Content = new InteractableManagementPanel();
     }
 }

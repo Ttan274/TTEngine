@@ -1,12 +1,19 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using TTEngine.Editor.Enums;
+using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Models.Editor
 {
-    public class EditorState
+    public enum PlacementMode
+    {
+        Tile,
+        Interactable
+    }
+
+    public class EditorState : INotifyPropertyChanged
     {
         public EditorConsole Console { get; } = new EditorConsole();
 
@@ -15,13 +22,27 @@ namespace TTEngine.Editor.Models.Editor
             {
                 new EditorLayer(MapLayerType.Background),
                 new EditorLayer(MapLayerType.Collision) {IsActive = true},
-                new EditorLayer(MapLayerType.Decoration)
+                new EditorLayer(MapLayerType.Decoration),
+                new EditorLayer(MapLayerType.Interactable)
             };
 
         public EditorLayer ActiveLayer =>
             Layers.First(l => l.IsActive);
 
         public ObservableCollection<TileDefinition> TileDefinitions { get; }
+        public ObservableCollection<InteractableDefinition> InteractableDefinitions { get; }
+        
+        //Placement
+        public PlacementMode _activePlacementMode;
+        public PlacementMode ActivePlacementMode
+        {
+            get => _activePlacementMode;
+            set
+            {
+                _activePlacementMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActivePlacementMode)));
+            }
+        }
 
         private TileDefinition _selectedTile;
         public TileDefinition SelectedTile
@@ -30,10 +51,38 @@ namespace TTEngine.Editor.Models.Editor
             set
             {
                 _selectedTile = value;
+                
+                if(value != null)
+                {
+                    _selectedInteractable = null;
+                    _activePlacementMode = PlacementMode.Tile;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedInteractable)));
+                }
+
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedTile)));
             }
         }
 
+        private InteractableDefinition _selectedInteractable;
+        public InteractableDefinition SelectedInteractable
+        {
+            get => _selectedInteractable;
+            set
+            {
+                _selectedInteractable = value;
+
+                if (value != null)
+                {
+                    _selectedTile = null;
+                    _activePlacementMode = PlacementMode.Interactable;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedTile)));
+                }
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedInteractable)));
+            }
+        }
+
+        //Active Layer & Active Map
         public bool IsActiveLayerLocked =>
             ActiveLayer != null && ActiveLayer.IsLocked;
 
@@ -65,6 +114,7 @@ namespace TTEngine.Editor.Models.Editor
         public EditorState()
         {
             TileDefinitions = new ObservableCollection<TileDefinition>(TileDefinitionService.Load());
+            InteractableDefinitions = new ObservableCollection<InteractableDefinition>(InteractableFileService.Load());
         }
 
         public void SetActiveLayer(EditorLayer layer)
@@ -88,9 +138,6 @@ namespace TTEngine.Editor.Models.Editor
 
             Console.Log($"{ActiveMapId} saved");
         }
-
-        public TileDefinition GetSelectedTile()
-            => TileDefinitions.FirstOrDefault(t => t.Id == SelectedTile.Id);
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
