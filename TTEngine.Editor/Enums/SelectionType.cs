@@ -5,6 +5,7 @@
         None,
         Tile,
         Player,
-        Enemy
+        Enemy,
+        Interactable
     }
 }

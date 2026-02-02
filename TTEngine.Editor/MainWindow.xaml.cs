@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models;
@@ -127,6 +128,12 @@ namespace TTEngine.Editor
                 return;
             }
 
+            if (editorState.ActivePlacementMode == PlacementMode.Interactable)
+            {
+                HandleInteractablePlacement(pos, e);
+                return;
+            }
+
             bool handled = _currentToolMode switch
             {
                 ToolMode.PlayerSpawn => HandlePlayerSpawn(pos),
@@ -134,12 +141,6 @@ namespace TTEngine.Editor
                 ToolMode.Fill => e.LeftButton == MouseButtonState.Pressed && HandleFill(pos),
                 _ => false
             };
-
-            if (editorState.ActivePlacementMode == PlacementMode.Interactable)
-            {
-                HandleInteractablePlacement(pos, e);
-                return;
-            }
 
             if (!handled)
                 HandleBrush(pos, e);
@@ -239,6 +240,7 @@ namespace TTEngine.Editor
 
             DrawPlayerSpawn();
             DrawEnemySpawns();
+            DrawInteractables();
 
             if (_hoverRect != null && !MapCanvas.Children.Contains(_hoverRect))
             {
@@ -309,9 +311,6 @@ namespace TTEngine.Editor
 
             if (layer == MapLayerType.Collision)
                 return Brushes.Transparent;
-
-            if (layer == MapLayerType.Interactable)
-                return Brushes.MediumPurple;
 
             return def.CollisionType switch
             {
@@ -387,6 +386,44 @@ namespace TTEngine.Editor
 
                 MapCanvas.Children.Add(e);
 
+            }
+        }
+
+        private void DrawInteractables()
+        {
+            if (!editorState.Layers.First(l => l.LayerType == MapLayerType.Interactable).IsVisible)
+                return;
+
+            foreach (var interactable in ActiveMap.Interactables)
+            {
+                var def = editorState.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
+
+                if (def == null || string.IsNullOrEmpty(def.ImagePath))
+                    continue;
+
+                string targetPath = System.IO.Path.Combine(EditorPaths.GetAssetsFolder(), def.ImagePath);
+
+                if (!System.IO.File.Exists(targetPath))
+                    continue;
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(targetPath, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+
+                Image img = new Image
+                {
+                    Source = bitmap,
+                    Width = ActiveMap.TileSize,
+                    Height = ActiveMap.TileSize,
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(img, interactable.X * ActiveMap.TileSize);
+                Canvas.SetTop(img, interactable.Y * ActiveMap.TileSize);
+
+                MapCanvas.Children.Add(img);
             }
         }
 
@@ -538,6 +575,23 @@ namespace TTEngine.Editor
         //Mouse Event Helpers
         private void HandleSelection(int x, int y)
         {
+            if(editorState.ActiveLayer.LayerType == MapLayerType.Interactable)
+            {
+                foreach (var interactable in ActiveMap.Interactables)
+                {
+                    if (interactable.X == x && interactable.Y == y)
+                    {
+                        _currentSelection = new SelectionModel
+                        {
+                            Type = SelectionType.Interactable,
+                            InteractableModel = interactable
+                        };
+                    }
+                    ShowInspector();
+                    return;
+                }
+            }
+
             if (ActiveMap.PlayerSpawn != null && ActiveMap.PlayerSpawn.Position.X == x && ActiveMap.PlayerSpawn.Position.Y == y)
             {
                 _currentSelection = new SelectionModel
@@ -596,6 +650,9 @@ namespace TTEngine.Editor
                     break;
                 case SelectionType.Enemy:
                     Inspector.SetContent(new EnemySpawnInspector(_currentSelection.EnemySpawnModel, _entityDefinitions));
+                    break;
+                case SelectionType.Interactable:
+                    Inspector.SetContent(new InteractableInspector(_currentSelection.InteractableModel, editorState.InteractableDefinitions));
                     break;
                 default:
                     Inspector.Clear();
