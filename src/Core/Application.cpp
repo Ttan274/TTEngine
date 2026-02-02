@@ -64,6 +64,15 @@ namespace EngineCore
 
 			if (event.type == SDL_EVENT_KEY_UP)
 				Input::OnKey(event.key.scancode, false);
+
+			if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+				Input::OnMouseButton(event.button.button, true);
+
+			if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
+				Input::OnMouseButton(event.button.button, false);
+
+			if (event.type == SDL_EVENT_MOUSE_MOTION)
+				Input::OnMouseMove(event.motion.x, event.motion.y);
 		}
 
 		if(Input::IsKeyDown(KeyCode::Escape))

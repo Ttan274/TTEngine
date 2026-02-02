@@ -335,12 +335,16 @@ namespace EngineGame
 
 	void Player::Reset()
 	{
+		m_Position = m_SpawnPoint;
+		m_Velocity = { 0.0f, 0.0f };
+		
 		m_HP = m_MaxHP;
 		m_IsDead = false;
+
 		m_IsAttacking = false;
 		m_HasHitThisAttack = false;
 
-		m_Velocity = { 0.0f, 0.0f };
+		m_State = PlayerState::Normal;
 		m_CurrentAnim = &m_IdleAnim;
 		m_CurrentAnim->Reset();
 	}

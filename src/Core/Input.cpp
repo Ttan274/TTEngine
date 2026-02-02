@@ -4,12 +4,19 @@ namespace EngineCore
 {
 	bool Input::s_Quit = false;
 	std::unordered_map<KeyCode, KeyState> Input::s_KeyState;
+	std::unordered_map<MouseButton, KeyState> Input::s_MouseState;
+	int Input::s_MouseX = 0;
+	int Input::s_MouseY = 0;
 
 	/*Lifecycle*/
 	void Input::Init()
 	{
 		s_Quit = false;
 		s_KeyState.clear();
+		s_MouseState.clear();
+		s_MouseState[MouseButton::Left] = KeyState::None;
+		s_MouseState[MouseButton::Right] = KeyState::None;
+		s_MouseState[MouseButton::Middle] = KeyState::None;
 
 		const KeyCode allKeys[] = {
 			KeyCode::W,
@@ -35,6 +42,14 @@ namespace EngineCore
 	void Input::EndFrame()
 	{
 		for (auto& [key, state] : s_KeyState)
+		{
+			if (state == KeyState::Pressed)
+				state = KeyState::Held;
+			else if (state == KeyState::Released)
+				state = KeyState::None;
+		}
+
+		for (auto& [btn, state] : s_MouseState)
 		{
 			if (state == KeyState::Pressed)
 				state = KeyState::Held;
@@ -74,6 +89,45 @@ namespace EngineCore
 		}
 	}
 
+	void Input::OnMouseButton(int sdlBtn, bool pressed)
+	{
+		MouseButton btn;
+
+		switch (sdlBtn)
+		{
+		case SDL_BUTTON_LEFT:
+			btn = MouseButton::Left;
+			break;
+		case SDL_BUTTON_RIGHT:
+			btn = MouseButton::Right;
+			break;
+		case SDL_BUTTON_MIDDLE:
+			btn = MouseButton::Middle;
+			break;
+		default:
+			return;
+		}
+
+		if (pressed)
+		{
+			if (s_MouseState[btn] == KeyState::None ||
+				s_MouseState[btn] == KeyState::Released)
+			{
+				s_MouseState[btn] = KeyState::Pressed;
+			}
+		}
+		else
+		{
+			s_MouseState[btn] = KeyState::Released;
+		}
+	}
+
+	void Input::OnMouseMove(int x, int y)
+	{
+		s_MouseX = x;
+		s_MouseY = y;
+	}
+
 	/*Queries*/
 	bool Input::IsKeyDown(KeyCode key)
 	{
@@ -100,6 +154,29 @@ namespace EngineCore
 			return false;
 
 		return k->second == KeyState::Released;
+	}
+
+	bool Input::IsMouseButtonDown(MouseButton btn)
+	{
+		return s_MouseState[btn] == KeyState::Pressed || s_MouseState[btn] == KeyState::Held;
+	}
+
+	bool Input::IsMouseButtonPressed(MouseButton btn)
+	{
+		return s_MouseState[btn] == KeyState::Pressed;
+	}
+
+	bool Input::IsMouseButtonReleased(MouseButton btn)
+	{
+		return s_MouseState[btn] == KeyState::Released;
+	}
+
+	EngineMath::Vector2 Input::GetMousePosition()
+	{
+		return {
+			static_cast<float>(s_MouseX),
+			static_cast<float>(s_MouseY)
+		};
 	}
 
 	/*Axis*/

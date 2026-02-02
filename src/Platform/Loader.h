@@ -10,7 +10,6 @@ namespace EngineGame
 
 namespace EnginePlatform
 {
-	class Scene;
 	class Loader
 	{
 	public:

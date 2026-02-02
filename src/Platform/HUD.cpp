@@ -1,4 +1,5 @@
 #include "Platform/HUD.h"
+#include "Platform/Scene.h"
 #include <algorithm>
 
 namespace EnginePlatform
@@ -11,37 +12,58 @@ namespace EnginePlatform
 	const int HP_BAR_W_EN = 40;
 	const int HP_BAR_H_EN = 6;
 
+	// UI button constants
+	const EngineCore::Rect topBtn{ 300, 260, 200, 40 };
+	const EngineCore::Rect bottomBtn{ 300, 320, 200, 40 };
+	const EngineCore::Color normalColor{ 50, 50, 50, 255 };
+	const EngineCore::Color hoverColor{ 80, 80, 80, 255 };
+
 	void HUD::Render(EngineCore::IRenderer* renderer, const EngineGame::Player& player,
 		const std::vector<std::unique_ptr<EngineGame::Enemy>>& enemies,
 		const EngineGame::Camera2D& camera,
+		Scene& scene,
 		GameState state,
 		float fadeAlpha)
 	{
 		switch (state)
 		{
 		case GameState::MainMenu:
-			RenderMainMenu(renderer);
+			RenderMainMenu(renderer, scene);
+			m_CanRenderCursor = true;
 			break;
 
 		case GameState::Playing:
 			RenderPlayerHP(renderer, player);
 			for (auto& e : enemies)
 				RenderEnemyHP(renderer, *e, camera);
+			m_CanRenderCursor = false;
 			break;
 
 		case GameState::LevelComplete:
 			RenderLevelComplete(renderer, fadeAlpha);
+			m_CanRenderCursor = false;
 			break;
 
 		case GameState::DeathScreen:
-			RenderDeathScreen(renderer);
+			RenderDeathScreen(renderer, scene);
+			m_CanRenderCursor = true;
 			break;
 		}
+
+		RenderCursor(renderer);
 	}
 
-	void HUD::RenderMainMenu(EngineCore::IRenderer* renderer)
+	void HUD::RenderMainMenu(EngineCore::IRenderer* renderer, Scene& scene)
 	{
-		renderer->DrawUIText("PRESS F5 TO START", 300.0f, 310.0f, { 255, 255, 255, 255 });
+		if (renderer->DrawUIButton("Start Game", topBtn, normalColor, hoverColor).clicked)
+		{
+			scene.StartGame();
+		}
+
+		if (renderer->DrawUIButton("Quit Game", bottomBtn, normalColor, hoverColor).clicked)
+		{
+			//Quit Game
+		}
 	}
 
 	//Pause Menu eklenmeli
@@ -53,10 +75,17 @@ namespace EnginePlatform
 		renderer->DrawUIText("Level Completed", 300.0f, 310.0f, { 255, 215, 0, 255 });
 	}
 
-	void HUD::RenderDeathScreen(EngineCore::IRenderer* renderer)
+	void HUD::RenderDeathScreen(EngineCore::IRenderer* renderer, Scene& scene)
 	{
-		renderer->DrawUIText("PRESS F5 TO RESTART", 300, 400, { 255, 255, 255, 255 });
-		renderer->DrawUIText("PRESS F9 TO MAIN MENU", 300, 300, { 255, 255, 255, 255 });
+		if (renderer->DrawUIButton("Restart Game", topBtn, normalColor, hoverColor).clicked)
+		{
+			scene.StartGame();
+		}
+
+		if (renderer->DrawUIButton("Main Menu", bottomBtn, normalColor, hoverColor).clicked)
+		{
+			scene.MainMenu();
+		}
 	}
 
 	void HUD::RenderPlayerHP(EngineCore::IRenderer* renderer, const EngineGame::Player& player)
@@ -99,5 +128,17 @@ namespace EnginePlatform
 
 		float textY = y - 14.0f;
 		renderer->DrawUIText(enemy.GetStateName(), x + HP_BAR_W_EN * 0.5f, textY, { 255, 255, 0, 255 });
+	}
+
+	void HUD::RenderCursor(EngineCore::IRenderer* renderer)
+	{
+		if (!m_CanRenderCursor)
+			return;
+
+		auto mousePos = EngineCore::Input::GetMousePosition();
+
+		EngineCore::Color cursorColor{ 220, 220, 220, 150 };
+
+		renderer->DrawCircle(mousePos.x, mousePos.y, 6.0f, cursorColor);
 	}
 }

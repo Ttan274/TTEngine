@@ -1,11 +1,11 @@
 #include "Platform/Scene.h"
 #include "Core/Log.h"
-#include "Core/PathUtil.h"
 #include "Core/Math/Collision.h"
 #include "Platform/LevelManager.h"
 
 namespace EnginePlatform
 {
+	//Level Transition constants
 	constexpr float LEVEL_COMPLETE_DELAY = 0.8f;
 	constexpr float FADE_SPEED = 1.5f;
 	constexpr float TEXT_POP_SPEED = 6.0f;
@@ -26,24 +26,17 @@ namespace EnginePlatform
 
 		ChangeGameState(GameState::MainMenu);
 		m_Loader.LoadBasics(m_EntityDefs);
-		LoadCurrentLevel();
 	}
 
 	void Scene::Update(float dt)
 	{
 		switch (m_GameState)
 		{
-		case GameState::MainMenu:
-			UpdateMainMenu(dt);
-			break;
 		case GameState::Playing:
 			UpdatePlaying(dt);
 			break;
 		case GameState::LevelComplete:
 			UpdateLevelComplete(dt);
-			break;
-		case GameState::DeathScreen:
-			UpdateDeathScreen(dt);
 			break;
 		}
 	}
@@ -51,12 +44,6 @@ namespace EnginePlatform
 	void Scene::ChangeGameState(GameState newState)
 	{
 		m_GameState = newState;
-	}
-
-	void Scene::UpdateMainMenu(float dt)
-	{
-		if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
-			ChangeGameState(GameState::Playing);
 	}
 
 	void Scene::UpdateLevelComplete(float dt)
@@ -161,19 +148,16 @@ namespace EnginePlatform
 		m_Camera.UpdateShake(dt);
 	}
 
-	void Scene::UpdateDeathScreen(float dt)
+	//UI
+	void Scene::StartGame()
 	{
-		if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
-		{
-			//Respawn Player
-			m_Player.Respawn();
-			ChangeGameState(GameState::Playing);
-		}
+		LoadCurrentLevel();
+		ChangeGameState(GameState::Playing);
+	}
 
-		if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F9))
-		{
-			ChangeGameState(GameState::MainMenu);
-		}
+	void Scene::MainMenu()
+	{
+		ChangeGameState(GameState::MainMenu);
 	}
 
 	//Render
@@ -192,7 +176,7 @@ namespace EnginePlatform
 			break;
 		}
 
-		m_HUD.Render(renderer, m_Player, m_Enemies, m_Camera, m_GameState, m_FadeAlpha);
+		m_HUD.Render(renderer, m_Player, m_Enemies, m_Camera, *this, m_GameState, m_FadeAlpha);
 	}
 
 	//Level Area
@@ -200,11 +184,6 @@ namespace EnginePlatform
 	{
 		LoadContext ctx = GetLoadContext();
 		m_Loader.LoadCurrentLevel(ctx);
-	}
-
-	void Scene::ReloadLevel()
-	{
-		LoadCurrentLevel();
 	}
 
 	void Scene::OnLevelCompleted()

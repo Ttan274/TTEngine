@@ -20,19 +20,20 @@ namespace EnginePlatform
 		void ChangeGameState(GameState newState);
 		GameState GetGameState() { return m_GameState; }
 
+		//Level
 		void LoadCurrentLevel();
-		void ReloadLevel();
 		void OnLevelCompleted();
-
-		EngineGame::Player& GetPlayer() { return m_Player; }
 		
-		//Load Context
+		//UI Methods
+		void StartGame();
+		void MainMenu();
+
+		//Get Methods
 		LoadContext GetLoadContext();
+		EngineGame::Player& GetPlayer() { return m_Player; }
 
 	private:
-		void UpdateMainMenu(float dt);
 		void UpdatePlaying(float dt);
-		void UpdateDeathScreen(float dt);
 		void UpdateLevelComplete(float dt);
 	private:
 		EngineGame::Player m_Player;

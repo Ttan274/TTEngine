@@ -20,6 +20,8 @@ namespace EnginePlatform
             const EngineCore::Color& color) override;
         void DrawRectOutline(const EngineCore::Rect& rect,
             const EngineCore::Color& color) override;
+        void DrawCircle(float cx, float cy, 
+            float radius, const EngineCore::Color& color) override;
 
         void DrawTexture(EngineGame::Texture2D* texture, const EngineCore::Rect& rect) override;
         void DrawTexture(EngineGame::Texture2D* texture, 
@@ -30,6 +32,10 @@ namespace EnginePlatform
             float x,
             float y,
             const EngineCore::Color& color) override;
+        EngineCore::ButtonResult DrawUIButton(const std::string& text,
+            const EngineCore::Rect& rect,
+            const EngineCore::Color& normal,
+            const EngineCore::Color& hover) override;
 
     private:
         static SDL_Renderer* s_Renderer;
