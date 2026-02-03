@@ -3,7 +3,6 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
-#include <windows.h>
 #include <Core/PathUtil.h>
 
 namespace EngineCore

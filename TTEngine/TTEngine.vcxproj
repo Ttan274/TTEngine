@@ -137,6 +137,7 @@
     <ClCompile Include="..\src\Core\DebugOverlay.cpp" />
     <ClCompile Include="..\src\Core\Input.cpp" />
     <ClCompile Include="..\src\Core\Log.cpp" />
+    <ClCompile Include="..\src\Core\PathUtil.cpp" />
     <ClCompile Include="..\src\Core\Time.cpp" />
     <ClCompile Include="..\src\Game\Camera.cpp" />
     <ClCompile Include="..\src\Game\Enemy.cpp" />
