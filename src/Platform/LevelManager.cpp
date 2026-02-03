@@ -90,5 +90,12 @@ namespace EnginePlatform
 		int next = m_CurrentLevelIndex + 1;
 		if (next < (int)m_Levels.size())
 			StartLevelByIndex(next);
+		else
+			CompleteAll();
+	}
+
+	void LevelManager::CompleteAll()
+	{
+		m_CurrentLevelIndex = -1;
 	}
 }

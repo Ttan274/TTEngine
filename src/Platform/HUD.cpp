@@ -51,6 +51,7 @@ namespace EnginePlatform
 		}
 
 		RenderCursor(renderer);
+		RenderInteractPopup(renderer);
 	}
 
 	void HUD::RenderMainMenu(EngineCore::IRenderer* renderer, Scene& scene)
@@ -140,5 +141,17 @@ namespace EnginePlatform
 		EngineCore::Color cursorColor{ 220, 220, 220, 150 };
 
 		renderer->DrawCircle(mousePos.x, mousePos.y, 6.0f, cursorColor);
+	}
+
+	void HUD::SetInteractPopup(bool canShow, float x, float y)
+	{
+		m_CanRenderPopup = canShow;
+		m_InteractPopupPos = { x, y };
+	}
+
+	void HUD::RenderInteractPopup(EngineCore::IRenderer* renderer)
+	{
+		if (m_CanRenderPopup)
+			renderer->DrawUIText("Press F5 Button", m_InteractPopupPos.x, m_InteractPopupPos.y, { 255, 255, 255, 255 });
 	}
 }

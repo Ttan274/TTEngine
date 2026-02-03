@@ -2,6 +2,8 @@
 #include "Game/Player.h"
 #include "Core/Math/Collision.h"
 #include "Core/Log.h"
+#include "Platform/AssetManager.h"
+#include "Core/PathUtil.h"
 
 namespace EngineGame
 {
@@ -21,6 +23,29 @@ namespace EngineGame
 				m_Interacted = &it;
 				return;
 			}
+		}
+	}
+
+	void InteractableManager::Render(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera)
+	{
+		for (const auto& it : m_Interactables)
+		{
+			if (!it.def)
+				continue;
+
+			std::string path = EngineCore::GetFile("Textures", it.def->imagePath);
+			EngineGame::Texture2D* tex = EnginePlatform::AssetManager::GetTexture(path);
+
+			if (!tex)
+				continue;
+
+			EngineCore::Rect dst;
+			dst.x = it.position.x - camera.GetX();
+			dst.y = it.position.y - camera.GetY();
+			dst.w = it.collider.Width();
+			dst.h = it.collider.Height();
+
+			renderer->DrawTexture(tex, dst);
 		}
 	}
 

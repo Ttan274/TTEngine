@@ -20,6 +20,7 @@ namespace EnginePlatform
 
 		void StartLevelByIndex(int index);
 		void LoadNextLevel();
+		void CompleteAll();
 
 		const LevelData* GetCurrentLevel() const;
 		const std::vector<LevelData>& GetLevels() const { return m_Levels; }

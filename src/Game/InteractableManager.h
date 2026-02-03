@@ -20,6 +20,7 @@ namespace EngineGame
 	{
 	public:
 		void Update(Player& player);
+		void Render(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera);
 		void Clear();
 		void Add(const InteractableInstance& instance);
 		void DebugDraw(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera);

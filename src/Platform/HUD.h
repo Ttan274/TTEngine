@@ -20,6 +20,8 @@ namespace EnginePlatform
 			Scene& scene,
 			GameState state,
 			float fadeAlpha);
+
+		void SetInteractPopup(bool canShow, float x, float y);
 	private:
 		void RenderMainMenu(EngineCore::IRenderer* renderer, Scene& scene);
 		void RenderLevelComplete(EngineCore::IRenderer* renderer, float fadeAlpha);
@@ -29,7 +31,10 @@ namespace EnginePlatform
 		void RenderEnemyHP(EngineCore::IRenderer* renderer, const EngineGame::Enemy& enemy, const EngineGame::Camera2D& camera);
 
 		void RenderCursor(EngineCore::IRenderer* renderer);
+		void RenderInteractPopup(EngineCore::IRenderer* renderer);
 
 		bool m_CanRenderCursor = false;
+		bool m_CanRenderPopup = false;
+		EngineMath::Vector2 m_InteractPopupPos;
 	};
 }

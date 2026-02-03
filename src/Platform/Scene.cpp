@@ -92,11 +92,23 @@ namespace EnginePlatform
 		m_Player.Update(dt);
 		m_InteractableManager.Update(m_Player);
 
-		if (m_InteractableManager.HasInteractableInRange() && EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
+		if (m_InteractableManager.HasInteractableInRange())
 		{
 			const auto* it = m_InteractableManager.GetInteracted();
 			if (it)
-				HandleInteractable(*it);
+			{
+				float screenX = it->position.x - m_Camera.GetX();
+				float screenY = it->position.y - m_Camera.GetY() - 20.0f;
+
+				m_HUD.SetInteractPopup(true, screenX, screenY);
+
+				if(EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
+					HandleInteractable(*it);
+			}
+		}
+		else
+		{
+			m_HUD.SetInteractPopup(false, 0, 0);
 		}
 
 		for (auto it = m_Enemies.begin(); it != m_Enemies.end();)
@@ -186,6 +198,7 @@ namespace EnginePlatform
 			m_TileMap->Draw(renderer, m_Camera);
 			m_TileMap->DrawCollisionDebug(renderer, m_Camera);
 			m_Player.Render(renderer, m_Camera);
+			m_InteractableManager.Render(renderer, m_Camera);
 			m_InteractableManager.DebugDraw(renderer, m_Camera);
 			for (auto& e : m_Enemies)
 				e->Render(renderer, m_Camera);
@@ -220,6 +233,7 @@ namespace EnginePlatform
 				"All levels have been completed"
 			);
 
+			//Game Completed State eklenicek
 			ChangeGameState(GameState::MainMenu);
 		}
 	}
