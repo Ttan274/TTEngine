@@ -90,6 +90,15 @@ namespace EnginePlatform
 		}
 
 		m_Player.Update(dt);
+		m_InteractableManager.Update(m_Player);
+
+		if (m_InteractableManager.HasInteractableInRange() && EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
+		{
+			const auto* it = m_InteractableManager.GetInteracted();
+			if (it)
+				HandleInteractable(*it);
+		}
+
 		for (auto it = m_Enemies.begin(); it != m_Enemies.end();)
 		{
 			auto& e = *it;
@@ -148,6 +157,14 @@ namespace EnginePlatform
 		m_Camera.UpdateShake(dt);
 	}
 
+	void Scene::HandleInteractable(const EngineGame::InteractableInstance& it)
+	{
+		if (it.def->type == "FinishGame")
+		{
+			OnLevelCompleted();
+		}
+	}
+
 	//UI
 	void Scene::StartGame()
 	{
@@ -169,6 +186,7 @@ namespace EnginePlatform
 			m_TileMap->Draw(renderer, m_Camera);
 			m_TileMap->DrawCollisionDebug(renderer, m_Camera);
 			m_Player.Render(renderer, m_Camera);
+			m_InteractableManager.DebugDraw(renderer, m_Camera);
 			for (auto& e : m_Enemies)
 				e->Render(renderer, m_Camera);
 			break;
@@ -214,6 +232,7 @@ namespace EnginePlatform
 			m_EntityDefs,
 			m_TileMap,
 			m_MapData,
+			m_InteractableManager,
 			m_Camera,
 			m_PlayerSpawned,
 			m_LevelCompleted

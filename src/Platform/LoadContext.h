@@ -8,6 +8,7 @@ namespace EngineGame
 	class Player;
 	class Enemy;
 	class TileMap;
+	class InteractableManager;
 	class Camera2D;
 
 	struct MapData;
@@ -27,6 +28,9 @@ namespace EnginePlatform
 		std::unique_ptr<EngineGame::TileMap>& tileMap;
 		EngineGame::MapData& mapData;
 
+		//Interactables
+		EngineGame::InteractableManager& interactableList;
+
 		//Camera
 		EngineGame::Camera2D& camera;
 
@@ -40,6 +44,7 @@ namespace EnginePlatform
 			std::unordered_map<std::string, EngineGame::EntityDefs>& eDef,
 			std::unique_ptr<EngineGame::TileMap>& t,
 			EngineGame::MapData& m,
+			EngineGame::InteractableManager& i,
 			EngineGame::Camera2D& c,
 			bool& pSpawn,
 			bool& lC
@@ -50,6 +55,7 @@ namespace EnginePlatform
 			entityDefs(eDef),
 			tileMap(t),
 			mapData(m),
+			interactableList(i),
 			camera(c),
 			playerSpawned(pSpawn),
 			levelCompleted(lC)

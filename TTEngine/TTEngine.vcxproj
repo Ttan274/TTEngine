@@ -141,6 +141,7 @@
     <ClCompile Include="..\src\Game\Camera.cpp" />
     <ClCompile Include="..\src\Game\Enemy.cpp" />
     <ClCompile Include="..\src\Game\Entity.cpp" />
+    <ClCompile Include="..\src\Game\InteractableManager.cpp" />
     <ClCompile Include="..\src\Game\MapLoader.cpp" />
     <ClCompile Include="..\src\Game\Player.cpp" />
     <ClCompile Include="..\src\Game\Texture.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="..\src\Platform\AnimationLibrary.cpp" />
     <ClCompile Include="..\src\Platform\AssetManager.cpp" />
     <ClCompile Include="..\src\Platform\HUD.cpp" />
+    <ClCompile Include="..\src\Platform\InteractableLibrary.cpp" />
     <ClCompile Include="..\src\Platform\LevelManager.cpp" />
     <ClCompile Include="..\src\Platform\Loader.cpp" />
     <ClCompile Include="..\src\Platform\RendererSdl.cpp" />
@@ -171,6 +173,7 @@
     <ClInclude Include="..\src\Game\Camera.h" />
     <ClInclude Include="..\src\Game\Enemy.h" />
     <ClInclude Include="..\src\Game\Entity.h" />
+    <ClInclude Include="..\src\Game\InteractableManager.h" />
     <ClInclude Include="..\src\Game\MapLoader.h" />
     <ClInclude Include="..\src\Game\Player.h" />
     <ClInclude Include="..\src\Game\Texture.h" />
@@ -179,6 +182,7 @@
     <ClInclude Include="..\src\Platform\AssetManager.h" />
     <ClInclude Include="..\src\Platform\GameState.h" />
     <ClInclude Include="..\src\Platform\HUD.h" />
+    <ClInclude Include="..\src\Platform\InteractableLibrary.h" />
     <ClInclude Include="..\src\Platform\LevelManager.h" />
     <ClInclude Include="..\src\Platform\LoadContext.h" />
     <ClInclude Include="..\src\Platform\Loader.h" />

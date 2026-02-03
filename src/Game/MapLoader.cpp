@@ -49,6 +49,33 @@ namespace EngineGame
 			return false;
 		}
 
+		
+
+		//Loading Interactables Data
+		if (!j.contains("Interactables"))
+		{
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Error,
+				EngineCore::LogCategory::Scene,
+				"Map has no interactables"
+			);
+			return false;
+		}
+
+		outMap.interactables.clear();
+		if (j.contains("Interactables"))
+		{
+			for (auto& i : j["Interactables"])
+			{
+				SpawnData d;
+				d.x = i["X"].get<float>();
+				d.y = i["Y"].get<float>();
+				d.defId = i["DefinitionId"].get<std::string>();
+
+				outMap.interactables.push_back(d);
+			}
+		}
+
 		//Loading Spawn Data
 		outMap.spawns.clear();
 

@@ -21,6 +21,7 @@ namespace EngineGame
 		std::vector<int> tiles;
 
 		std::vector<SpawnData> spawns;
+		std::vector<SpawnData> interactables;
 	};
 
 	class MapLoader

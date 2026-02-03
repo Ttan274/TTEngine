@@ -4,6 +4,7 @@
 #include "Platform/HUD.h"
 #include "Platform/Loader.h"
 #include "Platform/LoadContext.h"
+#include "Game/InteractableManager.h"
 
 namespace EnginePlatform
 {
@@ -19,6 +20,9 @@ namespace EnginePlatform
 		void Render(EngineCore::IRenderer* renderer);
 		void ChangeGameState(GameState newState);
 		GameState GetGameState() { return m_GameState; }
+
+		//Interaction
+		void HandleInteractable(const EngineGame::InteractableInstance& it);
 
 		//Level
 		void LoadCurrentLevel();
@@ -58,5 +62,6 @@ namespace EnginePlatform
 		//HUD - Loader
 		HUD m_HUD;
 		Loader m_Loader;
+		EngineGame::InteractableManager m_InteractableManager;
 	};
 }

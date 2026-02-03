@@ -4,6 +4,8 @@
 #include "Core/PathUtil.h"
 #include "Core/Log.h"
 #include "Platform/Scene.h"
+#include "Platform/InteractableLibrary.h"
+#include "Game/InteractableManager.h"
 
 namespace EnginePlatform
 {
@@ -32,6 +34,8 @@ namespace EnginePlatform
 			);
 			return;
 		}
+
+		InteractableLibrary::Get().LoadDefs(EngineCore::GetFile("Data", "Interactables.json"));
 
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
@@ -92,6 +96,7 @@ namespace EnginePlatform
 
 		//Other Load Operations
 		LoadSpawnEntities(ctx);
+		LoadInteractables(ctx);
 		LoadCamera(ctx);
 
 		EngineCore::Log::Write(
@@ -220,5 +225,44 @@ namespace EnginePlatform
 		ctx.camera.SetWorldBounds(ctx.tileMap->GetWorldWidth(), ctx.tileMap->GetWorldHeight());
 		ctx.camera.Follow(ctx.player.GetPosition().x, ctx.player.GetPosition().y);
 		ctx.camera.SetSmoothness(20.0f);
+	}
+
+	void Loader::LoadInteractables(LoadContext& ctx)
+	{
+		ctx.interactableList.Clear();
+
+		const int tileSize = ctx.tileMap->GetTileSize();
+
+		for (const auto& s : ctx.mapData.interactables)
+		{
+			const InteractableDef* def = InteractableLibrary::Get().GetDef(s.defId);
+
+			if (!def)
+			{
+				EngineCore::Log::Write(
+					EngineCore::LogLevel::Warning,
+					EngineCore::LogCategory::Scene,
+					"Unknown interactable def:" + s.defId
+				);
+				continue;
+			}
+
+			EngineMath::Vector2 worldPos;
+			worldPos.x = static_cast<float>(s.x * tileSize);
+			worldPos.y = static_cast<float>(s.y * tileSize);
+
+			EngineGame::InteractableInstance instance;
+			instance.position = worldPos;
+			instance.def = def;
+			instance.collider.SetFromPositionSize(worldPos.x, worldPos.y, static_cast<float>(tileSize), static_cast<float>(tileSize));
+
+			ctx.interactableList.Add(instance);
+		}
+
+		EngineCore::Log::Write(
+			EngineCore::LogLevel::Info,
+			EngineCore::LogCategory::Scene,
+			"Interactables loaded :" + std::to_string(ctx.mapData.interactables.size())
+		);
 	}
 }

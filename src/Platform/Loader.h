@@ -21,5 +21,6 @@ namespace EnginePlatform
 		void LoadPlayer(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
 		void LoadEnemy(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def);
 		void LoadCamera(LoadContext& ctx);
+		void LoadInteractables(LoadContext& ctx);
 	};
 }
