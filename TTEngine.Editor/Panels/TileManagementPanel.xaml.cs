@@ -86,7 +86,7 @@ namespace TTEngine.Editor.Panels
             var dialog = new OpenFileDialog
             {
                 Filter = "PNG Files (*.png)|*.png",
-                InitialDirectory = EditorPaths.GetAssetsFolder()
+                InitialDirectory = EditorPaths.GetTextureFolder()
             };
 
             if (dialog.ShowDialog() != true)
@@ -99,7 +99,7 @@ namespace TTEngine.Editor.Panels
         {
             try
             {
-                string targetPath = Path.Combine(EditorPaths.GetAssetsFolder(), fileName);
+                string targetPath = Path.Combine(EditorPaths.GetTextureFolder(), fileName);
             
                 if(!File.Exists(targetPath))
                 {

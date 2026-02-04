@@ -131,6 +131,10 @@
             <Button Content="Start Game"
                     Margin="0,10,0,0"
                     Click="StartGame_Click"/>
+            
+            <Button Content="Build Game"
+                    Margin="0,10,0,0"
+                    Click="BuildGame_Click"/>
 
         </StackPanel>
     </Border>

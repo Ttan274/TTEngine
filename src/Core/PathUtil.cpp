@@ -20,14 +20,8 @@ namespace EngineCore
 
 	std::string GetRootDirectory()
 	{
-		std::string exeDir = GetExecutableDirectory();
-		std::filesystem::path root = std::filesystem::path(exeDir).parent_path().parent_path();
-
-		std::string mapPath = root.string();
-
-		return mapPath;
+		return GetExecutableDirectory();
 	}
-
 
 	std::string GetFile(std::string folderName, std::string fileName)
 	{

@@ -24,6 +24,13 @@ namespace TTEngine.Editor.Services
         {
             var root = GetProjectRoot();
 
+            return Path.GetFullPath(Path.Combine(root, "Assets"));
+        }
+
+        public static string GetTextureFolder()
+        {
+            var root = GetProjectRoot();
+
             return Path.GetFullPath(Path.Combine(root, "Assets", "Textures"));
         }
 
@@ -43,12 +50,17 @@ namespace TTEngine.Editor.Services
 
         public static string GetEngineExe()
         {
-            var root = GetProjectRoot();
-            var enginePath = Path.Combine(root, "x64", "Debug");
-
-            return Path.GetFullPath(Path.Combine(enginePath, ENGINE_NAME));
+#if DEBUG
+            return Path.GetFullPath(Path.Combine(GetEngineExeBase(), "Debug", ENGINE_NAME));
+#else
+            return Path.GetFullPath(Path.Combine(GetEngineExeBase(), "Release",  ENGINE_NAME));
+#endif
         }
 
-        
+        private static string GetEngineExeBase()
+        {
+            var root = GetProjectRoot();
+            return Path.Combine(root, "x64");
+        }
     }
 }

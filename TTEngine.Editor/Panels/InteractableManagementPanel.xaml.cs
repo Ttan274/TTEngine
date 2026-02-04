@@ -55,7 +55,7 @@ namespace TTEngine.Editor.Panels
                 if (SelectedInteractable == null)
                     return;
 
-                string targetPath = Path.Combine(EditorPaths.GetAssetsFolder(), SelectedInteractable.ImagePath);
+                string targetPath = Path.Combine(EditorPaths.GetTextureFolder(), SelectedInteractable.ImagePath);
             
                 if(!File.Exists(targetPath))
                 {
@@ -116,7 +116,7 @@ namespace TTEngine.Editor.Panels
             OpenFileDialog dialog = new OpenFileDialog
             {
                 Filter = "Image Files (*.png;*.jpg)|*.png;*.jpg",
-                InitialDirectory = EditorPaths.GetAssetsFolder()
+                InitialDirectory = EditorPaths.GetTextureFolder()
             };
 
             if (dialog.ShowDialog() != true)

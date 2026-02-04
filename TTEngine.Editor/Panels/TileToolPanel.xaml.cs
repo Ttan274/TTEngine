@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using Microsoft.Win32;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -115,7 +115,7 @@ namespace TTEngine.Editor.Panels
 
         private void LoadImage(Image img, string fileName)
         {
-            string path = Path.Combine(EditorPaths.GetAssetsFolder(), fileName);
+            string path = Path.Combine(EditorPaths.GetTextureFolder(), fileName);
 
             if (!File.Exists(path))
                 return;
@@ -152,5 +152,31 @@ namespace TTEngine.Editor.Panels
         //Button Clicks
         private void StartGame_Click(object sender, RoutedEventArgs e)
             => StartGameClicked?.Invoke();
+
+        private void BuildGame_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = "Select build output folder",
+                CheckFileExists = false,
+                FileName = "Select Folder"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            string selectedFolder = Path.GetDirectoryName(dialog.FileName);
+
+            try
+            {
+                BuildService.BuildGame(selectedFolder, "TTGame");
+                MessageBox.Show("Build completed succesfully! \nZIP package created.", "Build", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Build Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw;
+            }
+        }
     }
 }

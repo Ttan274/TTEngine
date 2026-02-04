@@ -401,7 +401,7 @@ namespace TTEngine.Editor
                 if (def == null || string.IsNullOrEmpty(def.ImagePath))
                     continue;
 
-                string targetPath = System.IO.Path.Combine(EditorPaths.GetAssetsFolder(), def.ImagePath);
+                string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
 
                 if (!System.IO.File.Exists(targetPath))
                     continue;
