@@ -64,6 +64,7 @@ namespace EngineGame
 		
 		return m_X + shakeX; 
 	}
+
 	float Camera2D::GetY() const 
 	{
 		float shakeY = 0.0f;

@@ -24,7 +24,8 @@ namespace EnginePlatform
 		//Level
 		void LoadCurrentLevel();
 		void OnLevelCompleted();
-		
+		void LoadL();
+
 		//UI Methods
 		void StartGame();
 		void MainMenu();

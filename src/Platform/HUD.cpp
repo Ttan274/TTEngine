@@ -73,7 +73,7 @@ namespace EnginePlatform
 	{
 		EngineCore::Color fadeColor = { 0, 0, 0, static_cast<uint8_t>(fadeAlpha * 255) };
 		renderer->DrawRect({ 0, 0, 800, 600 }, fadeColor);
-		renderer->DrawUIText("Level Completed", 300.0f, 310.0f, { 255, 215, 0, 255 });
+		renderer->DrawUIText("Level Loading", 300.0f, 310.0f, { 255, 215, 0, 255 });
 	}
 
 	void HUD::RenderDeathScreen(EngineCore::IRenderer* renderer, Scene& scene)

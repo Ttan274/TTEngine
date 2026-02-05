@@ -70,7 +70,6 @@ namespace EnginePlatform
 			if (m_FadeAlpha >= 1.0f)
 			{
 				m_FadeAlpha = 1.0f;
-				OnLevelCompleted();
 				m_FadeOut = false;
 			}
 		}
@@ -80,6 +79,7 @@ namespace EnginePlatform
 			if (m_FadeAlpha <= 0.0f)
 			{
 				m_FadeAlpha = 0.0f;
+				LoadCurrentLevel();
 				ChangeGameState(GameState::Playing);
 			}
 		}
@@ -155,14 +155,6 @@ namespace EnginePlatform
 			++it;
 		}
 
-		if (m_LevelCompleted)
-		{
-			ChangeGameState(GameState::LevelComplete);
-			m_LevelCompleteTimer = 0.0f;
-			m_FadeOut = true;
-			return;
-		}
-
 		m_Camera.FollowSmooth(
 			m_Player.GetPosition().x,
 			m_Player.GetPosition().y,
@@ -174,8 +166,8 @@ namespace EnginePlatform
 	//UI
 	void Scene::StartGame()
 	{
-		LoadCurrentLevel();
-		ChangeGameState(GameState::Playing);
+		ChangeGameState(GameState::LevelComplete);
+		//LoadCurrentLevel();
 	}
 
 	void Scene::MainMenu()
@@ -213,11 +205,14 @@ namespace EnginePlatform
 
 	void Scene::OnLevelCompleted()
 	{
+		m_HUD.SetInteractPopup(false, 0, 0);
 		LevelManager::Get().LoadNextLevel();
 
 		if (LevelManager::Get().GetCurrentLevel() != nullptr)
 		{
-			LoadCurrentLevel();
+			ChangeGameState(GameState::LevelComplete);
+			m_LevelCompleteTimer = 0.0f;
+			m_FadeOut = true;
 		}
 		else
 		{
