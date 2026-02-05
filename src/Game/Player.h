@@ -38,6 +38,10 @@ namespace EngineGame
 		void Respawn();
 		void Reset();
 
+		//Player Key Holder
+		void TakeKey() { m_HasKey = true; }
+		bool HasKey() const { return m_HasKey; }
+
 	protected:
 		//Base Class Methods
 		void OnDeath() override;
@@ -94,5 +98,8 @@ namespace EngineGame
 		float m_Acceleration = 150.0f;
 		float m_Friction = 2000.0f;
 		float m_AirControl = 0.5f;
+
+		//Key
+		bool m_HasKey = false;
 	};
 }

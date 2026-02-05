@@ -188,5 +188,17 @@
     <ClInclude Include="..\src\Game\InteractableManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\ChestInteractable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\DoorInteractable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\Interactable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\KeyInteractable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

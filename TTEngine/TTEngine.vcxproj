@@ -175,6 +175,10 @@
     <ClInclude Include="..\src\Game\Enemy.h" />
     <ClInclude Include="..\src\Game\Entity.h" />
     <ClInclude Include="..\src\Game\InteractableManager.h" />
+    <ClInclude Include="..\src\Game\Interactables\ChestInteractable.h" />
+    <ClInclude Include="..\src\Game\Interactables\DoorInteractable.h" />
+    <ClInclude Include="..\src\Game\Interactables\Interactable.h" />
+    <ClInclude Include="..\src\Game\Interactables\KeyInteractable.h" />
     <ClInclude Include="..\src\Game\MapLoader.h" />
     <ClInclude Include="..\src\Game\Player.h" />
     <ClInclude Include="..\src\Game\Texture.h" />

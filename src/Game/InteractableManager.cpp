@@ -1,26 +1,25 @@
 #include "Game/InteractableManager.h"
-#include "Game/Player.h"
 #include "Core/Math/Collision.h"
+#include "Game/Interactables/KeyInteractable.h"
+#include "Game/Interactables/DoorInteractable.h"
+#include "Game/Interactables/ChestInteractable.h"
 #include "Core/Log.h"
-#include "Platform/AssetManager.h"
-#include "Core/PathUtil.h"
 
 namespace EngineGame
 {
 	void InteractableManager::Update(Player& player)
 	{
 		m_Interacted = nullptr;
-
 		const EngineCore::AABB& playerCol = player.GetCollider();
 
-		for (const auto& it : m_Interactables)
+		for (auto& it : m_Interactables)
 		{
-			if (!it.def)
+			if (it->IsUsed())
 				continue;
 
-			if (EngineMath::AABBIntersectsAABB(playerCol, it.collider))
+			if (EngineMath::AABBIntersectsAABB(playerCol, it->GetCollider()))
 			{
-				m_Interacted = &it;
+				m_Interacted = it.get();
 				return;
 			}
 		}
@@ -28,39 +27,14 @@ namespace EngineGame
 
 	void InteractableManager::Render(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera)
 	{
-		for (const auto& it : m_Interactables)
-		{
-			if (!it.def)
-				continue;
-
-			std::string path = EngineCore::GetFile("Textures", it.def->imagePath);
-			EngineGame::Texture2D* tex = EnginePlatform::AssetManager::GetTexture(path);
-
-			if (!tex)
-				continue;
-
-			EngineCore::Rect dst;
-			dst.x = it.position.x - camera.GetX();
-			dst.y = it.position.y - camera.GetY();
-			dst.w = it.collider.Width();
-			dst.h = it.collider.Height();
-
-			renderer->DrawTexture(tex, dst);
-		}
+		for (auto& it : m_Interactables)
+			it->Render(renderer, camera);
 	}
 
-	bool InteractableManager::HasInteractableInRange() const
+	void InteractableManager::DebugDraw(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera)
 	{
-		return m_Interacted != nullptr;
-	}
-
-	void InteractableManager::HandleInteraction(const InteractableInstance& instance)
-	{
-		EngineCore::Log::Write(
-			EngineCore::LogLevel::Info,
-			EngineCore::LogCategory::Scene,
-			"Interacted with me"
-		);
+		for (auto& it : m_Interactables)
+			it->DebugDraw(renderer, camera);
 	}
 
 	void InteractableManager::Clear()
@@ -70,20 +44,62 @@ namespace EngineGame
 
 	void InteractableManager::Add(const InteractableInstance& instance)
 	{
-		m_Interactables.push_back(instance);
+		auto interactable = CreateInteractable(instance);
+		if (interactable)
+			m_Interactables.push_back(std::move(interactable));
 	}
 
-	void InteractableManager::DebugDraw(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera)
+	std::unique_ptr<Interactable> InteractableManager::CreateInteractable(const InteractableInstance& instance)
 	{
-		for (const auto& it : m_Interactables)
-		{
-			EngineCore::Rect r;
-			r.x = it.collider.Left() - camera.GetX();
-			r.y = it.collider.Top() - camera.GetY();
-			r.w = it.collider.Width();
-			r.h = it.collider.Height();
+		const std::string& id = instance.def->id;
 
-			renderer->DrawRectOutline(r, { 0, 255, 255, 255 });
+		if (id == "Key")
+			return std::make_unique<KeyInteractable>(instance);
+		if(id == "Door")
+			return std::make_unique<DoorInteractable>(instance);
+		if(id == "Chest")
+			return std::make_unique<ChestInteractable>(instance);
+
+		return nullptr;
+	}
+
+	bool InteractableManager::HasInteractableInRange() const
+	{
+		return m_Interacted != nullptr;
+	}
+
+	void InteractableManager::HandleInteraction(Player& player)
+	{
+		if (!m_Interacted)
+			return;
+		InteractResult result =	m_Interacted->OnInteract(player);
+
+		switch (result)
+		{
+		case InteractResult::SpawnKey:
+			SpawnKey(m_Interacted->GetPosition());
+			break;
+		case InteractResult::FinishGame:
+			if (m_OnLevelComplete)
+				m_OnLevelComplete();
+			break;
 		}
+	}
+
+	void InteractableManager::SpawnKey(const EngineMath::Vector2& pos)
+	{
+		const EnginePlatform::InteractableDef* keyDef =
+			EnginePlatform::InteractableLibrary::Get().GetDef("Key");
+
+		if (!keyDef)
+			return;
+
+		InteractableInstance instance;
+		instance.def = keyDef;
+		instance.position = pos + EngineMath::Vector2(16.0f, 0.0f);
+		instance.collider.SetFromPositionSize(instance.position.x, instance.position.y, 50, 50);
+		instance.used = false;
+
+		Add(instance);
 	}
 }

@@ -1,36 +1,38 @@
 #pragma once
+#include <functional>
 #include <vector>
-#include "Core/Math/Vector2.h"
-#include "Core/AABB.h"
-#include "Platform/InteractableLibrary.h"
-#include "Core/IRenderer.h"
-#include "Game/Camera.h"
+#include <memory>
+#include "Game/Interactables/Interactable.h"
 
 namespace EngineGame
 {
-	struct InteractableInstance
-	{
-		const EnginePlatform::InteractableDef* def = nullptr;
-		EngineMath::Vector2 position;
-		EngineCore::AABB collider;
-	};
-
-	class Player;
 	class InteractableManager
 	{
 	public:
 		void Update(Player& player);
 		void Render(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera);
-		void Clear();
-		void Add(const InteractableInstance& instance);
 		void DebugDraw(EngineCore::IRenderer* renderer, const EngineGame::Camera2D& camera);
+		
+		void Add(const InteractableInstance& instance);
+		void Clear();
+		
 		bool HasInteractableInRange() const;
-		const InteractableInstance* GetInteracted() const { return m_Interacted; }
+		void HandleInteraction(Player& player);
+		std::unique_ptr<Interactable> CreateInteractable(const InteractableInstance& instance);
+
+		const EngineMath::Vector2 GetPosition() const { return m_Interacted->GetPosition(); }
+		void SpawnKey(const EngineMath::Vector2& pos);
+
+		//Callback
+		void SetOnLevelComplete(std::function<void()> callback)
+		{
+			m_OnLevelComplete = std::move(callback);
+		}
 
 	private:
-		void HandleInteraction(const InteractableInstance& instance);
 
-		std::vector<InteractableInstance> m_Interactables;
-		const InteractableInstance* m_Interacted = nullptr;
+		std::vector<std::unique_ptr<Interactable>> m_Interactables;
+		Interactable* m_Interacted = nullptr;
+		std::function<void()> m_OnLevelComplete;
 	};
 }

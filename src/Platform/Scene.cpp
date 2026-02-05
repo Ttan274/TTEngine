@@ -26,6 +26,10 @@ namespace EnginePlatform
 
 		ChangeGameState(GameState::MainMenu);
 		m_Loader.LoadBasics(m_EntityDefs);
+		m_InteractableManager.SetOnLevelComplete([this]()
+		{
+			OnLevelCompleted();;
+		});
 	}
 
 	void Scene::Update(float dt)
@@ -94,17 +98,15 @@ namespace EnginePlatform
 
 		if (m_InteractableManager.HasInteractableInRange())
 		{
-			const auto* it = m_InteractableManager.GetInteracted();
-			if (it)
-			{
-				float screenX = it->position.x - m_Camera.GetX();
-				float screenY = it->position.y - m_Camera.GetY() - 20.0f;
+			const auto it = m_InteractableManager.GetPosition();
+			
+			float screenX = it.x - m_Camera.GetX();
+			float screenY = it.y - m_Camera.GetY() - 20.0f;
 
-				m_HUD.SetInteractPopup(true, screenX, screenY);
+			m_HUD.SetInteractPopup(true, screenX, screenY);
 
-				if(EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
-					HandleInteractable(*it);
-			}
+			if (EngineCore::Input::IsKeyPressed(EngineCore::KeyCode::F5))
+				m_InteractableManager.HandleInteraction(m_Player);
 		}
 		else
 		{
@@ -167,14 +169,6 @@ namespace EnginePlatform
 			dt
 		);
 		m_Camera.UpdateShake(dt);
-	}
-
-	void Scene::HandleInteractable(const EngineGame::InteractableInstance& it)
-	{
-		if (it.def->type == "FinishGame")
-		{
-			OnLevelCompleted();
-		}
 	}
 
 	//UI

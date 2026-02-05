@@ -21,9 +21,6 @@ namespace EnginePlatform
 		void ChangeGameState(GameState newState);
 		GameState GetGameState() { return m_GameState; }
 
-		//Interaction
-		void HandleInteractable(const EngineGame::InteractableInstance& it);
-
 		//Level
 		void LoadCurrentLevel();
 		void OnLevelCompleted();
