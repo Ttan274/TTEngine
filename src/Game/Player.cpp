@@ -287,6 +287,9 @@ namespace EngineGame
 		m_CurrentAnim->Reset();
 
 		//Knockback
+		if (objectDir == 0.0f)
+			return;
+
 		float dir = objectDir ? 1.0f : -1.0f;
 		m_KnockbackVel.x = dir * 150.0f;
 		m_KnockbackVel.y = -200.0f;
