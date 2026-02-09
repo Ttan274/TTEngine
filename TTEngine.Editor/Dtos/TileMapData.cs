@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using TTEngine.Editor.Enums;
+﻿using TTEngine.Editor.Enums;
 
 namespace TTEngine.Editor.Dtos
 {
@@ -12,5 +11,6 @@ namespace TTEngine.Editor.Dtos
         public SpawnDto PlayerSpawn { get; set; }
         public List<SpawnDto> EnemySpawns { get; set; }
         public List<InteractableDto> Interactables { get; set; } = new();
+        public List<TrapDto> Traps { get; set; } = new();
     }
 }

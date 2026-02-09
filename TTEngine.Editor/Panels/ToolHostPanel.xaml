@@ -16,6 +16,7 @@
             <Button Content="Levels"        Click="OpenLevels"/>
             <Button Content="Entities"      Click="OpenEntities"/>
             <Button Content="Anim"          Click="OpenAnimations"/>
+            <Button Content="Traps"         Click="OpenTraps"/>
             <Button Content="Interactables" Click="OpenInteractables"/>
         </StackPanel>
 

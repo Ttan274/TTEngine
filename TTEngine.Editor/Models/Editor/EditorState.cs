@@ -3,6 +3,7 @@ using System.ComponentModel;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Models.Editor
@@ -10,7 +11,8 @@ namespace TTEngine.Editor.Models.Editor
     public enum PlacementMode
     {
         Tile,
-        Interactable
+        Interactable,
+        Trap
     }
 
     public class EditorState : INotifyPropertyChanged
@@ -31,16 +33,17 @@ namespace TTEngine.Editor.Models.Editor
 
         public ObservableCollection<TileDefinition> TileDefinitions { get; }
         public ObservableCollection<InteractableDefinition> InteractableDefinitions { get; }
+        public ObservableCollection<TrapDefinition> TrapDefinitions { get; }
         
         //Placement
-        public PlacementMode _activePlacementMode;
+        private PlacementMode _activePlacementMode;
         public PlacementMode ActivePlacementMode
         {
             get => _activePlacementMode;
             set
             {
                 _activePlacementMode = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActivePlacementMode)));
+                OnPropertyChanged(nameof(ActivePlacementMode));
             }
         }
 
@@ -54,12 +57,12 @@ namespace TTEngine.Editor.Models.Editor
                 
                 if(value != null)
                 {
-                    _selectedInteractable = null;
-                    _activePlacementMode = PlacementMode.Tile;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedInteractable)));
+                    SelectedInteractable = null;
+                    SelectedTrap = null;
+                    ActivePlacementMode = PlacementMode.Tile;
                 }
 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedTile)));
+                OnPropertyChanged(nameof(SelectedTile));
             }
         }
 
@@ -73,12 +76,31 @@ namespace TTEngine.Editor.Models.Editor
 
                 if (value != null)
                 {
-                    _selectedTile = null;
-                    _activePlacementMode = PlacementMode.Interactable;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedTile)));
+                    SelectedTile = null;
+                    SelectedTrap = null;
+                    ActivePlacementMode = PlacementMode.Interactable;
                 }
 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedInteractable)));
+                OnPropertyChanged(nameof(SelectedInteractable));
+            }
+        }
+
+        private TrapDefinition _selectedTrap;
+        public TrapDefinition SelectedTrap
+        {
+            get => _selectedTrap;
+            set
+            {
+                _selectedTrap = value;
+
+                if(value != null)
+                {
+                    SelectedTile = null;
+                    SelectedInteractable = null;
+                    ActivePlacementMode = PlacementMode.Trap;
+                }
+
+                OnPropertyChanged(nameof(SelectedTrap));
             }
         }
 
@@ -115,6 +137,7 @@ namespace TTEngine.Editor.Models.Editor
         {
             TileDefinitions = new ObservableCollection<TileDefinition>(TileDefinitionService.Load());
             InteractableDefinitions = new ObservableCollection<InteractableDefinition>(InteractableFileService.Load());
+            TrapDefinitions = new ObservableCollection<TrapDefinition>(TrapFileService.Load());  
         }
 
         public void SetActiveLayer(EditorLayer layer)
@@ -140,5 +163,7 @@ namespace TTEngine.Editor.Models.Editor
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string name)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

@@ -11,6 +11,7 @@ using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Models.Validation;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services;
@@ -131,6 +132,12 @@ namespace TTEngine.Editor
             if (editorState.ActivePlacementMode == PlacementMode.Interactable)
             {
                 HandleInteractablePlacement(pos, e);
+                return;
+            }
+
+            if (editorState.ActivePlacementMode == PlacementMode.Trap)
+            {
+                HandleTrapPlacement(pos, e);
                 return;
             }
 
@@ -394,6 +401,7 @@ namespace TTEngine.Editor
             if (!editorState.Layers.First(l => l.LayerType == MapLayerType.Interactable).IsVisible)
                 return;
 
+            //Draw Interactable
             foreach (var interactable in ActiveMap.Interactables)
             {
                 var def = editorState.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
@@ -425,6 +433,40 @@ namespace TTEngine.Editor
 
                 MapCanvas.Children.Add(img);
             }
+
+            //Draw Trap
+            foreach (var trap in ActiveMap.Traps)
+            {
+                var def = editorState.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
+
+                if (def == null || string.IsNullOrEmpty(def.ImagePath))
+                    continue;
+
+                string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
+
+                if (!System.IO.File.Exists(targetPath))
+                    continue;
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(targetPath, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+
+                Image img = new Image
+                {
+                    Source = bitmap,
+                    Width = ActiveMap.TileSize,
+                    Height = ActiveMap.TileSize,
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(img, trap.X * ActiveMap.TileSize);
+                Canvas.SetTop(img, trap.Y * ActiveMap.TileSize);
+
+                MapCanvas.Children.Add(img);
+            }
+
         }
 
         private void CreateHoverRect()
@@ -474,6 +516,12 @@ namespace TTEngine.Editor
 
         private void ApplyBrush(Point pos, bool isPaint)
         {
+            if(TryGetTilePosition(pos, out int xPos, out int yPos))
+            {
+                if (HasTrapAt(xPos, yPos) || HasInteractableAt(xPos, yPos))
+                    return;
+            }
+
             if (editorState.ActivePlacementMode != PlacementMode.Tile)
                 return;
 
@@ -752,32 +800,76 @@ namespace TTEngine.Editor
             if (!TryGetTilePosition(pos, out int x, out int y))
                 return;
 
+            if (HasTrapAt(x, y))
+                return;
+
             int index = ActiveMap.GetIndex(x, y);
 
             if(e.LeftButton == MouseButtonState.Pressed)
             {
+                if (HasInteractableAt(x, y))
+                    return;
+
                 ActiveMap.Layers[MapLayerType.Interactable][index] = 1;
-
-                var existing = ActiveMap.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
-
-                if(existing == null)
+                ActiveMap.Interactables.Add(new InteractableModel
                 {
-                    ActiveMap.Interactables.Add(new InteractableModel
-                    {
-                        X = x,
-                        Y = y,
-                        DefinitionId = editorState.SelectedInteractable.Id
-                    });
-                }
+                    X = x,
+                    Y = y,
+                    DefinitionId = editorState.SelectedInteractable.Id
+                });
+
             }
             else if(e.LeftButton == MouseButtonState.Released)
             {
-                ActiveMap.Layers[MapLayerType.Interactable][index] = 0;
-
                 var existing = ActiveMap.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
-
                 if (existing != null)
+                {
                     ActiveMap.Interactables.Remove(existing);
+                    ActiveMap.Layers[MapLayerType.Interactable][index] = 0;
+
+                }
+            }
+
+            DrawGrid();
+        }
+
+        private void HandleTrapPlacement(Point pos, MouseButtonEventArgs e)
+        {
+            if (editorState.ActivePlacementMode != PlacementMode.Trap || editorState.ActiveLayer.LayerType != MapLayerType.Interactable)
+                return;
+
+            if (editorState.SelectedTrap == null)
+                return;
+
+            if (!TryGetTilePosition(pos, out int x, out int y))
+                return;
+
+            if (HasInteractableAt(x, y))
+                return;
+
+            int index = ActiveMap.GetIndex(x, y);
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (HasTrapAt(x, y))
+                    return;
+
+                ActiveMap.Layers[MapLayerType.Interactable][index] = 1;
+                ActiveMap.Traps.Add(new TrapModel
+                {
+                    X = x,
+                    Y = y,
+                    DefinitionId = editorState.SelectedTrap.Id
+                });
+            }
+            else if (e.LeftButton == MouseButtonState.Released)
+            {
+                var existing = ActiveMap.Traps.FirstOrDefault(i => i.X == x && i.Y == y);
+                if (existing != null)
+                {
+                    ActiveMap.Layers[MapLayerType.Interactable][index] = 0;
+                    ActiveMap.Traps.Remove(existing);
+                }
             }
 
             DrawGrid();
@@ -889,5 +981,15 @@ namespace TTEngine.Editor
         }
 
         #endregion
+   
+        private bool HasInteractableAt(int x, int y)
+        {
+            return ActiveMap.Interactables.Any(i => i.X == x && i.Y == y);
+        }
+
+        private bool HasTrapAt(int x, int y)
+        {
+            return ActiveMap.Traps.Any(i => i.X == x && i.Y == y);
+        }
     }
 }

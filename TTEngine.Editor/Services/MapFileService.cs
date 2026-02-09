@@ -5,6 +5,7 @@ using TTEngine.Editor.Dtos;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Models.Trap;
 
 namespace TTEngine.Editor.Services
 {
@@ -71,13 +72,22 @@ namespace TTEngine.Editor.Services
                     Y = p.Position.Y,
                     DefinitionId = p.DefinitionId,
                 }).ToList(),
-                Interactables = model.Interactables.
-                         Select(i => new InteractableDto
-                         {
-                             X = i.X,
-                             Y = i.Y,
-                             DefinitionId = i.DefinitionId
-                         }).ToList()
+                Interactables = model.Interactables == null
+                ? new List<InteractableDto>()
+                : model.Interactables.Select(i => new InteractableDto
+                {
+                    X = i.X,
+                    Y = i.Y,
+                    DefinitionId = i.DefinitionId
+                }).ToList(),
+                Traps = model.Traps == null
+                ? new List<TrapDto>()
+                : model.Traps.Select(i => new TrapDto
+                {
+                    X = i.X,
+                    Y = i.Y,
+                    DefinitionId = i.DefinitionId
+                }).ToList(),
             };
 
             return data;
@@ -124,6 +134,21 @@ namespace TTEngine.Editor.Services
                 foreach (var dto in data.Interactables)
                 {
                     model.Interactables.Add(new InteractableModel
+                    {
+                        X = dto.X,
+                        Y = dto.Y,
+                        DefinitionId = dto.DefinitionId
+                    });
+                }
+            }
+
+            model.Traps.Clear();
+
+            if(data.Traps != null)
+            {
+                foreach (var dto in data.Traps)
+                {
+                    model.Traps.Add(new TrapModel
                     {
                         X = dto.X,
                         Y = dto.Y,

@@ -1,6 +1,7 @@
 ﻿using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.Trap;
 
 namespace TTEngine.Editor.Models.Tile
 {
@@ -13,6 +14,7 @@ namespace TTEngine.Editor.Models.Tile
         public PlayerSpawnModel PlayerSpawn { get; set; }
         public List<EnemySpawnModel> EnemySpawns { get; set; } = new();
         public List<InteractableModel> Interactables { get; set; } = new();
+        public List<TrapModel> Traps { get; set; } = new();
 
         public void Init()
         {

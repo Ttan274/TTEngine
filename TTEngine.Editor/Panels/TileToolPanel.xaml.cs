@@ -8,6 +8,7 @@ using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Panels
@@ -99,6 +100,42 @@ namespace TTEngine.Editor.Panels
             }
         }
 
+        #endregion
+
+        #region Trap Methods
+        private void OnTrapClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender is Border border && border.Tag is string trapId && Editor != null)
+            {
+                Editor.SelectedTrap = Editor.TrapDefinitions.First(t => t.Id == trapId);
+            }
+        }
+
+        private void TrapButtonLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is Border border && border.Tag is string trapId && Editor != null)
+            {
+                UpdateTrapBtnVisual(border);
+                Editor.PropertyChanged += (_, __) => UpdateTrapBtnVisual(border);
+            }
+        }
+
+        private void UpdateTrapBtnVisual(Border border)
+        {
+            if (border.Tag is string trapId && Editor != null)
+            {
+                bool isSelected = Editor.SelectedTrap?.Id == trapId;
+                UpdateBtnVisual(border, isSelected);
+            }
+        }
+
+        private void TrapImageLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is Image img && img.DataContext is TrapDefinition def && !string.IsNullOrEmpty(def.ImagePath))
+            {
+                LoadImage(img, def.ImagePath);
+            }
+        }
         #endregion
 
         //Helpers

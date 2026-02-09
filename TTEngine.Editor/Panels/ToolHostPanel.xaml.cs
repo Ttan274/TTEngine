@@ -32,5 +32,7 @@ namespace TTEngine.Editor.Panels
             => ContentHost.Content = new LevelsPanel(_editorState);
         private void OpenInteractables(object sender, RoutedEventArgs e)
             => ContentHost.Content = new InteractableManagementPanel();
+        private void OpenTraps(object sender, RoutedEventArgs e)
+            => ContentHost.Content = new TrapDefinitionPanel();
     }
 }

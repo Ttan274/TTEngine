@@ -76,6 +76,40 @@
 
             <Separator Margin="0,8,0,8"/>
 
+            <!-- TRAP SELECTION -->
+           <TextBlock Text="Traps"
+           FontWeight="Bold"
+           Foreground="White"
+           Margin="0,0,0,6"/>
+
+            <ItemsControl ItemsSource="{Binding TrapDefinitions}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="40"
+                                Height="40"
+                                Margin="4"
+                                BorderThickness="1"
+                                Tag="{Binding Id}"
+                                BorderBrush="DimGray"
+                                Background="#2D2D2D"
+                                MouseLeftButtonDown="OnTrapClicked"
+                                ToolTip="{Binding Id}"
+                                Loaded="TrapButtonLoaded">
+                            <Image Stretch="Uniform"
+                                 Loaded="TrapImageLoaded"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Separator Margin="0,8,0,8"/>
+
             <!-- BRUSH SIZE -->
             <TextBlock Text="Brush Size"
                        FontWeight="Bold"
