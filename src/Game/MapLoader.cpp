@@ -62,6 +62,7 @@ namespace EngineGame
 			return false;
 		}
 
+		//Loading Interactbles SpawnData in Map
 		outMap.interactables.clear();
 		if (j.contains("Interactables"))
 		{
@@ -73,6 +74,21 @@ namespace EngineGame
 				d.defId = i["DefinitionId"].get<std::string>();
 
 				outMap.interactables.push_back(d);
+			}
+		}
+
+		//Loading Traps SpawnData in Map
+		outMap.traps.clear();
+		if (j.contains("Traps"))
+		{
+			for (auto& i : j["Traps"])
+			{
+				SpawnData d;
+				d.x = i["X"].get<float>();
+				d.y = i["Y"].get<float>();
+				d.defId = i["DefinitionId"].get<std::string>();
+
+				outMap.traps.push_back(d);
 			}
 		}
 

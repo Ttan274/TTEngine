@@ -1,11 +1,10 @@
 #include "Platform/Loader.h"
 #include "Platform/AnimationLibrary.h"
+#include "Platform/InteractableLibrary.h"
 #include "Platform/LevelManager.h"
 #include "Core/PathUtil.h"
 #include "Core/Log.h"
 #include "Platform/Scene.h"
-#include "Platform/InteractableLibrary.h"
-#include "Game/InteractableManager.h"
 
 namespace EnginePlatform
 {
@@ -24,8 +23,7 @@ namespace EnginePlatform
 		}
 
 		//Entity Definitions loaded
-		if (!EngineGame::MapLoader::LoadEntityDefs(EngineCore::GetFile("Data", "entity_def.json"),
-			entityDefs))
+		if (!EngineGame::MapLoader::LoadEntityDefs(EngineCore::GetFile("Data", "entity_def.json"), entityDefs))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Fatal,
@@ -35,7 +33,8 @@ namespace EnginePlatform
 			return;
 		}
 
-		InteractableLibrary::Get().LoadDefs(EngineCore::GetFile("Data", "Interactables.json"));
+		InteractableLibrary::Get().LoadInteractableDefs(EngineCore::GetFile("Data", "Interactables.json"));
+		InteractableLibrary::Get().LoadTrapDefs(EngineCore::GetFile("Data", "TrapDef.json"));
 
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
@@ -97,12 +96,13 @@ namespace EnginePlatform
 		//Other Load Operations
 		LoadSpawnEntities(ctx);
 		LoadInteractables(ctx);
+		LoadTraps(ctx);
 		LoadCamera(ctx);
 
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
-			"Map Loaded + TileMap initialized + Player-Enemies have been spawned + Camera loaded."
+			"Map Loaded + TileMap initialized + Player-Enemies have been spawned + Interactables-Traps spawned + Camera loaded."
 		);
 	}
 
@@ -235,7 +235,7 @@ namespace EnginePlatform
 
 		for (const auto& s : ctx.mapData.interactables)
 		{
-			const InteractableDef* def = InteractableLibrary::Get().GetDef(s.defId);
+			const InteractableDef* def = InteractableLibrary::Get().GetInteractableDef(s.defId);
 
 			if (!def)
 			{
@@ -263,6 +263,44 @@ namespace EnginePlatform
 			EngineCore::LogLevel::Info,
 			EngineCore::LogCategory::Scene,
 			"Interactables loaded :" + std::to_string(ctx.mapData.interactables.size())
+		);
+	}
+
+	void Loader::LoadTraps(LoadContext& ctx)
+	{
+		ctx.trapList.Clear();
+
+		const int tileSize = ctx.tileMap->GetTileSize();
+
+		for (const auto& s : ctx.mapData.traps)
+		{
+			const TrapDef* def = InteractableLibrary::Get().GetTrapDef(s.defId);
+
+			if (!def)
+			{
+				EngineCore::Log::Write(
+					EngineCore::LogLevel::Warning,
+					EngineCore::LogCategory::Scene,
+					"Unknown trap def:" + s.defId
+				);
+				continue;
+			}
+
+			EngineMath::Vector2 worldPos;
+			worldPos.x = static_cast<float>(s.x * tileSize);
+			worldPos.y = static_cast<float>(s.y * tileSize);
+
+			EngineGame::TrapInstance trap;
+			trap.def = def;
+			trap.position = worldPos;
+
+			ctx.trapList.Add(trap);
+		}
+
+		EngineCore::Log::Write(
+			EngineCore::LogLevel::Info,
+			EngineCore::LogCategory::Scene,
+			"traps loaded :" + std::to_string(ctx.mapData.traps.size())
 		);
 	}
 }

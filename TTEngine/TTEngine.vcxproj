@@ -147,6 +147,7 @@
     <ClCompile Include="..\src\Game\Player.cpp" />
     <ClCompile Include="..\src\Game\Texture.cpp" />
     <ClCompile Include="..\src\Game\TileMap.cpp" />
+    <ClCompile Include="..\src\Game\TrapManager.cpp" />
     <ClCompile Include="..\src\Game\Traps\FireTrap.cpp" />
     <ClCompile Include="..\src\Game\Traps\SawTrap.cpp" />
     <ClCompile Include="..\src\main.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="..\src\Game\Player.h" />
     <ClInclude Include="..\src\Game\Texture.h" />
     <ClInclude Include="..\src\Game\TileMap.h" />
+    <ClInclude Include="..\src\Game\TrapManager.h" />
     <ClInclude Include="..\src\Game\Traps\FireTrap.h" />
     <ClInclude Include="..\src\Game\Traps\SawTrap.h" />
     <ClInclude Include="..\src\Game\Traps\Trap.h" />

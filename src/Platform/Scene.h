@@ -5,6 +5,7 @@
 #include "Platform/Loader.h"
 #include "Platform/LoadContext.h"
 #include "Game/InteractableManager.h"
+#include "Game/TrapManager.h"
 
 namespace EnginePlatform
 {
@@ -61,5 +62,6 @@ namespace EnginePlatform
 		HUD m_HUD;
 		Loader m_Loader;
 		EngineGame::InteractableManager m_InteractableManager;
+		EngineGame::TrapManager m_TrapManager;
 	};
 }

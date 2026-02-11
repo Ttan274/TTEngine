@@ -74,7 +74,7 @@ namespace EngineGame
 		void UpdateCollider();
 
 		virtual void OnDeath() = 0;
-		virtual void TakeDamage(float amount, bool objectDir) = 0;
+		virtual void TakeDamage(float amount, float objectDir) = 0;
 		virtual void UpdateAttack(float dt) = 0;
 		virtual void UpdateHurt(float dt) = 0;
 		virtual void UpdateDeath(float dt) = 0;

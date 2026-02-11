@@ -95,6 +95,7 @@ namespace EnginePlatform
 
 		m_Player.Update(dt);
 		m_InteractableManager.Update(m_Player);
+		m_TrapManager.Update(dt, m_Player);
 
 		if (m_InteractableManager.HasInteractableInRange())
 		{
@@ -186,6 +187,8 @@ namespace EnginePlatform
 			m_Player.Render(renderer, m_Camera);
 			m_InteractableManager.Render(renderer, m_Camera);
 			m_InteractableManager.DebugDraw(renderer, m_Camera);
+			m_TrapManager.Render(renderer, m_Camera);
+			m_TrapManager.DebugDraw(renderer, m_Camera);
 			for (auto& e : m_Enemies)
 				e->Render(renderer, m_Camera);
 			break;
@@ -236,6 +239,7 @@ namespace EnginePlatform
 			m_TileMap,
 			m_MapData,
 			m_InteractableManager,
+			m_TrapManager,
 			m_Camera,
 			m_PlayerSpawned,
 			m_LevelCompleted

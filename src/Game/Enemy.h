@@ -22,7 +22,7 @@ namespace EngineGame
 		//Base class methods
 		void Render(EngineCore::IRenderer* renderer,
 			const Camera2D& camera) override;
-		void TakeDamage(float amount, bool objectDir) override;
+		void TakeDamage(float amount, float objectDir) override;
 		void ApplyDefinition(const EntityDefs& def) override;
 
 		//Enemy Spesific Methods

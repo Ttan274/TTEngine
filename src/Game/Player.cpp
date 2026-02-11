@@ -263,7 +263,7 @@ namespace EngineGame
 			m_IsDead = true;
 	}
 
-	void Player::TakeDamage(float amount, bool objectDir)
+	void Player::TakeDamage(float amount, float objectDir)
 	{
 		if (m_State == PlayerState::Dead)
 			return;
@@ -290,7 +290,7 @@ namespace EngineGame
 		if (objectDir == 0.0f)
 			return;
 
-		float dir = objectDir ? 1.0f : -1.0f;
+		float dir = (objectDir == 1.0f) ? -1.0f : 1.0f;
 		m_KnockbackVel.x = dir * 150.0f;
 		m_KnockbackVel.y = -200.0f;
 	}

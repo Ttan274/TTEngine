@@ -89,7 +89,7 @@ namespace EngineGame
 	void InteractableManager::SpawnKey(const EngineMath::Vector2& pos)
 	{
 		const EnginePlatform::InteractableDef* keyDef =
-			EnginePlatform::InteractableLibrary::Get().GetDef("Key");
+			EnginePlatform::InteractableLibrary::Get().GetInteractableDef("Key");
 
 		if (!keyDef)
 			return;

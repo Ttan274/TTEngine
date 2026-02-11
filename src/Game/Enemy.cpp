@@ -354,7 +354,7 @@ namespace EngineGame
 			m_IsDead = true;
 	}
 
-	void Enemy::TakeDamage(float amount, bool objectDir)
+	void Enemy::TakeDamage(float amount, float objectDir)
 	{
 		if (m_State == EnemyState::Dead)
 			return;
@@ -375,7 +375,11 @@ namespace EngineGame
 		m_CurrentAnim->Reset();
 
 		//Knockback
-		float dir = objectDir ? 1.0f : -1.0f;
+		if (objectDir == 0.0f)
+			return;
+
+		//Knockback
+		float dir = (objectDir == 1.0f) ? -1.0f : 1.0f;
 		m_KnockbackVel.x = dir * 100.0f;
 		m_KnockbackVel.y = -50.0f;
 		m_KnockbackTimer = m_KnockbackDuration;
