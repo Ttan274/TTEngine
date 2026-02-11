@@ -3,9 +3,9 @@
 #include "Game/MapLoader.h"
 #include "Platform/HUD.h"
 #include "Platform/Loader.h"
-#include "Platform/LoadContext.h"
 #include "Game/InteractableManager.h"
 #include "Game/TrapManager.h"
+#include "Core/Data/Entity/EntityData.h"
 
 namespace EnginePlatform
 {
@@ -25,7 +25,6 @@ namespace EnginePlatform
 		//Level
 		void LoadCurrentLevel();
 		void OnLevelCompleted();
-		void LoadL();
 
 		//UI Methods
 		void StartGame();
@@ -42,11 +41,10 @@ namespace EnginePlatform
 		EngineGame::Player m_Player;
 		std::vector<std::unique_ptr<EngineGame::Enemy>> m_Enemies;
 		EngineGame::Camera2D m_Camera;
-		std::unique_ptr < EngineGame::TileMap> m_TileMap;
+		std::unique_ptr<EngineGame::TileMap> m_TileMap;
 		GameState m_GameState = GameState::MainMenu;
 
 		//Load data
-		std::unordered_map<std::string, EngineGame::EntityDefs> m_EntityDefs;
 		EngineGame::MapData m_MapData;
 		bool m_PlayerSpawned = false;
 		bool m_LevelCompleted = false;
@@ -58,7 +56,7 @@ namespace EnginePlatform
 		float m_LevelTextScale = 0.0f;
 		float m_LevelTextTimer = 0.0f;
 
-		//HUD - Loader
+		//HUD - Loader - Managers
 		HUD m_HUD;
 		Loader m_Loader;
 		EngineGame::InteractableManager m_InteractableManager;

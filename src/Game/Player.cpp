@@ -13,7 +13,7 @@ namespace EngineGame
 		UpdateCollider();
 	}
 
-	void Player::ApplyDefinition(const EntityDefs& def)
+	void Player::ApplyDefinition(const EngineData::EntityData& def)
 	{
 		//Base settings
 		m_Speed = def.speed;

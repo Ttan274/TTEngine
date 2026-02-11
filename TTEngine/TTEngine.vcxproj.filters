@@ -19,17 +19,26 @@
     <Filter Include="Header Files\Rendering">
       <UniqueIdentifier>{14dcd350-1e50-42ea-9fdd-47ebc2411992}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Entity">
-      <UniqueIdentifier>{8b8b0e17-02ed-43e8-b901-aa3ab2db36ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Interactable">
-      <UniqueIdentifier>{e90fcf7e-de2b-43a1-bba8-92c2f54e058d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Debug">
       <UniqueIdentifier>{e12f0201-078d-4c15-80d9-1996260fe129}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Physics">
       <UniqueIdentifier>{cebc4a2f-bb6b-4d5f-a218-2443035ca1ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{e0c1c6b4-9d6b-4d02-b5ee-aeb13b805496}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Gameplay">
+      <UniqueIdentifier>{f8f464e3-4b07-4928-b899-c317ff0cf512}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Gameplay\Entity">
+      <UniqueIdentifier>{8b8b0e17-02ed-43e8-b901-aa3ab2db36ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Gameplay\Interactable">
+      <UniqueIdentifier>{e90fcf7e-de2b-43a1-bba8-92c2f54e058d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Gameplay\Managers">
+      <UniqueIdentifier>{271a97ee-1f3b-46c1-8f75-5b175d656b3a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -113,58 +122,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Core\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\TileMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\AssetManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Game\MapLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\PathUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Platform\LevelManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\HUD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\GameState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\Loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\LoadContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\InteractableManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\TrapManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Animator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Data\DataLibrary.h">
@@ -192,34 +153,34 @@
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Enemy.h">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Gameplay\Entity</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Entity.h">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Gameplay\Entity</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Player.h">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Gameplay\Entity</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Interactables\DoorInteractable.h">
-      <Filter>Header Files\Interactable</Filter>
+      <Filter>Header Files\Gameplay\Interactable</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Interactables\ChestInteractable.h">
-      <Filter>Header Files\Interactable</Filter>
+      <Filter>Header Files\Gameplay\Interactable</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Traps\FireTrap.h">
-      <Filter>Header Files\Interactable</Filter>
+      <Filter>Header Files\Gameplay\Interactable</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Traps\SawTrap.h">
-      <Filter>Header Files\Interactable</Filter>
+      <Filter>Header Files\Gameplay\Interactable</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Traps\Trap.h">
-      <Filter>Header Files\Interactable</Filter>
+      <Filter>Header Files\Gameplay\Interactable</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Interactables\Interactable.h">
-      <Filter>Header Files\Interactable</Filter>
+      <Filter>Header Files\Gameplay\Interactable</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\Interactables\KeyInteractable.h">
-      <Filter>Header Files\Interactable</Filter>
+      <Filter>Header Files\Gameplay\Interactable</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Debug.h">
       <Filter>Header Files\Debug</Filter>
@@ -252,6 +213,60 @@
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Platform\LibraryManager.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Animation.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Animator.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Application.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Input.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\Scene.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\Window.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\HUD.h">
+      <Filter>Header Files\Gameplay\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\Loader.h">
+      <Filter>Header Files\Gameplay\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\TrapManager.h">
+      <Filter>Header Files\Gameplay\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\InteractableManager.h">
+      <Filter>Header Files\Gameplay\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\GameState.h">
+      <Filter>Header Files\Gameplay\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\PathUtil.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Time.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\TileMap.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\AssetManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\LoadContext.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Entity\EntityData.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Entity\EntityParser.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
   </ItemGroup>

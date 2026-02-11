@@ -30,7 +30,7 @@ namespace EngineGame
 		void Render(EngineCore::IRenderer* renderer,
 					const Camera2D& camera) override;
 		void TakeDamage(float amount, float objectDir) override;
-		void ApplyDefinition(const EntityDefs& def) override;
+		void ApplyDefinition(const EngineData::EntityData& def) override;
 
 		//Player Spesific Methods
 		void Update(float dt);

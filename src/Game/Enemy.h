@@ -1,6 +1,5 @@
 #pragma once
 #include "Game/Entity.h"
-#include <functional>
 
 namespace EngineGame
 {
@@ -23,7 +22,7 @@ namespace EngineGame
 		void Render(EngineCore::IRenderer* renderer,
 			const Camera2D& camera) override;
 		void TakeDamage(float amount, float objectDir) override;
-		void ApplyDefinition(const EntityDefs& def) override;
+		void ApplyDefinition(const EngineData::EntityData& def) override;
 
 		//Enemy Spesific Methods
 		void Update(float dt, const EngineMath::Vector2& playerPos, const EngineCore::AABB& playerCollider);

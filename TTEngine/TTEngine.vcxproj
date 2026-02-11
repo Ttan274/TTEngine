@@ -165,6 +165,8 @@
     <ClInclude Include="..\src\Core\Data\Animation\AnimationData.h" />
     <ClInclude Include="..\src\Core\Data\Animation\AnimationParser.h" />
     <ClInclude Include="..\src\Core\Data\DataLibrary.h" />
+    <ClInclude Include="..\src\Core\Data\Entity\EntityData.h" />
+    <ClInclude Include="..\src\Core\Data\Entity\EntityParser.h" />
     <ClInclude Include="..\src\Core\Data\Interactable\InteractableData.h" />
     <ClInclude Include="..\src\Core\Data\Interactable\InteractableParser.h" />
     <ClInclude Include="..\src\Core\Data\Interactable\TrapData.h" />

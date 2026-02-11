@@ -12,7 +12,7 @@ namespace EngineGame
 		UpdateCollider();
 	}
 
-	void Enemy::ApplyDefinition(const EntityDefs& def)
+	void Enemy::ApplyDefinition(const EngineData::EntityData& def)
 	{
 		//Base settings
 		m_Speed = def.speed;

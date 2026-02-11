@@ -4,28 +4,10 @@
 #include "Game/Camera.h"
 #include "Game/TileMap.h"
 #include "Core/Animation.h"
+#include "Core/Data/Entity/EntityData.h"
 
 namespace EngineGame
 {
-	struct EntityDefs
-	{
-		//Type
-		std::string defId;
-		
-		//Stats
-		float speed;
-		float attackDamage;
-		float attackInterval;
-		float maxHp;
-
-		//Texture paths
-		std::string idleAnim;
-		std::string walkAnim;
-		std::string hurtAnim;
-		std::string deathAnim;
-		std::vector<std::string> attackAnims;
-	};
-
 	class Entity
 	{
 	public:
@@ -35,7 +17,7 @@ namespace EngineGame
 		//Virtual methods
 		virtual void Render(EngineCore::IRenderer* renderer,
 			const Camera2D& camera) = 0;
-		virtual void ApplyDefinition(const EntityDefs& def) = 0;
+		virtual void ApplyDefinition(const EngineData::EntityData& def) = 0;
 
 		//Basic Methods
 		void SetWorld(TileMap* world);

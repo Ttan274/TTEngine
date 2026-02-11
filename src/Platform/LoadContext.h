@@ -13,7 +13,6 @@ namespace EngineGame
 	class Camera2D;
 
 	struct MapData;
-	struct EntityDefs;
 }
 
 namespace EnginePlatform
@@ -23,7 +22,6 @@ namespace EnginePlatform
 		//Entity
 		EngineGame::Player& player;
 		std::vector<std::unique_ptr<EngineGame::Enemy>>& enemies;
-		std::unordered_map<std::string, EngineGame::EntityDefs>& entityDefs;
 
 		//Map
 		std::unique_ptr<EngineGame::TileMap>& tileMap;
@@ -43,7 +41,6 @@ namespace EnginePlatform
 		LoadContext(
 			EngineGame::Player& p,
 			std::vector<std::unique_ptr<EngineGame::Enemy>>& e,
-			std::unordered_map<std::string, EngineGame::EntityDefs>& eDef,
 			std::unique_ptr<EngineGame::TileMap>& t,
 			EngineGame::MapData& m,
 			EngineGame::InteractableManager& i,
@@ -55,7 +52,6 @@ namespace EnginePlatform
 			:
 			player(p),
 			enemies(e),
-			entityDefs(eDef),
 			tileMap(t),
 			mapData(m),
 			interactableList(i),

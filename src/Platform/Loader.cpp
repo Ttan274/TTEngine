@@ -1,7 +1,5 @@
 #include "Platform/Loader.h"
 #include "Platform/LibraryManager.h"
-#include "Core/Data/Interactable/InteractableData.h"
-#include "Core/Data/Interactable/TrapData.h"
 #include "Core/PathUtil.h"
 #include "Platform/LevelManager.h"
 #include "Core/Log.h"
@@ -9,7 +7,7 @@
 
 namespace EnginePlatform
 {
-	void Loader::LoadBasics(std::unordered_map<std::string, EngineGame::EntityDefs>& entityDefs)
+	void Loader::LoadBasics()
 	{
 		//Animation Library loaded
 		std::string animDir = EngineCore::GetExecutableDirectory() + "\\Assets\\Animation";
@@ -24,7 +22,7 @@ namespace EnginePlatform
 		}
 
 		//Entity Definitions loaded
-		if (!EngineGame::MapLoader::LoadEntityDefs(EngineCore::GetFile("Data", "entity_def.json"), entityDefs))
+		if (!EntityLibrary::LoadFromFile(EngineCore::GetFile("Data", "entity_def.json")))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Fatal,
@@ -113,18 +111,7 @@ namespace EnginePlatform
 	{
 		for (const auto& spawn : ctx.mapData.spawns)
 		{
-			auto it = ctx.entityDefs.find(spawn.defId);
-			if (it == ctx.entityDefs.end())
-			{
-				EngineCore::Log::Write(
-					EngineCore::LogLevel::Warning,
-					EngineCore::LogCategory::Scene,
-					"Unknown entity def : " + spawn.defId
-				);
-				continue;
-			}
-
-			const EngineGame::EntityDefs& def = it->second;
+			const EngineData::EntityData* data = EntityLibrary::Get(spawn.defId);
 
 			//Selecting is it player or enemy
 			if (spawn.defId == "Player")
@@ -139,12 +126,12 @@ namespace EnginePlatform
 					continue;
 				}
 
-				LoadPlayer(ctx, spawn, def);
+				LoadPlayer(ctx, spawn, *data);
 				ctx.playerSpawned = true;
 			}
 			else
 			{
-				LoadEnemy(ctx, spawn, def);
+				LoadEnemy(ctx, spawn, *data);
 			}
 
 			if (!ctx.playerSpawned)
@@ -158,7 +145,7 @@ namespace EnginePlatform
 		}
 	}
 
-	void Loader::LoadPlayer(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
+	void Loader::LoadPlayer(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineData::EntityData& def)
 	{
 		//Set World Reference
 		ctx.player.SetWorld(ctx.tileMap.get());
@@ -199,7 +186,7 @@ namespace EnginePlatform
 		);
 	}
 
-	void Loader::LoadEnemy(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineGame::EntityDefs& def)
+	void Loader::LoadEnemy(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineData::EntityData& def)
 	{
 		//Enemy Loading
 		auto enemy = std::make_unique<EngineGame::Enemy>();

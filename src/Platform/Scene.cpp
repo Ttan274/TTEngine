@@ -25,7 +25,7 @@ namespace EnginePlatform
 		);
 
 		ChangeGameState(GameState::MainMenu);
-		m_Loader.LoadBasics(m_EntityDefs);
+		m_Loader.LoadBasics();
 		m_InteractableManager.SetOnLevelComplete([this]()
 		{
 			OnLevelCompleted();;
@@ -235,7 +235,6 @@ namespace EnginePlatform
 		return LoadContext(
 			m_Player,
 			m_Enemies,
-			m_EntityDefs,
 			m_TileMap,
 			m_MapData,
 			m_InteractableManager,

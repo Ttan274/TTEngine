@@ -29,6 +29,5 @@ namespace EngineGame
 	{
 	public:
 		static bool LoadFromFile(const std::string& path, MapData& outMap);
-		static bool LoadEntityDefs(const std::string& path, std::unordered_map<std::string, EntityDefs>& outDefs);
 	};
 }
