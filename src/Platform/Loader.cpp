@@ -1,5 +1,5 @@
 #include "Platform/Loader.h"
-#include "Platform/AnimationLibrary.h"
+#include "Platform/LibraryManager.h"
 #include "Platform/InteractableLibrary.h"
 #include "Platform/LevelManager.h"
 #include "Core/PathUtil.h"
@@ -12,7 +12,7 @@ namespace EnginePlatform
 	{
 		//Animation Library loaded
 		std::string animDir = EngineCore::GetExecutableDirectory() + "\\Assets\\Animation";
-		if (!EnginePlatform::AnimationLibrary::LoadAllAnims(animDir))
+		if (!EnginePlatform::AnimationLibrary::LoadFromFile(animDir))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Fatal,

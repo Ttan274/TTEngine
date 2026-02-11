@@ -1,5 +1,5 @@
 #include "Game/Player.h"
-#include "Platform/AnimationLibrary.h"
+#include "Game/Animator.h"
 
 namespace EngineGame
 {
@@ -23,14 +23,14 @@ namespace EngineGame
 		m_HP = m_MaxHP;
 
 		//Animations
-		m_IdleAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.idleAnim);
-		m_WalkAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.walkAnim);
-		m_HurtAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.hurtAnim);
-		m_DeathAnim = EnginePlatform::AnimationLibrary::CreateAnimation(def.deathAnim);
+		m_IdleAnim = Animator::Create(def.idleAnim);
+		m_WalkAnim = Animator::Create(def.walkAnim);
+		m_HurtAnim = Animator::Create(def.hurtAnim);
+		m_DeathAnim = Animator::Create(def.deathAnim);
 		
 		m_AttackAnims.clear();
 		for (const auto& animId : def.attackAnims)
-			m_AttackAnims.push_back(EnginePlatform::AnimationLibrary::CreateAnimation(animId));
+			m_AttackAnims.push_back(Animator::Create(animId));
 
 		m_CurrentAnim = &m_IdleAnim;
 	}
