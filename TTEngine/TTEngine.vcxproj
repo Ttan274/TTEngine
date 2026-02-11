@@ -152,7 +152,6 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Platform\AssetManager.cpp" />
     <ClCompile Include="..\src\Platform\HUD.cpp" />
-    <ClCompile Include="..\src\Platform\InteractableLibrary.cpp" />
     <ClCompile Include="..\src\Platform\LevelManager.cpp" />
     <ClCompile Include="..\src\Platform\Loader.cpp" />
     <ClCompile Include="..\src\Platform\RendererSdl.cpp" />
@@ -166,6 +165,10 @@
     <ClInclude Include="..\src\Core\Data\Animation\AnimationData.h" />
     <ClInclude Include="..\src\Core\Data\Animation\AnimationParser.h" />
     <ClInclude Include="..\src\Core\Data\DataLibrary.h" />
+    <ClInclude Include="..\src\Core\Data\Interactable\InteractableData.h" />
+    <ClInclude Include="..\src\Core\Data\Interactable\InteractableParser.h" />
+    <ClInclude Include="..\src\Core\Data\Interactable\TrapData.h" />
+    <ClInclude Include="..\src\Core\Data\Interactable\TrapParser.h" />
     <ClInclude Include="..\src\Core\Debug.h" />
     <ClInclude Include="..\src\Core\DebugOverlay.h" />
     <ClInclude Include="..\src\Core\Input.h" />
@@ -196,7 +199,6 @@
     <ClInclude Include="..\src\Platform\AssetManager.h" />
     <ClInclude Include="..\src\Platform\GameState.h" />
     <ClInclude Include="..\src\Platform\HUD.h" />
-    <ClInclude Include="..\src\Platform\InteractableLibrary.h" />
     <ClInclude Include="..\src\Platform\LevelManager.h" />
     <ClInclude Include="..\src\Platform\LibraryManager.h" />
     <ClInclude Include="..\src\Platform\LoadContext.h" />

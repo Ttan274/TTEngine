@@ -3,6 +3,7 @@
 #include "Game/Interactables/KeyInteractable.h"
 #include "Game/Interactables/DoorInteractable.h"
 #include "Game/Interactables/ChestInteractable.h"
+#include "Platform/LibraryManager.h"
 #include "Core/Log.h"
 
 namespace EngineGame
@@ -88,8 +89,8 @@ namespace EngineGame
 
 	void InteractableManager::SpawnKey(const EngineMath::Vector2& pos)
 	{
-		const EnginePlatform::InteractableDef* keyDef =
-			EnginePlatform::InteractableLibrary::Get().GetInteractableDef("Key");
+		const EngineData::InteractableData* keyDef =
+			EnginePlatform::InteractableLibrary::Get("Key");
 
 		if (!keyDef)
 			return;

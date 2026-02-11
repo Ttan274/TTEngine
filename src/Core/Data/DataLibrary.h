@@ -9,8 +9,8 @@ namespace EngineData
 	class DataLibrary
 	{
 	public:
-
-		static bool LoadFromFile(const std::string& path)
+		//Load all json files in a folder
+		static bool LoadFromFolder(const std::string& path)
 		{
 			for (auto& file : std::filesystem::directory_iterator(path))
 			{
@@ -30,6 +30,29 @@ namespace EngineData
 				{
 					//duplicate warning
 				}
+
+				s_Data[data.id] = data;
+			}
+
+			return true;
+		}
+
+		//Load all datas in a json file
+		static bool LoadFromFile(const std::string& path)
+		{
+			nlohmann::json j;
+			if (!EngineCore::JsonLoader::LoadFromFile(path, j))
+				return false;
+
+			if (!j.is_array())
+				return false;
+
+			for (auto& item : j)
+			{
+				T data = Parser::Parse(item);
+
+				if (data.id.empty())
+					continue;
 
 				s_Data[data.id] = data;
 			}

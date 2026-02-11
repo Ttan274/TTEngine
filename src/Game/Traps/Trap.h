@@ -1,16 +1,16 @@
 #pragma once
 #include "Core/AABB.h"
 #include "Core/IRenderer.h"
-#include "Platform/InteractableLibrary.h"
 #include "Core/PathUtil.h"
 #include "Platform/AssetManager.h"
 #include "Game/Camera.h"
+#include "Core/Data/Interactable/TrapData.h"
 
 namespace EngineGame
 {
 	struct TrapInstance
 	{
-		const EnginePlatform::TrapDef* def = nullptr;
+		const EngineData::TrapData* def = nullptr;
 		EngineMath::Vector2 position;
 		EngineCore::AABB collider;
 	};

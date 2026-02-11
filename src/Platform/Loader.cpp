@@ -1,8 +1,9 @@
 #include "Platform/Loader.h"
 #include "Platform/LibraryManager.h"
-#include "Platform/InteractableLibrary.h"
-#include "Platform/LevelManager.h"
+#include "Core/Data/Interactable/InteractableData.h"
+#include "Core/Data/Interactable/TrapData.h"
 #include "Core/PathUtil.h"
+#include "Platform/LevelManager.h"
 #include "Core/Log.h"
 #include "Platform/Scene.h"
 
@@ -12,7 +13,7 @@ namespace EnginePlatform
 	{
 		//Animation Library loaded
 		std::string animDir = EngineCore::GetExecutableDirectory() + "\\Assets\\Animation";
-		if (!EnginePlatform::AnimationLibrary::LoadFromFile(animDir))
+		if (!AnimationLibrary::LoadFromFolder(animDir))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Fatal,
@@ -33,8 +34,9 @@ namespace EnginePlatform
 			return;
 		}
 
-		InteractableLibrary::Get().LoadInteractableDefs(EngineCore::GetFile("Data", "Interactables.json"));
-		InteractableLibrary::Get().LoadTrapDefs(EngineCore::GetFile("Data", "TrapDef.json"));
+		//Interactable + Trap Definitions Loaded
+		InteractableLibrary::LoadFromFile(EngineCore::GetFile("Data", "Interactables.json"));
+		TrapLibrary::LoadFromFile(EngineCore::GetFile("Data", "TrapDef.json"));
 
 		EngineCore::Log::Write(
 			EngineCore::LogLevel::Info,
@@ -235,7 +237,7 @@ namespace EnginePlatform
 
 		for (const auto& s : ctx.mapData.interactables)
 		{
-			const InteractableDef* def = InteractableLibrary::Get().GetInteractableDef(s.defId);
+			const EngineData::InteractableData* def = InteractableLibrary::Get(s.defId);
 
 			if (!def)
 			{
@@ -274,7 +276,7 @@ namespace EnginePlatform
 
 		for (const auto& s : ctx.mapData.traps)
 		{
-			const TrapDef* def = InteractableLibrary::Get().GetTrapDef(s.defId);
+			const EngineData::TrapData* def = TrapLibrary::Get(s.defId);
 
 			if (!def)
 			{

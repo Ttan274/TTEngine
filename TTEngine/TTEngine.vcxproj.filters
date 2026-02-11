@@ -13,6 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Data">
+      <UniqueIdentifier>{4171e205-ca04-4f65-848c-e2c2f9c04132}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{14dcd350-1e50-42ea-9fdd-47ebc2411992}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entity">
+      <UniqueIdentifier>{8b8b0e17-02ed-43e8-b901-aa3ab2db36ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Interactable">
+      <UniqueIdentifier>{e90fcf7e-de2b-43a1-bba8-92c2f54e058d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Debug">
+      <UniqueIdentifier>{e12f0201-078d-4c15-80d9-1996260fe129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{cebc4a2f-bb6b-4d5f-a218-2443035ca1ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -81,9 +99,6 @@
     <ClCompile Include="..\src\Platform\Loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Platform\InteractableLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Game\InteractableManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -104,49 +119,19 @@
     <ClInclude Include="..\src\Core\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Platform\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Game\Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\DebugOverlay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\IRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Platform\RendererSdl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Game\TileMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\AABB.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Platform\AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Math\Vector2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Platform\Scene.h">
@@ -156,15 +141,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\PathUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Enemy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Math\Collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Platform\LevelManager.h">
@@ -182,53 +158,101 @@
     <ClInclude Include="..\src\Platform\LoadContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Platform\InteractableLibrary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Game\InteractableManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Interactables\ChestInteractable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Interactables\DoorInteractable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Interactables\Interactable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Interactables\KeyInteractable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Traps\FireTrap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Traps\SawTrap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game\Traps\Trap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Game\TrapManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\JsonLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Data\DataLibrary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Data\Animation\AnimationData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Data\Animation\AnimationParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Game\Animator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Data\DataLibrary.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\JsonLoader.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Camera.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\IRenderer.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Platform\RendererSdl.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Texture.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Animation\AnimationData.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Animation\AnimationParser.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Enemy.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Entity.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Player.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\DoorInteractable.h">
+      <Filter>Header Files\Interactable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\ChestInteractable.h">
+      <Filter>Header Files\Interactable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Traps\FireTrap.h">
+      <Filter>Header Files\Interactable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Traps\SawTrap.h">
+      <Filter>Header Files\Interactable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Traps\Trap.h">
+      <Filter>Header Files\Interactable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\Interactable.h">
+      <Filter>Header Files\Interactable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\Interactables\KeyInteractable.h">
+      <Filter>Header Files\Interactable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Debug.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Log.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\DebugOverlay.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\AABB.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Math\Collision.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Math\Vector2.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Interactable\InteractableData.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Interactable\InteractableParser.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Interactable\TrapData.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Interactable\TrapParser.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Platform\LibraryManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

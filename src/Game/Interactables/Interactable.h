@@ -1,16 +1,16 @@
 #pragma once
 #include "Core/IRenderer.h"
 #include "Game/Camera.h"
-#include "Platform/InteractableLibrary.h"
 #include "Platform/AssetManager.h"
 #include "Core/PathUtil.h"
 #include "Game/Player.h"
+#include "Core/Data/Interactable/InteractableData.h"
 
 namespace EngineGame
 {
 	struct InteractableInstance
 	{
-		const EnginePlatform::InteractableDef* def = nullptr;
+		const EngineData::InteractableData* def = nullptr;
 		EngineMath::Vector2 position;
 		EngineCore::AABB collider;
 		bool used = false;
