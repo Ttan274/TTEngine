@@ -93,12 +93,6 @@
     <ClCompile Include="..\src\Core\PathUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Game\Traps\FireTrap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Game\Traps\SawTrap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Game\TrapManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -18,14 +18,9 @@ namespace EngineCore
 		return fullPath.substr(0, lastSlash);
 	}
 
-	std::string GetRootDirectory()
-	{
-		return GetExecutableDirectory();
-	}
-
 	std::string GetFile(std::string folderName, std::string fileName)
 	{
-		std::string rootDir = GetRootDirectory() + "\\Assets";
+		std::string rootDir = GetExecutableDirectory() + "\\Assets";
 		std::filesystem::path asset = std::filesystem::path(rootDir);
 
 		std::string targetPath = (asset / folderName / fileName).string();

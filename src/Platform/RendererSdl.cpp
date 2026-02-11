@@ -20,7 +20,7 @@ namespace EnginePlatform
 
         SDL_HideCursor();
         
-        std::string fontPath = EngineCore::GetRootDirectory() + "\\Assets/Fonts/FontTest.ttf";
+        std::string fontPath = EngineCore::GetFile("Fonts", "FontTest.ttf");
         TTF_Init();
         s_Instance->m_Font = TTF_OpenFont(fontPath.c_str(), 14);
     }

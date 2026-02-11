@@ -15,9 +15,8 @@ namespace EngineGame
 
 	void TileMap::LoadAssets()
 	{
-		std::string exeDir = EngineCore::GetRootDirectory() + "\\Assets/Textures";
-		m_GroundTex = EnginePlatform::AssetManager::GetTexture(exeDir + "\\ground.png");
-		m_WallTex = EnginePlatform::AssetManager::GetTexture(exeDir + "\\wall.png");
+		m_GroundTex = EnginePlatform::AssetManager::GetTexture(EngineCore::GetFile("Textures", "ground.png"));
+		m_WallTex = EnginePlatform::AssetManager::GetTexture(EngineCore::GetFile("Textures", "wall.png"));
 	}
 
 	TileType TileMap::GetTile(int x, int y) const

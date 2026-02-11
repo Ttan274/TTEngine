@@ -11,7 +11,7 @@ namespace EnginePlatform
 	void Loader::LoadBasics(std::unordered_map<std::string, EngineGame::EntityDefs>& entityDefs)
 	{
 		//Animation Library loaded
-		std::string animDir = EngineCore::GetRootDirectory() + "\\Assets\\Animation";
+		std::string animDir = EngineCore::GetExecutableDirectory() + "\\Assets\\Animation";
 		if (!EnginePlatform::AnimationLibrary::LoadAllAnims(animDir))
 		{
 			EngineCore::Log::Write(

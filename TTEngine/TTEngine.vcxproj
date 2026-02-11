@@ -148,8 +148,6 @@
     <ClCompile Include="..\src\Game\Texture.cpp" />
     <ClCompile Include="..\src\Game\TileMap.cpp" />
     <ClCompile Include="..\src\Game\TrapManager.cpp" />
-    <ClCompile Include="..\src\Game\Traps\FireTrap.cpp" />
-    <ClCompile Include="..\src\Game\Traps\SawTrap.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Platform\AnimationLibrary.cpp" />
     <ClCompile Include="..\src\Platform\AssetManager.cpp" />
