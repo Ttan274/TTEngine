@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TTEngine.Editor.EditorServices.Rendering;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models;
 using TTEngine.Editor.Models.Editor;
@@ -25,6 +26,7 @@ namespace TTEngine.Editor
     {
         //Map
         private TileMapModel ActiveMap => editorState.ActiveMap;
+        private MapRenderer _renderer;
         private bool _isPainting = false;
         private int _brushSize = 1;
         private Rectangle _hoverRect;
@@ -97,9 +99,9 @@ namespace TTEngine.Editor
             TileTools.BrushSizechanged += size => _brushSize = size;
             TileTools.StartGameClicked += OnStartRequested;
 
+            _renderer = new MapRenderer(MapCanvas, editorState);
             EnsureDefaultMap();
             DrawGrid();
-            CreateHoverRect();
         }
 
         #endregion
@@ -164,7 +166,7 @@ namespace TTEngine.Editor
             if (editorState.IsDefaultMap)
                 return;
 
-            UpdateHover(e.GetPosition(MapCanvas));
+            _renderer.UpdateHover(e.GetPosition(MapCanvas), _brushSize);
 
             if (editorState.IsActiveLayerLocked)
                 return;
@@ -195,7 +197,7 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseLeave(object sender, MouseEventArgs e)
         {
-            _hoverRect.Visibility = Visibility.Hidden;
+            _renderer.MakeHoverUnvisible();
         }
 
         #endregion
@@ -221,291 +223,7 @@ namespace TTEngine.Editor
 
         #region Drawing
         //Canvas Methods
-        private void DrawGrid()
-        {
-            //Mapcanvas settings
-            MapCanvas.Children.Clear();
-            if (ActiveMap == null)
-            {
-                MapCanvas.Children.Clear();
-                return;    
-            }
-            MapCanvas.Width = ActiveMap.Width * ActiveMap.TileSize;
-            MapCanvas.Height = ActiveMap.Height * ActiveMap.TileSize;
-
-            //Grid overlay
-            DrawGridOverlay();
-            
-            //Drawing Visible Layer Types
-            foreach (var layer in editorState.Layers)
-            {
-                if (!layer.IsVisible)
-                    continue;
-
-                DrawLayer(layer.LayerType);
-            }
-
-            DrawPlayerSpawn();
-            DrawEnemySpawns();
-            DrawInteractables();
-
-            if (_hoverRect != null && !MapCanvas.Children.Contains(_hoverRect))
-            {
-                MapCanvas.Children.Add(_hoverRect);
-            }
-        }
-
-        private void DrawGridOverlay()
-        {
-            for (int y = 0; y < ActiveMap.Height; y++)
-            {
-                for (int x = 0; x < ActiveMap.Width; x++)
-                {
-                    Rectangle grid = new Rectangle
-                    {
-                        Width = ActiveMap.TileSize,
-                        Height = ActiveMap.TileSize,
-                        Stroke = Brushes.DimGray,
-                        StrokeThickness = 0.5,
-                        Fill = Brushes.DimGray,
-                        IsHitTestVisible = false
-                    };
-
-                    Canvas.SetLeft(grid, x * ActiveMap.TileSize);
-                    Canvas.SetTop(grid, y * ActiveMap.TileSize);
-
-                    MapCanvas.Children.Add(grid);
-                }
-            }
-        }
-
-        private void DrawLayer(MapLayerType layerType)
-        {
-            var tiles = ActiveMap.Layers[layerType];
-
-            for (int y = 0; y < ActiveMap.Height; y++)
-            {
-                for (int x = 0; x < ActiveMap.Width; x++)
-                {
-                    int index = ActiveMap.GetIndex(x, y);
-                    int tile = tiles[index];
-
-                    if (tile == 0)
-                        continue;
-
-                    Rectangle rect = new Rectangle
-                    {
-                        Width = ActiveMap.TileSize,
-                        Height = ActiveMap.TileSize,
-                        Stroke = GetTileStroke(tile, layerType),
-                        StrokeThickness = (layerType == MapLayerType.Collision) ? 2.0 : 0.0,
-                        Fill = GetTileBrush(tile, layerType),
-                        IsHitTestVisible = false
-                    };
-
-                    Canvas.SetLeft(rect, x * ActiveMap.TileSize);
-                    Canvas.SetTop(rect, y * ActiveMap.TileSize);
-                    MapCanvas.Children.Add(rect);
-                }
-            }
-        }
-
-        private Brush GetTileBrush(int tile, MapLayerType layer)
-        {
-            var def = TileDefinitionService.GetById(tile);
-            if (def == null)
-                return Brushes.Transparent;
-
-            if (layer == MapLayerType.Collision)
-                return Brushes.Transparent;
-
-            return def.CollisionType switch
-            {
-                CollisionType.Ground => Brushes.LightGreen,
-                CollisionType.Wall => Brushes.SaddleBrown,
-                _ => Brushes.Transparent
-            };
-        }
-
-        private Brush GetTileStroke(int tile, MapLayerType layer)
-        {
-            if (layer != MapLayerType.Collision)
-                return Brushes.Transparent;
-
-            var def = TileDefinitionService.GetById(tile);
-            if(def == null)
-                return Brushes.Transparent;
-
-            return def.CollisionType switch
-            {
-                CollisionType.Ground => Brushes.Orange,
-                CollisionType.Wall => Brushes.Red,
-                _ => Brushes.Transparent
-            };
-        }
-
-        private void DrawPlayerSpawn()
-        {
-            if (ActiveMap.PlayerSpawn == null)
-                return;
-
-            double cx = (ActiveMap.PlayerSpawn.Position.X + 0.5) * ActiveMap.TileSize;
-            double cy = (ActiveMap.PlayerSpawn.Position.Y + 0.5) * ActiveMap.TileSize;
-
-            Path star = new Path
-            {
-                Fill = Brushes.Gold,
-                Stroke = Brushes.DarkOrange,
-                StrokeThickness = 2,
-                Data = Geometry.Parse(
-                        "M 0,-10 L 3,-3 L 10,0 L 3,3 L 0,10 L -3,3 L -10,0 L -3,-3 Z"
-                        ),
-                IsHitTestVisible = false
-            };
-
-            Canvas.SetLeft(star, cx);
-            Canvas.SetTop(star, cy);
-            star.RenderTransform = new TranslateTransform(-10, -10);
-
-            MapCanvas.Children.Add(star);
-        }
-
-        private void DrawEnemySpawns()
-        {
-            foreach (var spawn in ActiveMap.EnemySpawns)
-            {
-                double cx = (spawn.Position.X + 0.5) * ActiveMap.TileSize;
-                double cy = (spawn.Position.Y + 0.5) * ActiveMap.TileSize;
-
-                Ellipse e = new Ellipse
-                {
-                    Width = ActiveMap.TileSize * 0.5,
-                    Height = ActiveMap.TileSize * 0.5,
-                    Stroke = Brushes.Red,
-                    StrokeThickness = 2,
-                    Fill = Brushes.Transparent,
-                    IsHitTestVisible = false,
-                    Tag = "EnemySpawn"
-                };
-
-                Canvas.SetLeft(e, cx - e.Width / 2);
-                Canvas.SetTop(e, cy - e.Height / 2);
-
-                MapCanvas.Children.Add(e);
-
-            }
-        }
-
-        private void DrawInteractables()
-        {
-            if (!editorState.Layers.First(l => l.LayerType == MapLayerType.Interactable).IsVisible)
-                return;
-
-            //Draw Interactable
-            foreach (var interactable in ActiveMap.Interactables)
-            {
-                var def = editorState.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
-
-                if (def == null || string.IsNullOrEmpty(def.ImagePath))
-                    continue;
-
-                string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
-
-                if (!System.IO.File.Exists(targetPath))
-                    continue;
-
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(targetPath, UriKind.Absolute);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-
-                Image img = new Image
-                {
-                    Source = bitmap,
-                    Width = ActiveMap.TileSize,
-                    Height = ActiveMap.TileSize,
-                    IsHitTestVisible = false
-                };
-
-                Canvas.SetLeft(img, interactable.X * ActiveMap.TileSize);
-                Canvas.SetTop(img, interactable.Y * ActiveMap.TileSize);
-
-                MapCanvas.Children.Add(img);
-            }
-
-            //Draw Trap
-            foreach (var trap in ActiveMap.Traps)
-            {
-                var def = editorState.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
-
-                if (def == null || string.IsNullOrEmpty(def.ImagePath))
-                    continue;
-
-                string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
-
-                if (!System.IO.File.Exists(targetPath))
-                    continue;
-
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(targetPath, UriKind.Absolute);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-
-                Image img = new Image
-                {
-                    Source = bitmap,
-                    Width = ActiveMap.TileSize,
-                    Height = ActiveMap.TileSize,
-                    IsHitTestVisible = false
-                };
-
-                Canvas.SetLeft(img, trap.X * ActiveMap.TileSize);
-                Canvas.SetTop(img, trap.Y * ActiveMap.TileSize);
-
-                MapCanvas.Children.Add(img);
-            }
-
-        }
-
-        private void CreateHoverRect()
-        {
-            _hoverRect = new Rectangle
-            {
-                Stroke = Brushes.Yellow,
-                StrokeThickness = 2,
-                Fill = Brushes.Transparent,
-                IsHitTestVisible = false
-            };
-
-            MapCanvas.Children.Add(_hoverRect);
-        }
-
-        private void UpdateHover(Point pos)
-        {
-            if (ActiveMap == null)
-                return;
-
-            int x = (int)(pos.X / ActiveMap.TileSize);
-            int y = (int)(pos.Y / ActiveMap.TileSize);
-
-            if (x < 0 || y < 0 || x >= ActiveMap.Width || y >= ActiveMap.Height)
-            {
-                _hoverRect.Visibility = Visibility.Hidden;
-                return;
-            }
-
-            _hoverRect.Visibility = Visibility.Visible;
-
-            _hoverRect.Width = _brushSize * ActiveMap.TileSize;
-            _hoverRect.Height = _brushSize * ActiveMap.TileSize;
-
-            _hoverRect.Stroke = editorState.IsActiveLayerLocked ? Brushes.Gray : Brushes.Yellow;
-
-            Canvas.SetLeft(_hoverRect, x * ActiveMap.TileSize);
-            Canvas.SetTop(_hoverRect, y * ActiveMap.TileSize);
-        }
+        private void DrawGrid() => _renderer.Draw();
 
         #endregion
 
