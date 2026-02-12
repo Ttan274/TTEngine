@@ -1,10 +1,7 @@
 #include "Platform/LevelManager.h"
-#include <fstream>
-#include <json.hpp>
+#include "Core/JsonLoader.h"
+#include "Core/Data/Level/LevelParser.h"
 #include "Core/Log.h"
-
-using json = nlohmann::json;
-
 
 namespace EnginePlatform
 {
@@ -19,39 +16,26 @@ namespace EnginePlatform
 		m_Levels.clear();
 		m_CurrentLevelIndex = -1;
 
-		std::ifstream file(filePath);
-		if (!file.is_open())
+		nlohmann::json j;
+
+		if (!EngineCore::JsonLoader::LoadFromFile(filePath, j))
 		{
 			EngineCore::Log::Write(
 				EngineCore::LogLevel::Error,
 				EngineCore::LogCategory::Core,
-				"Failed to open levels.json"
+				"Levels loaded succesfully : " + std::to_string(m_Levels.size())
 			);
 			return false;
 		}
 
-		json j;
-		file >> j;
-
-		if (!j.contains("Levels"))
-			return false;
-
-		for (auto& l : j["Levels"])
+		if (!EngineData::LevelParser::Parse(j, m_Levels))
 		{
-			LevelData data;
-			data.id = l["Id"].get<std::string>();
-			data.mapId = l["MapId"].get<std::string>();
-			data.IsActive = l["IsActive"].get<bool>();
-
-			if (data.IsActive)
-			{
-				m_Levels.push_back(data);
-				EngineCore::Log::Write(
-					EngineCore::LogLevel::Info,
-					EngineCore::LogCategory::Core,
-					"level added :" + data.id
-				);
-			}
+			EngineCore::Log::Write(
+				EngineCore::LogLevel::Error,
+				EngineCore::LogCategory::Core,
+				"Failed to parse level file"
+			);
+			return false;
 		}
 
 		EngineCore::Log::Write(
@@ -63,7 +47,7 @@ namespace EnginePlatform
 		return true;
 	}
 
-	const LevelData* LevelManager::GetCurrentLevel() const
+	const EngineData::LevelData* LevelManager::GetCurrentLevel() const
 	{
 		if (m_CurrentLevelIndex < 0 || m_CurrentLevelIndex >= (int)m_Levels.size())
 			return nullptr;

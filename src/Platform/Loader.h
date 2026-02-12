@@ -2,14 +2,10 @@
 #include <string>
 #include "Platform/LoadContext.h"
 
-namespace EngineGame
-{
-	struct SpawnData;
-}
-
 namespace EngineData
 {
 	struct EntityData;
+	struct SpawnData;
 }
 
 namespace EnginePlatform
@@ -22,8 +18,8 @@ namespace EnginePlatform
 	private:
 		void LoadMap(LoadContext& ctx, const std::string& mapId);
 		void LoadSpawnEntities(LoadContext& ctx);
-		void LoadPlayer(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineData::EntityData& def);
-		void LoadEnemy(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineData::EntityData& def);
+		void LoadPlayer(LoadContext& ctx, const EngineData::SpawnData& spawn, const EngineData::EntityData& def);
+		void LoadEnemy(LoadContext& ctx, const EngineData::SpawnData& spawn, const EngineData::EntityData& def);
 		void LoadCamera(LoadContext& ctx);
 		void LoadInteractables(LoadContext& ctx);
 		void LoadTraps(LoadContext& ctx);

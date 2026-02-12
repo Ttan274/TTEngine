@@ -40,6 +40,9 @@
     <Filter Include="Header Files\Gameplay\Managers">
       <UniqueIdentifier>{271a97ee-1f3b-46c1-8f75-5b175d656b3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Gameplay\Map">
+      <UniqueIdentifier>{841b4f6a-5ad7-4a03-8c8c-b6cb3f9233ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -122,9 +125,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Game\MapLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Platform\LevelManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -254,9 +254,6 @@
     <ClInclude Include="..\src\Core\Time.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Game\TileMap.h">
-      <Filter>Header Files\Gameplay</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Platform\AssetManager.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -267,6 +264,24 @@
       <Filter>Header Files\Data</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Data\Entity\EntityParser.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\TileMap.h">
+      <Filter>Header Files\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game\MapLoader.h">
+      <Filter>Header Files\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Map\MapData.h">
+      <Filter>Header Files\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Map\MapParser.h">
+      <Filter>Header Files\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Level\LevelData.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Data\Level\LevelParser.h">
       <Filter>Header Files\Data</Filter>
     </ClInclude>
   </ItemGroup>

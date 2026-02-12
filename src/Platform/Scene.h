@@ -5,7 +5,6 @@
 #include "Platform/Loader.h"
 #include "Game/InteractableManager.h"
 #include "Game/TrapManager.h"
-#include "Core/Data/Entity/EntityData.h"
 
 namespace EnginePlatform
 {
@@ -45,7 +44,7 @@ namespace EnginePlatform
 		GameState m_GameState = GameState::MainMenu;
 
 		//Load data
-		EngineGame::MapData m_MapData;
+		EngineData::MapData m_MapData;
 		bool m_PlayerSpawned = false;
 		bool m_LevelCompleted = false;
 

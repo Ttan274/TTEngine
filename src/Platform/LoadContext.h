@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include <unordered_map>
 
 namespace EngineGame
 {
@@ -11,7 +10,10 @@ namespace EngineGame
 	class InteractableManager;
 	class TrapManager;
 	class Camera2D;
+}
 
+namespace EngineData
+{
 	struct MapData;
 }
 
@@ -25,7 +27,7 @@ namespace EnginePlatform
 
 		//Map
 		std::unique_ptr<EngineGame::TileMap>& tileMap;
-		EngineGame::MapData& mapData;
+		EngineData::MapData& mapData;
 
 		//Interactables
 		EngineGame::InteractableManager& interactableList;
@@ -42,7 +44,7 @@ namespace EnginePlatform
 			EngineGame::Player& p,
 			std::vector<std::unique_ptr<EngineGame::Enemy>>& e,
 			std::unique_ptr<EngineGame::TileMap>& t,
-			EngineGame::MapData& m,
+			EngineData::MapData& m,
 			EngineGame::InteractableManager& i,
 			EngineGame::TrapManager& trap,
 			EngineGame::Camera2D& c,

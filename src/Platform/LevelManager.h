@@ -1,16 +1,10 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "Core/Data/Level/LevelData.h"
 
 namespace EnginePlatform
 {
-	struct LevelData
-	{
-		std::string id;
-		std::string mapId;
-		bool IsActive;
-	};
-
 	class LevelManager
 	{
 	public:
@@ -22,14 +16,14 @@ namespace EnginePlatform
 		void LoadNextLevel();
 		void CompleteAll();
 
-		const LevelData* GetCurrentLevel() const;
-		const std::vector<LevelData>& GetLevels() const { return m_Levels; }
+		const EngineData::LevelData* GetCurrentLevel() const;
+		const std::vector<EngineData::LevelData>& GetLevels() const { return m_Levels; }
 		int GetCurrentIndex() const { return m_CurrentLevelIndex; }
 
 	private:
 		LevelManager() = default;
 
-		std::vector<LevelData> m_Levels;
+		std::vector<EngineData::LevelData> m_Levels;
 		int m_CurrentLevelIndex = -1;
 	};
 }

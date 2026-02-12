@@ -3,6 +3,7 @@
 #include "Core/PathUtil.h"
 #include "Platform/LevelManager.h"
 #include "Core/Log.h"
+#include "Core/Data/Level/LevelData.h"
 #include "Platform/Scene.h"
 
 namespace EnginePlatform
@@ -45,7 +46,7 @@ namespace EnginePlatform
 
 	void Loader::LoadCurrentLevel(LoadContext& ctx)
 	{
-		const LevelData* level = LevelManager::Get().GetCurrentLevel();
+		const EngineData::LevelData* level = LevelManager::Get().GetCurrentLevel();
 	
 		if (!level)
 		{
@@ -72,14 +73,7 @@ namespace EnginePlatform
 
 		//Loading Map
 		if (!EngineGame::MapLoader::LoadFromFile(targetPath, ctx.mapData))
-		{
-			EngineCore::Log::Write(
-				EngineCore::LogLevel::Fatal,
-				EngineCore::LogCategory::Scene,
-				"Failed to load map.json"
-			);
 			return;
-		}
 
 		//TileMap Creation
 		ctx.tileMap = std::make_unique<EngineGame::TileMap>(ctx.mapData.w, ctx.mapData.h, ctx.mapData.tSize);
@@ -145,7 +139,7 @@ namespace EnginePlatform
 		}
 	}
 
-	void Loader::LoadPlayer(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineData::EntityData& def)
+	void Loader::LoadPlayer(LoadContext& ctx, const EngineData::SpawnData& spawn, const EngineData::EntityData& def)
 	{
 		//Set World Reference
 		ctx.player.SetWorld(ctx.tileMap.get());
@@ -186,7 +180,7 @@ namespace EnginePlatform
 		);
 	}
 
-	void Loader::LoadEnemy(LoadContext& ctx, const EngineGame::SpawnData& spawn, const EngineData::EntityData& def)
+	void Loader::LoadEnemy(LoadContext& ctx, const EngineData::SpawnData& spawn, const EngineData::EntityData& def)
 	{
 		//Enemy Loading
 		auto enemy = std::make_unique<EngineGame::Enemy>();
