@@ -11,43 +11,46 @@ namespace TTEngine.Editor.EditorServices.Rendering
 {
     public class MapRenderer
     {
-        private readonly Canvas _canvas;
+        private readonly Canvas _root;
         private readonly EditorState _state;
 
+        //Layers
+        private readonly Canvas _gridLayer = new();
+        private readonly Canvas _tileLayer = new();
+        private readonly Canvas _objectLayer = new();
+        private readonly Canvas _overlayLayer = new();
+
+        //Cache
+        private readonly Dictionary<string, BitmapImage> _imageCache = new();
+
+        //Hover Rectangle
         private Rectangle _hoverRect;
 
-        public MapRenderer(Canvas canvas, EditorState state)
+        public MapRenderer(Canvas root, EditorState state)
         {
-            _canvas = canvas;
+            _root = root;
             _state = state;
+
+            _root.Children.Clear();
+            _root.Children.Add(_gridLayer);
+            _root.Children.Add(_tileLayer);
+            _root.Children.Add(_objectLayer);
+            _root.Children.Add(_overlayLayer);
+
             CreateHoverRect();
         }
 
-        #region Draw Region
-        public void Draw()
+        public void InitializeGrid()
         {
-            _canvas.Children.Clear();
+            _gridLayer.Children.Clear();
 
             if (_state.ActiveMap == null)
                 return;
 
             var map = _state.ActiveMap;
 
-            _canvas.Width = map.Width * map.TileSize;
-            _canvas.Height = map.Height * map.TileSize;
-
-            DrawGridOverlay();
-            DrawLayers();
-            DrawPlayerSpawn();
-            DrawEnemySpawns();
-            DrawInteractables();
-
-            _canvas.Children.Add(_hoverRect);
-        }
-
-        private void DrawGridOverlay()
-        {
-            var map = _state.ActiveMap;
+            _root.Width = map.Width * map.TileSize;
+            _root.Height = map.Height * map.TileSize;
 
             for (int y = 0; y < map.Height; y++)
             {
@@ -66,9 +69,25 @@ namespace TTEngine.Editor.EditorServices.Rendering
                     Canvas.SetLeft(grid, x * map.TileSize);
                     Canvas.SetTop(grid, y * map.TileSize);
 
-                    _canvas.Children.Add(grid);
+                    _gridLayer.Children.Add(grid);
                 }
             }
+        }
+
+        #region Draw Region
+        public void DrawStatic()
+        {
+            _tileLayer.Children.Clear();
+            _objectLayer.Children.Clear();
+
+            if (_state.ActiveMap == null)
+                return;
+
+            DrawLayers();
+            DrawPlayerSpawn();
+            DrawEnemySpawns();
+            DrawInteractables();
+            DrawTraps();
         }
 
         private void DrawLayers()
@@ -109,7 +128,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
                     Canvas.SetLeft(rect, x * map.TileSize);
                     Canvas.SetTop(rect, y * map.TileSize);
-                    _canvas.Children.Add(rect);
+                    _tileLayer.Children.Add(rect);
                 }
             }
         }
@@ -137,7 +156,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
             Canvas.SetLeft(marker, cx - marker.Width / 2);
             Canvas.SetTop(marker, cy - marker.Height / 2);
 
-            _canvas.Children.Add(marker);
+            _objectLayer.Children.Add(marker);
         }
 
         private void DrawEnemySpawns()
@@ -163,7 +182,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
                 Canvas.SetLeft(marker, cx - marker.Width / 2);
                 Canvas.SetTop(marker, cy - marker.Height / 2);
 
-                _canvas.Children.Add(marker);
+                _objectLayer.Children.Add(marker);
             }
         }
 
@@ -184,15 +203,9 @@ namespace TTEngine.Editor.EditorServices.Rendering
                 if (!System.IO.File.Exists(targetPath))
                     continue;
 
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(targetPath, UriKind.Absolute);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-
                 Image img = new Image
                 {
-                    Source = bitmap,
+                    Source = GetImage(targetPath),
                     Width = map.TileSize,
                     Height = map.TileSize,
                     IsHitTestVisible = false
@@ -200,9 +213,13 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
                 Canvas.SetLeft(img, interactable.X * map.TileSize);
                 Canvas.SetTop(img, interactable.Y * map.TileSize);
-
-                _canvas.Children.Add(img);
+                _objectLayer.Children.Add(img);
             }
+        }
+
+        private void DrawTraps()
+        {
+            var map = _state.ActiveMap;
 
             //Draw Trap
             foreach (var trap in map.Traps)
@@ -217,15 +234,9 @@ namespace TTEngine.Editor.EditorServices.Rendering
                 if (!System.IO.File.Exists(targetPath))
                     continue;
 
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(targetPath, UriKind.Absolute);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-
                 Image img = new Image
                 {
-                    Source = bitmap,
+                    Source = GetImage(targetPath),
                     Width = map.TileSize,
                     Height = map.TileSize,
                     IsHitTestVisible = false
@@ -233,10 +244,30 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
                 Canvas.SetLeft(img, trap.X * map.TileSize);
                 Canvas.SetTop(img, trap.Y * map.TileSize);
-
-                _canvas.Children.Add(img);
+                _objectLayer.Children.Add(img);
             }
         }
+        #endregion
+
+        #region Image Cache
+
+        private BitmapImage GetImage(string path)
+        {
+            if(!_imageCache.ContainsKey(path))
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(path, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                _imageCache[path] = bitmap;
+            }
+
+            return _imageCache[path];
+        }
+
         #endregion
 
         #region Paint
@@ -288,6 +319,8 @@ namespace TTEngine.Editor.EditorServices.Rendering
                 IsHitTestVisible = false,
                 Visibility = Visibility.Hidden
             };
+
+            _overlayLayer.Children.Add(_hoverRect);
         }
 
         public void MakeHoverUnvisible()

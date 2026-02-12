@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using TTEngine.Editor.Enums;
+using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Trap;
@@ -34,7 +35,20 @@ namespace TTEngine.Editor.Models.Editor
         public ObservableCollection<TileDefinition> TileDefinitions { get; }
         public ObservableCollection<InteractableDefinition> InteractableDefinitions { get; }
         public ObservableCollection<TrapDefinition> TrapDefinitions { get; }
-        
+        public ObservableCollection<EntityDefinitionModel> EntityDefinitions { get; }
+
+        //Tool Mode
+        private ToolMode _currentToolmode;
+        public ToolMode CurrentToolMode
+        {
+            get => _currentToolmode;
+            set
+            {
+                _currentToolmode = value;
+                OnPropertyChanged(nameof(CurrentToolMode));
+            }
+        }
+
         //Placement
         private PlacementMode _activePlacementMode;
         public PlacementMode ActivePlacementMode
@@ -137,7 +151,8 @@ namespace TTEngine.Editor.Models.Editor
         {
             TileDefinitions = new ObservableCollection<TileDefinition>(TileDefinitionService.Load());
             InteractableDefinitions = new ObservableCollection<InteractableDefinition>(InteractableFileService.Load());
-            TrapDefinitions = new ObservableCollection<TrapDefinition>(TrapFileService.Load());  
+            TrapDefinitions = new ObservableCollection<TrapDefinition>(TrapFileService.Load());
+            EntityDefinitions = new ObservableCollection<EntityDefinitionModel>(EntityDefinitionService.Load());
         }
 
         public void SetActiveLayer(EditorLayer layer)
