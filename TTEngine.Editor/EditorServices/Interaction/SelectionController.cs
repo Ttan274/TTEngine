@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
-using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Panels;
 
 namespace TTEngine.Editor.EditorServices.Interaction
@@ -22,22 +22,22 @@ namespace TTEngine.Editor.EditorServices.Interaction
             if (map == null)
                 return;
 
-            // Interactable
-            if (_state.ActiveLayer.LayerType == MapLayerType.Interactable)
-            {
-                var interactable = map.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
+            if (CheckInteractables(map, x, y))
+                return;
 
-                if (interactable != null)
-                {
-                    _showInspector(
-                        new InteractableInspector(
-                            interactable,
-                            _state.InteractableDefinitions));
+            if (CheckEntities(map, x, y))
+                return;
 
-                    return;
-                }
-            }
+            // Default Tile
+            int index = map.GetIndex(x, y);
+            int tileValue = map.Layers[_state.ActiveLayer.LayerType][index];
 
+            _showInspector(
+                new TileSpawnInspector(x, y, tileValue));
+        }
+
+        private bool CheckEntities(TileMapModel map, int x, int y)
+        {
             // Player
             if (map.PlayerSpawn != null &&
                 map.PlayerSpawn.Position.X == x &&
@@ -48,7 +48,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                         map.PlayerSpawn,
                         _state.EntityDefinitions.ToList()));
 
-                return;
+                return true;
             }
 
             // Enemy
@@ -62,15 +62,29 @@ namespace TTEngine.Editor.EditorServices.Interaction
                         enemy,
                         _state.EntityDefinitions.ToList()));
 
-                return;
+                return true;
             }
 
-            // Default Tile
-            int index = map.GetIndex(x, y);
-            int tileValue = map.Layers[_state.ActiveLayer.LayerType][index];
+            return false;
+        }
 
-            _showInspector(
-                new TileSpawnInspector(x, y, tileValue));
+        private bool CheckInteractables(TileMapModel map, int x, int y)
+        {
+            var interactable = map.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
+
+            if (interactable != null)
+            {
+                _showInspector(
+                    new InteractableInspector(
+                        interactable,
+                        _state.InteractableDefinitions));
+
+                return true;
+            }
+
+            //trap eklenicek
+
+            return false;
         }
     }
 }
