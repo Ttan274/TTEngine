@@ -19,44 +19,28 @@ namespace TTEngine.Editor
         //Map
         private MapRenderer _renderer;
         private MapInteractionController _interaction;
+        private SelectionController _selection;
         private int _brushSize = 1;
         public const string DEFAULT_MAP_ID = "Map_Default";
 
-        //Selection + Entity Def
-        private SelectionModel _currentSelection = new();
-
-        //Layer
+        //Editor State
         public EditorState editorState { get; } = new EditorState();
 
         public MainWindow()
         {
             InitializeComponent();
+            ContextSetup();
             WindowSetup();
+            ChangeEventBindings();
         }
 
         #region Setup
 
-        //Setup
         private void WindowSetup()
         {
-            //Context setup
-            AnimationDefinitionService.LoadAll();
-            LayerEditor.DataContext = editorState;
-            TileTools.DataContext = editorState;
-            ConsoleEditor.DataContext = editorState;
-            ToolHost.BindEditor(editorState);
-
-            editorState.PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName == nameof(editorState.ActiveMap))
-                    _renderer.DrawStatic();
-            };
-
-            foreach (var layer in editorState.Layers)
-                layer.VisibilityChanged += OnLayerVisibilityChanged;
-
             _renderer = new MapRenderer(MapCanvas, editorState);
             _interaction = new MapInteractionController(editorState, () => _renderer.DrawStatic());
+            _selection = new SelectionController(editorState, content => Inspector.SetContent(content));
            
             EnsureDefaultMap();
             _renderer.InitializeGrid();
@@ -76,6 +60,27 @@ namespace TTEngine.Editor
                 ApplicationCommands.Save,
                 (_, _) => editorState.SaveActiveMap()
             ));
+        }
+
+        private void ContextSetup()
+        {
+            AnimationDefinitionService.LoadAll();
+            LayerEditor.DataContext = editorState;
+            TileTools.DataContext = editorState;
+            ConsoleEditor.DataContext = editorState;
+            ToolHost.BindEditor(editorState);
+        }
+
+        private void ChangeEventBindings()
+        {
+            editorState.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(editorState.ActiveMap))
+                    _renderer.DrawStatic();
+            };
+
+            foreach (var layer in editorState.Layers)
+                layer.VisibilityChanged += OnLayerVisibilityChanged;
 
             //Tile Tool Panel Events
             TileTools.ToolModeChanged += mode => editorState.CurrentToolMode = mode;
@@ -93,17 +98,44 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            _interaction.OnMouseDown(e.GetPosition(MapCanvas), e);
+            if (editorState.IsDefaultMap)
+                return;
+
+            if (editorState.IsActiveLayerLocked)
+                return;
+
+            Point pos = e.GetPosition(MapCanvas);
+
+            //Selection override
+            if (Keyboard.IsKeyDown(Key.LeftAlt))
+            {
+                if (TryGetTilePosition(pos, out int sx, out int sy))
+                    _selection.HandleSelection(sx, sy);
+                return;
+            }
+
+            Mouse.Capture(MapCanvas);
+           
+            // Selection
+            if (TryGetTilePosition(pos, out int x, out int y))
+                _selection.HandleSelection(x, y);
+
+            // Interaction
+            _interaction.OnMouseDown(pos, e);
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
+            if (editorState.IsDefaultMap)
+                return;
+
             _renderer.UpdateHover(e.GetPosition(MapCanvas), _brushSize);
             _interaction.OnMouseMove(e.GetPosition(MapCanvas), e);
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            Mouse.Capture(null);
             _interaction.OnMouseUp();
         }
 
@@ -133,98 +165,24 @@ namespace TTEngine.Editor
 
         #endregion
 
-        
-        //Selection hariç her şeyi taşıdık !!
+        private bool TryGetTilePosition(Point pos, out int x, out int y)
+        {
+            x = 0;
+            y = 0;
 
-        //Mouse Event Helpers
-        //private void HandleSelection(int x, int y)
-        //{
-        //    if(editorState.ActiveLayer.LayerType == MapLayerType.Interactable)
-        //    {
-        //        foreach (var interactable in ActiveMap.Interactables)
-        //        {
-        //            if (interactable.X == x && interactable.Y == y)
-        //            {
-        //                _currentSelection = new SelectionModel
-        //                {
-        //                    Type = SelectionType.Interactable,
-        //                    InteractableModel = interactable
-        //                };
-        //            }
-        //            ShowInspector();
-        //            return;
-        //        }
-        //    }
+            if (editorState.ActiveMap == null)
+                return false;
 
-        //    if (ActiveMap.PlayerSpawn != null && ActiveMap.PlayerSpawn.Position.X == x && ActiveMap.PlayerSpawn.Position.Y == y)
-        //    {
-        //        _currentSelection = new SelectionModel
-        //        {
-        //            Type = SelectionType.Player,
-        //            PlayerSpawnModel = new PlayerSpawnModel
-        //            {
-        //                Position = new Point(x, y)
-        //            }
-        //        };
+            var map = editorState.ActiveMap;
 
-        //        ShowInspector();
-        //        return;
-        //    }
+            x = (int)(pos.X / map.TileSize);
+            y = (int)(pos.Y / map.TileSize);
 
-        //    foreach (var spawn in ActiveMap.EnemySpawns)
-        //    {
-        //        if (spawn.Position.X == x && spawn.Position.Y == y)
-        //        {
-        //            _currentSelection = new SelectionModel
-        //            {
-        //                Type = SelectionType.Enemy,
-        //                EnemySpawnModel = new EnemySpawnModel
-        //                {
-        //                    Position = spawn.Position,
-        //                    DefinitionId = spawn.DefinitionId
-        //                }
-        //            };
+            if (x < 0 || y < 0 || x >= map.Width || y >= map.Height)
+                return false;
 
-        //            ShowInspector();
-        //            return;
-        //        }
-        //    }
-
-
-        //    _currentSelection = new SelectionModel
-        //    {
-        //        Type = SelectionType.Tile,
-        //        TileX = x,
-        //        TileY = y
-        //    };
-
-        //    ShowInspector();
-        //}
-
-        //private void ShowInspector()
-        //{
-        //    switch (_currentSelection.Type)
-        //    {
-        //        case SelectionType.Tile:
-        //            int index = ActiveMap.GetIndex(_currentSelection.TileX, _currentSelection.TileY);
-        //            Inspector.SetContent(new TileSpawnInspector(_currentSelection.TileX, _currentSelection.TileY, ActiveTiles[index]));
-        //            break;
-        //        case SelectionType.Player:
-        //            Inspector.SetContent(new PlayerSpawnInspector(_currentSelection.PlayerSpawnModel, editorState.EntityDefinitions.ToList()));
-        //            break;
-        //        case SelectionType.Enemy:
-        //            Inspector.SetContent(new EnemySpawnInspector(_currentSelection.EnemySpawnModel, editorState.EntityDefinitions.ToList()));
-        //            break;
-        //        case SelectionType.Interactable:
-        //            Inspector.SetContent(new InteractableInspector(_currentSelection.InteractableModel, editorState.InteractableDefinitions));
-        //            break;
-        //        default:
-        //            Inspector.Clear();
-        //            break;
-        //    }
-        //}
-
-        #region Load Default Map
+            return true;
+        }
 
         private void EnsureDefaultMap()
         {
@@ -244,10 +202,6 @@ namespace TTEngine.Editor
             editorState.Console.Log($"{DEFAULT_MAP_ID} is loaded.");
         }
 
-        #endregion
-
-        #region Validation
-
         private EditorValidationResult ValidateMap()
         {
             editorState.Console.Clear();
@@ -259,7 +213,5 @@ namespace TTEngine.Editor
 
             return result;
         }
-
-        #endregion
     }
 }
