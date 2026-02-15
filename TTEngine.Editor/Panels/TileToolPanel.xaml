@@ -162,7 +162,8 @@
             <Separator/>
 
             <!-- ACTIONS -->
-            <Button Content="Start Game"
+            <Button x:Name="RunBtn"
+                    Content="Start Game"
                     Margin="0,10,0,0"
                     Click="StartGame_Click"/>
             

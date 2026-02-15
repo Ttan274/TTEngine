@@ -215,5 +215,7 @@ namespace TTEngine.Editor.Panels
                 throw;
             }
         }
+    
+        public void SetStartButtonTxt(string text) => RunBtn.Content = text;
     }
 }

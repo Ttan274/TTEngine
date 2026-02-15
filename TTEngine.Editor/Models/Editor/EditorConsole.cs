@@ -1,9 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace TTEngine.Editor.Models.Editor
 {
     public class EditorConsole
     {
+        private const int maxLogs = 100;
+
         public ObservableCollection<string> Messages { get; }
             = new ObservableCollection<string>();
 
@@ -14,7 +17,13 @@ namespace TTEngine.Editor.Models.Editor
 
         public void Log(string msg)
         {
-            Messages.Add(msg);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Messages.Add(msg);
+
+                if(Messages.Count > maxLogs)
+                    Messages.RemoveAt(0);
+            });
         }
     }
 }

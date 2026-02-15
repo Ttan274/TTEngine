@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
+using TTEngine.Editor.EditorServices.EngineLauncher;
 using TTEngine.Editor.EditorServices.Interaction;
 using TTEngine.Editor.EditorServices.Rendering;
-using TTEngine.Editor.Models;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Validation;
@@ -25,6 +24,9 @@ namespace TTEngine.Editor
 
         //Editor State
         public EditorState editorState { get; } = new EditorState();
+        
+        //Engine Launcher
+        private EngineLauncher _engineLauncher = new EngineLauncher();
 
         public MainWindow()
         {
@@ -32,6 +34,20 @@ namespace TTEngine.Editor
             ContextSetup();
             WindowSetup();
             ChangeEventBindings();
+
+            this.Closed += (_, _) =>
+            {
+                _engineLauncher.Stop();
+            };
+
+            _engineLauncher.EngineExited += () =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    editorState.Console.Log("Engine Stopped");
+                    UpdateRunBtn();
+                });
+            };
         }
 
         #region Setup
@@ -150,19 +166,43 @@ namespace TTEngine.Editor
 
         private void OnStartRequested()
         {
-            var validation = ValidateMap();
-
-            if (!validation.IsValid)
-                return;
-
-            StartGame(this, new RoutedEventArgs());
+            if(_engineLauncher.IsRunning)
+                StopGame();
+            else
+                StartEngine();
         }
 
         private void OnLayerVisibilityChanged(EditorLayer layer)
             => _renderer.DrawStatic();
 
-        private void StartGame(object sender, RoutedEventArgs e) => Process.Start(EditorPaths.GetEngineExe());
+        private void StartEngine()
+        {
+            var validation = ValidateMap();
+            if (!validation.IsValid)
+                return;
 
+            var exePath = EditorPaths.GetEngineExe();
+
+            editorState.Console.Log("Engine Starting...");
+
+            _engineLauncher.Start(exePath, line =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    editorState.Console.Log(line);
+                });
+            });
+
+            editorState.Console.Log("Engine Launched");
+            UpdateRunBtn();
+        }
+
+        private void StopGame()
+        {
+            editorState.Console.Log("Engine Stopped");
+            _engineLauncher.Stop();
+            UpdateRunBtn();
+        }
         #endregion
 
         private bool TryGetTilePosition(Point pos, out int x, out int y)
@@ -213,5 +253,7 @@ namespace TTEngine.Editor
 
             return result;
         }
+
+        private void UpdateRunBtn() => TileTools.SetStartButtonTxt(_engineLauncher.IsRunning ? "Stop" : "Start");
     }
 }

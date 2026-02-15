@@ -3,7 +3,7 @@ using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 
-namespace TTEngine.Editor.Models
+namespace TTEngine.Editor.Models.Selection
 {
     public class SelectionModel
     {

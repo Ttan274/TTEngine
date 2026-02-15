@@ -10,12 +10,14 @@
                        FontWeight="Bold"
                        Margin="0,0,0,4"/>
 
-            <ListBox ItemsSource="{Binding Console.Messages}"
+            <ListBox x:Name="LogList"
+                     ItemsSource="{Binding Console.Messages}"
                      Background="#121212"
                      Foreground="LightGray"
                      BorderThickness="0"
                      FontFamily="Consolas"
-                     FontSize="12"/>
+                     FontSize="12"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
 
         </StackPanel>
     </Border>

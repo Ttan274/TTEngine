@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 #include <Core/PathUtil.h>
+#include <iostream>
 
 namespace EngineCore
 {
@@ -55,11 +56,18 @@ namespace EngineCore
 				<< "[" << CategoryToString(category) << "] "
 				<< msg;
 
+		std::string output = line.str();
+
+		//File
 		if (s_LogFile.is_open())
 		{
-			s_LogFile << line.str() << std::endl;
+			s_LogFile << output << std::endl;
 			s_LogFile.flush();
 		}
+
+		//STDOUT -- editor pipeline
+		std::cout << output << std::endl;
+		std::cout.flush();
 	}
 
 	//Helper Methods

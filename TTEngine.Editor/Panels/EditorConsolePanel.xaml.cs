@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using TTEngine.Editor.Models.Editor;
 
 namespace TTEngine.Editor.Panels
 {
@@ -10,6 +11,18 @@ namespace TTEngine.Editor.Panels
         public EditorConsolePanel()
         {
             InitializeComponent();
+
+            Loaded += (_, _) =>
+            {
+                if(DataContext is EditorState state)
+                {
+                    state.Console.Messages.CollectionChanged += (_, _) =>
+                    {
+                        if (LogList.Items.Count > 0)
+                            LogList.ScrollIntoView(LogList.Items[LogList.Items.Count - 1]);
+                    };
+                }
+            };
         }
     }
 }
