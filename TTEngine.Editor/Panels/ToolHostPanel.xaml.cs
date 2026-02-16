@@ -23,7 +23,7 @@ namespace TTEngine.Editor.Panels
         private void OpenTiles(object sender, RoutedEventArgs e)
             => ContentHost.Content = new TileManagementPanel(_editorState);
         private void OpenEntities(object sender, RoutedEventArgs e)
-            => ContentHost.Content = new EntityDefinitionPanel(_editorState.EntityDefinitions.ToList());
+            => ContentHost.Content = new EntityDefinitionPanel(_editorState.EntityDefinitions.ToList(), _editorState.EntityRepository);
         private void OpenAnimations(object sender, RoutedEventArgs e)
             => ContentHost.Content = new AnimationDefinitionPanel();
         private void OpenMaps(object sender, RoutedEventArgs e)
@@ -31,8 +31,8 @@ namespace TTEngine.Editor.Panels
         private void OpenLevels(object sender, RoutedEventArgs e)
             => ContentHost.Content = new LevelsPanel(_editorState);
         private void OpenInteractables(object sender, RoutedEventArgs e)
-            => ContentHost.Content = new InteractableManagementPanel();
+            => ContentHost.Content = new InteractableManagementPanel(_editorState.InteractableRepository);
         private void OpenTraps(object sender, RoutedEventArgs e)
-            => ContentHost.Content = new TrapDefinitionPanel();
+            => ContentHost.Content = new TrapDefinitionPanel(_editorState.TrapRepository);
     }
 }

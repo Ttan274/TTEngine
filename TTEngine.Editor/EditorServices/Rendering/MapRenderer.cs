@@ -276,7 +276,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
             if (layer != MapLayerType.Collision)
                 return Brushes.Transparent;
 
-            var def = TileDefinitionService.GetById(tile);
+            var def = _state.GetTileById(tile);
             if (def == null)
                 return Brushes.Transparent;
 
@@ -290,7 +290,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private Brush GetTileBrush(int tile, MapLayerType layer)
         {
-            var def = TileDefinitionService.GetById(tile);
+            var def = _state.GetTileById(tile);
             if (def == null)
                 return Brushes.Transparent;
 

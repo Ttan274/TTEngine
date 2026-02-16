@@ -30,9 +30,12 @@ namespace TTEngine.Editor.Panels
             }
         }
 
-        public InteractableManagementPanel()
+        private readonly JsonRepository<InteractableDefinition> _repository;
+
+        public InteractableManagementPanel(JsonRepository<InteractableDefinition> repository)
         {
             InitializeComponent();
+            _repository = repository;
             LoadInteractables();
             DataContext = this;
         }
@@ -41,7 +44,7 @@ namespace TTEngine.Editor.Panels
         {
             Interactables.Clear();
 
-            var list = InteractableFileService.Load();
+            var list = _repository.GetAll();
             foreach (var i in list)
                 Interactables.Add(i);
 
@@ -140,7 +143,7 @@ namespace TTEngine.Editor.Panels
                 return;
             }
 
-            InteractableFileService.Save(Interactables.ToList());
+            _repository.SaveAll(Interactables.ToList());
         }
     }
 }

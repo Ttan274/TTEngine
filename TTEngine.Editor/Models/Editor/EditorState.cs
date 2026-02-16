@@ -160,12 +160,29 @@ namespace TTEngine.Editor.Models.Editor
         public const string DEFAULT_MAP_ID = "Map_Default";
         public bool IsDefaultMap => ActiveMapId == DEFAULT_MAP_ID;
 
+        //Repositories
+        public JsonRepository<EntityDefinitionModel> EntityRepository { get; }
+        public JsonRepository<TileDefinition> TileRepository { get; }
+        public JsonRepository<InteractableDefinition> InteractableRepository { get; }
+        public JsonRepository<TrapDefinition> TrapRepository { get; }
+
         public EditorState()
         {
-            TileDefinitions = new ObservableCollection<TileDefinition>(TileDefinitionService.Load());
-            InteractableDefinitions = new ObservableCollection<InteractableDefinition>(InteractableFileService.Load());
-            TrapDefinitions = new ObservableCollection<TrapDefinition>(TrapFileService.Load());
-            EntityDefinitions = new ObservableCollection<EntityDefinitionModel>(EntityDefinitionService.Load());
+            //Entity Repo + Load Definitions
+            EntityRepository = new JsonRepository<EntityDefinitionModel>(EditorPaths.EntityDefs);
+            EntityDefinitions = new ObservableCollection<EntityDefinitionModel>(EntityRepository.GetAll());
+
+            //Tile Repo + Load Definitions
+            TileRepository = new JsonRepository<TileDefinition>(EditorPaths.TileDefs);
+            TileDefinitions = new ObservableCollection<TileDefinition>(TileRepository.GetAll());
+
+            //Interactable Repo + Load Definitions
+            InteractableRepository = new JsonRepository<InteractableDefinition>(EditorPaths.InteractableDefs);
+            InteractableDefinitions = new ObservableCollection<InteractableDefinition>(InteractableRepository.GetAll());
+
+            //Trap Repo + Load Definitions
+            TrapRepository = new JsonRepository<TrapDefinition>(EditorPaths.TrapDefs);
+            TrapDefinitions = new ObservableCollection<TrapDefinition>(TrapRepository.GetAll()); 
         }
 
         public void SetActiveLayer(EditorLayer layer)
@@ -189,6 +206,9 @@ namespace TTEngine.Editor.Models.Editor
 
             Console.Log($"{ActiveMapId} saved");
         }
+
+        public TileDefinition? GetTileById(int id)
+           => TileDefinitions.FirstOrDefault(d => d.Id == id);
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string name)

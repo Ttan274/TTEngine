@@ -1,9 +1,6 @@
-﻿using Microsoft.Win32;
-using System.Globalization;
-using System.IO;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using TTEngine.Editor.Models.Animation;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Services;
@@ -19,12 +16,14 @@ namespace TTEngine.Editor.Panels
         private List<AnimationDefinition> _animations;
         private EntityDefinitionModel _current;
         private const string BaseId = "NewEntity";
+        private readonly JsonRepository<EntityDefinitionModel> _repository;
 
-        public EntityDefinitionPanel(List<EntityDefinitionModel> definitions)
+        public EntityDefinitionPanel(List<EntityDefinitionModel> definitions, JsonRepository<EntityDefinitionModel> repository)
         {
             InitializeComponent();
 
             _definitions = definitions;
+            _repository = repository;
 
             DefinitionCombo.ItemsSource = _definitions;
             DefinitionCombo.DisplayMemberPath = "Id";
@@ -75,7 +74,7 @@ namespace TTEngine.Editor.Panels
             _current.HurtAnimation = (HurtAnimCombo.SelectedItem as AnimationDefinition)?.Id;
             _current.DeathAnimation = (DeathAnimCombo.SelectedItem as AnimationDefinition)?.Id;
 
-            EntityDefinitionService.Save(_definitions);
+            _repository.SaveAll(_definitions);
         }
 
         private void NewDefClicked(object sender, RoutedEventArgs e)

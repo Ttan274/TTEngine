@@ -86,7 +86,7 @@ namespace TTEngine.Editor.Panels
             var dialog = new OpenFileDialog
             {
                 Filter = "PNG Files (*.png)|*.png",
-                InitialDirectory = EditorPaths.GetAnimationFolder()
+                InitialDirectory = EditorPaths.Animation
             };
 
             if (dialog.ShowDialog() != true)

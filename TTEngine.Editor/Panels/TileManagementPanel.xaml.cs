@@ -3,8 +3,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Panels
@@ -39,9 +39,22 @@ namespace TTEngine.Editor.Panels
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            var tile = TileDefinitionService.AddTile();
+            int nextId = Editor.TileDefinitions.Count == 0
+                 ? 1
+                 : Editor.TileDefinitions.Max(t => t.Id) + 1;
+
+            var tile = new TileDefinition
+            {
+                Id = nextId,
+                Name = $"NewTile_{nextId}",
+                SpritePath = "",
+                CollisionType = Enums.CollisionType.None
+            };
+
             Editor.TileDefinitions.Add(tile);
             Editor.SelectedTile = tile;
+
+            SaveAll();
         }
 
         private void Remove_Click(object sender, RoutedEventArgs e)
@@ -55,18 +68,19 @@ namespace TTEngine.Editor.Panels
                 return;
             }
 
-            TileDefinitionService.RemoveTile(Editor.SelectedTile);
             Editor.TileDefinitions.Remove(Editor.SelectedTile);
             Editor.SelectedTile = null;
+
+            SaveAll();
         }
         
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (Editor.SelectedTile == null)
-                return;
-
-            TileDefinitionService.Save();
+            SaveAll();
         }
+
+        private void SaveAll()
+            => Editor.TileRepository.SaveAll(Editor.TileDefinitions.ToList());
 
         private void BrowseSprite_Click(object sender, RoutedEventArgs e)
         {

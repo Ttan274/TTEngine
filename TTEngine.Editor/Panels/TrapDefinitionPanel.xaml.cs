@@ -40,9 +40,12 @@ namespace TTEngine.Editor.Panels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public TrapDefinitionPanel()
+        private readonly JsonRepository<TrapDefinition> _repository;
+
+        public TrapDefinitionPanel(JsonRepository<TrapDefinition> repository)
         {
             InitializeComponent();
+            _repository = repository;
             LoadTraps();
             DataContext = this;
         }
@@ -51,7 +54,7 @@ namespace TTEngine.Editor.Panels
         {
             Traps.Clear();
 
-            var list = TrapFileService.Load();
+            var list = _repository.GetAll();
             foreach (var t in list)
                 Traps.Add(t);
 
@@ -157,7 +160,7 @@ namespace TTEngine.Editor.Panels
                 return;
             }
 
-            TrapFileService.Save(Traps.ToList());
+            _repository.SaveAll(Traps.ToList());
         }
     }
 }

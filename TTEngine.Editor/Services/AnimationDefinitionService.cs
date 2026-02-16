@@ -8,7 +8,7 @@ namespace TTEngine.Editor.Services
     {
         private static readonly Dictionary<string, AnimationDefinition> _cache = new();
 
-        private static readonly string FilePath = EditorPaths.GetAnimationFolder();
+        private static readonly string FilePath = EditorPaths.Animation;
 
         public static IReadOnlyCollection<AnimationDefinition> All
             => _cache.Values;

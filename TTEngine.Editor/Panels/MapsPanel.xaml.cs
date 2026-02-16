@@ -56,7 +56,7 @@ namespace TTEngine.Editor.Panels
         {
             Maps.Clear();
 
-            var path = EditorPaths.GetMapsFolder();
+            var path = EditorPaths.Maps;
 
             foreach (var m in Directory.GetFiles(path, "*.json"))
             {

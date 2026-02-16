@@ -16,7 +16,7 @@ namespace TTEngine.Editor.Services
         {
             string engineExe = EditorPaths.GetEngineExe();
             string engineDir = Path.GetDirectoryName(engineExe);
-            string assetsDir = EditorPaths.GetAssetsFolder();
+            string assetsDir = EditorPaths.Assets;
 
             if (!File.Exists(engineExe))
                 throw new FileNotFoundException("Engine exe not found", engineExe);
