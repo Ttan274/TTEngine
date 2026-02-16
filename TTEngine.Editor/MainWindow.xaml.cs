@@ -56,7 +56,7 @@ namespace TTEngine.Editor
         {
             _renderer = new MapRenderer(MapCanvas, editorState);
             _interaction = new MapInteractionController(editorState, () => _renderer.DrawStatic());
-            _selection = new SelectionController(editorState, content => Inspector.SetContent(content));
+            _selection = new SelectionController(editorState);
            
             EnsureDefaultMap();
             _renderer.InitializeGrid();
@@ -85,6 +85,7 @@ namespace TTEngine.Editor
             TileTools.DataContext = editorState;
             ConsoleEditor.DataContext = editorState;
             ToolHost.BindEditor(editorState);
+            Inspector.DataContext = editorState;
         }
 
         private void ChangeEventBindings()

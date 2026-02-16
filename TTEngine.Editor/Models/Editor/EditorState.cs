@@ -3,6 +3,7 @@ using System.ComponentModel;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Services;
@@ -115,6 +116,18 @@ namespace TTEngine.Editor.Models.Editor
                 }
 
                 OnPropertyChanged(nameof(SelectedTrap));
+            }
+        }
+
+        //Selection
+        private SelectionViewModel _currentSelection;
+        public SelectionViewModel CurrentSelection
+        {
+            get => _currentSelection;
+            set
+            {
+                _currentSelection = value;
+                OnPropertyChanged(nameof(CurrentSelection));
             }
         }
 

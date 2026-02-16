@@ -1,5 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Panels;
 
@@ -8,12 +10,10 @@ namespace TTEngine.Editor.EditorServices.Interaction
     public class SelectionController
     {
         private readonly EditorState _state;
-        private readonly Action<UserControl> _showInspector;
 
-        public SelectionController(EditorState state, Action<UserControl> showInspector)
+        public SelectionController(EditorState state)
         {
             _state = state;
-            _showInspector = showInspector;
         }
 
         public void HandleSelection(int x, int y)
@@ -32,8 +32,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
             int index = map.GetIndex(x, y);
             int tileValue = map.Layers[_state.ActiveLayer.LayerType][index];
 
-            _showInspector(
-                new TileSpawnInspector(x, y, tileValue));
+            _state.CurrentSelection = new TileSelectionViewModel(x, y, tileValue);
         }
 
         private bool CheckEntities(TileMapModel map, int x, int y)
@@ -43,10 +42,10 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 map.PlayerSpawn.Position.X == x &&
                 map.PlayerSpawn.Position.Y == y)
             {
-                _showInspector(
-                    new PlayerSpawnInspector(
-                        map.PlayerSpawn,
-                        _state.EntityDefinitions.ToList()));
+                var def = _state.EntityDefinitions.FirstOrDefault(d => d.Id == map.PlayerSpawn.DefinitionId);
+
+                if(def != null)
+                    _state.CurrentSelection = new PlayerSelectionViewModel(x, y, def);
 
                 return true;
             }
@@ -57,10 +56,10 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
             if (enemy != null)
             {
-                _showInspector(
-                    new EnemySpawnInspector(
-                        enemy,
-                        _state.EntityDefinitions.ToList()));
+                var def = _state.EntityDefinitions.FirstOrDefault(d => d.Id == enemy.DefinitionId);
+
+                if (def != null)
+                    _state.CurrentSelection = new EnemySelectionViewModel(x, y, def);
 
                 return true;
             }
@@ -74,10 +73,12 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
             if (interactable != null)
             {
-                _showInspector(
-                    new InteractableInspector(
-                        interactable,
-                        _state.InteractableDefinitions));
+                var def = _state.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
+
+                if (def != null)
+                {
+                    //Bunun modeli eklenmedi
+                }
 
                 return true;
             }

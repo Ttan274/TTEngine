@@ -1,9 +1,38 @@
 ﻿<UserControl x:Class="TTEngine.Editor.Panels.InspectorPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:TTEngine.Editor.Models.Selection"
+             xmlns:views="clr-namespace:TTEngine.Editor.Panels.InspectorViews">
+
+    <UserControl.Resources>
+      
+        <DataTemplate DataType="{x:Type vm:TileSelectionViewModel}">
+            <views:TileInspectorView/>
+        </DataTemplate>
+       
+      
+        <DataTemplate DataType="{x:Type vm:PlayerSelectionViewModel}">
+            <views:PlayerInspectorView/>
+        </DataTemplate>
+        
+       
+        <DataTemplate DataType="{x:Type vm:EnemySelectionViewModel}">
+            <views:EnemyInspectorView/>
+        </DataTemplate>
+
+        <!--
+        <DataTemplate DataType="{x:Type vm:InteractableSelectionViewModel}">
+            <views:InteractableInspector/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:TrapSelectionViewModel}">
+            <views:TrapInspector/>
+        </DataTemplate>
+        -->
+        
+    </UserControl.Resources>
 
     <Grid>
-        <!-- INSPECTOR CONTENT -->
-        <ContentControl x:Name="InspectorContent"/>
+        <ContentControl Content="{Binding CurrentSelection}" />
     </Grid>
 </UserControl>

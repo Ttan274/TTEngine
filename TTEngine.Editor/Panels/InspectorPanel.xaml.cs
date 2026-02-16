@@ -11,15 +11,5 @@ namespace TTEngine.Editor.Panels
         {
             InitializeComponent();
         }
-
-        public void SetContent(UserControl content)
-        {
-            InspectorContent.Content = content;
-        }
-
-        public void Clear()
-        {
-            InspectorContent.Content = null;
-        }
     }
 }
