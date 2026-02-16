@@ -18,7 +18,7 @@ namespace TTEngine.Editor.Models.Selection
     {
         public int TileId { get; }
 
-        public TileSelectionViewModel(int x, int y, int tileId) 
+        public TileSelectionViewModel(int x, int y, int tileId)
             : base(x, y)
         {
             TileId = tileId;
@@ -33,7 +33,7 @@ namespace TTEngine.Editor.Models.Selection
         public float AttackInterval { get; }
         public float MaxHP { get; }
 
-        public PlayerSelectionViewModel(int x, int y, EntityDefinitionModel def) 
+        public PlayerSelectionViewModel(int x, int y, EntityDefinitionModel def)
             : base(x, y)
         {
             Type = def.Id;
@@ -52,7 +52,7 @@ namespace TTEngine.Editor.Models.Selection
         public float AttackInterval { get; }
         public float MaxHP { get; }
 
-        public EnemySelectionViewModel(int x, int y, EntityDefinitionModel def) 
+        public EnemySelectionViewModel(int x, int y, EntityDefinitionModel def)
             : base(x, y)
         {
             Type = def.Id;
@@ -63,5 +63,16 @@ namespace TTEngine.Editor.Models.Selection
         }
     }
 
-    //Interactable ve Trap eklicez!!
+    public class InteractableSelectionViewModel : SelectionViewModel
+    {
+        public string Type { get; }
+        public string Task { get; }
+
+        public InteractableSelectionViewModel(int x, int y, string type, string task)
+            : base(x, y)
+        {
+            Type = type;
+            Task = task;
+        }
+    }
 }

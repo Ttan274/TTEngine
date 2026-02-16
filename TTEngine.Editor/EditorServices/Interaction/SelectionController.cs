@@ -76,9 +76,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 var def = _state.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
 
                 if (def != null)
-                {
-                    //Bunun modeli eklenmedi
-                }
+                    _state.CurrentSelection = new InteractableSelectionViewModel(x, y, def.Id, def.Type);
 
                 return true;
             }

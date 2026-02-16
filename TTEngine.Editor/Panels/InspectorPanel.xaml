@@ -20,11 +20,12 @@
             <views:EnemyInspectorView/>
         </DataTemplate>
 
-        <!--
+       
         <DataTemplate DataType="{x:Type vm:InteractableSelectionViewModel}">
-            <views:InteractableInspector/>
+            <views:InteractableInspectorView/>
         </DataTemplate>
 
+        <!--
         <DataTemplate DataType="{x:Type vm:TrapSelectionViewModel}">
             <views:TrapInspector/>
         </DataTemplate>
