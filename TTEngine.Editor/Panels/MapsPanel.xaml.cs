@@ -73,17 +73,12 @@ namespace TTEngine.Editor.Panels
             if (SelectedMap == null)
                 return;
 
-            var data = MapFileService.Load(SelectedMap.Id);
-            TileMapModel model;
+            var model = _editorState.MapService.Load(SelectedMap.Id);
 
-            if(data == null)
+            if (model == null)
             {
                 model = new TileMapModel();
                 model.Init();
-            }
-            else
-            {
-                model = MapFileService.FromDto(data);
             }
 
             _editorState.ActiveMapId = SelectedMap.Id;
@@ -101,8 +96,7 @@ namespace TTEngine.Editor.Panels
             var model = new TileMapModel();
             model.Init();
 
-            var data = MapFileService.ToDto(model);
-            MapFileService.Save(id, data);
+            _editorState.MapService.Save(id, model);
 
             var map = new MapDefinition { Id = id };
             Maps.Add(map);
@@ -134,7 +128,7 @@ namespace TTEngine.Editor.Panels
             if (result != MessageBoxResult.Yes)
                 return;
 
-            MapFileService.Delete(SelectedMap.Id);
+            _editorState.MapService.Delete(SelectedMap.Id);
             int index = Maps.IndexOf(SelectedMap);
             Maps.Remove(SelectedMap);
 

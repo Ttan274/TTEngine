@@ -48,7 +48,7 @@ namespace TTEngine.Editor.Services
 
         private static string GetPath()
         {
-            var path = EditorPaths.GetDataFolder();
+            var path = EditorPaths.Data;
             return Path.Combine(path, LEVEL_FILE_NAME);
         }
     }

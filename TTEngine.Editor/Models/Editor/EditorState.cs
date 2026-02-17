@@ -160,6 +160,9 @@ namespace TTEngine.Editor.Models.Editor
         public const string DEFAULT_MAP_ID = "Map_Default";
         public bool IsDefaultMap => ActiveMapId == DEFAULT_MAP_ID;
 
+        //Services
+        public MapService MapService { get; }
+
         //Repositories
         public JsonRepository<EntityDefinitionModel> EntityRepository { get; }
         public JsonRepository<TileDefinition> TileRepository { get; }
@@ -168,6 +171,8 @@ namespace TTEngine.Editor.Models.Editor
 
         public EditorState()
         {
+            MapService = new MapService();
+
             //Entity Repo + Load Definitions
             EntityRepository = new JsonRepository<EntityDefinitionModel>(EditorPaths.EntityDefs);
             EntityDefinitions = new ObservableCollection<EntityDefinitionModel>(EntityRepository.GetAll());
@@ -201,9 +206,7 @@ namespace TTEngine.Editor.Models.Editor
             if (ActiveMap == null || string.IsNullOrEmpty(ActiveMapId))
                 return;
 
-            var dto = MapFileService.ToDto(ActiveMap);
-            MapFileService.Save(ActiveMapId, dto);
-
+            MapService.Save(ActiveMapId, ActiveMap);
             Console.Log($"{ActiveMapId} saved");
         }
 

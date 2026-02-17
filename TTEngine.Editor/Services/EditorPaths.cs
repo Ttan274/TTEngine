@@ -28,37 +28,24 @@ namespace TTEngine.Editor.Services
         private static string Combine(params string[] parts)
             => Path.GetFullPath(Path.Combine(new[] { Root }.Concat(parts).ToArray()));
 
+        //Map Helper
+        public static string GetMapPath(string mapId)
+            => Path.Combine(Maps, $"{mapId}.json");
 
-        //will be deleted from here 
-        public static string GetMapsFolder()
-        {
-            return Path.GetFullPath(Path.Combine(Root, "Assets", "Maps"));
-        }
-
+        //will be deleted 
         public static string GetTextureFolder()
         {
             return Path.GetFullPath(Path.Combine(Root, "Assets", "Textures"));
         }
 
-        public static string GetDataFolder()
-        {
-            return Path.GetFullPath(Path.Combine(Root, "Assets", "Data"));
-        }
-        //will be deleted from here to here
-
         //Engine Exe
         public static string GetEngineExe()
         {
 #if DEBUG
-            return Path.GetFullPath(Path.Combine(GetEngineExeBase(), "Debug", ENGINE_NAME));
+            return Path.GetFullPath(Path.Combine(Root, "x64", "Debug", ENGINE_NAME));
 #else
-            return Path.GetFullPath(Path.Combine(GetEngineExeBase(), "Release",  ENGINE_NAME));
+            return Path.GetFullPath(Path.Combine(Root, "x64", "Release",  ENGINE_NAME));
 #endif
-        }
-
-        private static string GetEngineExeBase()
-        {
-            return Path.Combine(Root, "x64");
         }
     }
 }

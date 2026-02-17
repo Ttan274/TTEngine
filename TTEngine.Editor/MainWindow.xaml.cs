@@ -227,16 +227,15 @@ namespace TTEngine.Editor
 
         private void EnsureDefaultMap()
         {
-            if(!MapFileService.Exists(DEFAULT_MAP_ID))
+            if(!editorState.MapService.Exists(DEFAULT_MAP_ID))
             {
                 var model = new TileMapModel();
                 model.Init();
 
-                MapFileService.Save(DEFAULT_MAP_ID, MapFileService.ToDto(model));
+                editorState.MapService.Save(DEFAULT_MAP_ID, model);
             }
 
-            var data = MapFileService.Load(DEFAULT_MAP_ID);
-            var mapModel = MapFileService.FromDto(data);
+            var mapModel = editorState.MapService.Load(DEFAULT_MAP_ID);
 
             editorState.ActiveMapId = DEFAULT_MAP_ID;
             editorState.ActiveMap = mapModel;

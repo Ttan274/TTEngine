@@ -1,53 +1,14 @@
-﻿using System.IO;
-using System.Text.Json;
-using System.Windows;
+﻿using System.Windows;
 using TTEngine.Editor.Dtos;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Trap;
 
-namespace TTEngine.Editor.Services
+namespace TTEngine.Editor.Converter
 {
-    public static class MapFileService
+    public static class MapMapper
     {
-        public static void Save(string mapId, TileMapData data)
-        {
-            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-
-            File.WriteAllText(GetMapPath(mapId), json); 
-        }
-
-        public static TileMapData Load(string mapId)
-        {
-            var path = GetMapPath(mapId);
-
-            if (!File.Exists(path))
-                return null;
-
-            string json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<TileMapData>(json);
-        }
-
-        public static void Delete(string mapId)
-        {
-            var path = GetMapPath(mapId);
-            if (File.Exists(path))
-                File.Delete(path);
-        }
-
-        public static bool Exists(string mapId) => File.Exists(GetMapPath(mapId));
-
-        public static string GetMapPath(string mapId)
-        {
-            var path = EditorPaths.GetMapsFolder();
-            return Path.Combine(path, $"{mapId}.json");
-        }
-
-        //Helpers
         public static TileMapData ToDto(TileMapModel model)
         {
             TileMapData data = new TileMapData
@@ -104,7 +65,7 @@ namespace TTEngine.Editor.Services
                 PlayerSpawn = null
             };
 
-            if(data.PlayerSpawn != null)
+            if (data.PlayerSpawn != null)
             {
                 model.PlayerSpawn = new PlayerSpawnModel
                 {
@@ -115,7 +76,7 @@ namespace TTEngine.Editor.Services
 
             model.EnemySpawns.Clear();
 
-            if(data.EnemySpawns != null)
+            if (data.EnemySpawns != null)
             {
                 foreach (var sp in data.EnemySpawns)
                 {
@@ -129,7 +90,7 @@ namespace TTEngine.Editor.Services
 
             model.Interactables.Clear();
 
-            if(data.Interactables != null)
+            if (data.Interactables != null)
             {
                 foreach (var dto in data.Interactables)
                 {
@@ -144,7 +105,7 @@ namespace TTEngine.Editor.Services
 
             model.Traps.Clear();
 
-            if(data.Traps != null)
+            if (data.Traps != null)
             {
                 foreach (var dto in data.Traps)
                 {
