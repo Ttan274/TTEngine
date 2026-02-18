@@ -39,9 +39,9 @@ namespace TTEngine.Editor.Panels
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            int nextId = Editor.TileDefinitions.Count == 0
+            int nextId = Editor.Definition.TileDefinitions.Count == 0
                  ? 1
-                 : Editor.TileDefinitions.Max(t => t.Id) + 1;
+                 : Editor.Definition.TileDefinitions.Max(t => t.Id) + 1;
 
             var tile = new TileDefinition
             {
@@ -51,7 +51,7 @@ namespace TTEngine.Editor.Panels
                 CollisionType = Enums.CollisionType.None
             };
 
-            Editor.TileDefinitions.Add(tile);
+            Editor.Definition.TileDefinitions.Add(tile);
             Editor.Placement.SelectedTile = tile;
 
             SaveAll();
@@ -68,7 +68,7 @@ namespace TTEngine.Editor.Panels
                 return;
             }
 
-            Editor.TileDefinitions.Remove(Editor.Placement.SelectedTile);
+            Editor.Definition.TileDefinitions.Remove(Editor.Placement.SelectedTile);
             Editor.Placement.SelectedTile = null;
 
             SaveAll();
@@ -80,7 +80,7 @@ namespace TTEngine.Editor.Panels
         }
 
         private void SaveAll()
-            => Editor.TileRepository.SaveAll(Editor.TileDefinitions.ToList());
+            => Editor.Definition.TileRepository.SaveAll(Editor.Definition.TileDefinitions.ToList());
 
         private void BrowseSprite_Click(object sender, RoutedEventArgs e)
         {

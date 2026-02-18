@@ -44,10 +44,10 @@ namespace TTEngine.Editor.EditorServices.Rendering
         {
             _gridLayer.Children.Clear();
 
-            if (_state.ActiveMap == null)
+            if (_state.MapSession.ActiveMap == null)
                 return;
 
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
 
             _root.Width = map.Width * map.TileSize;
             _root.Height = map.Height * map.TileSize;
@@ -80,7 +80,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
             _tileLayer.Children.Clear();
             _objectLayer.Children.Clear();
 
-            if (_state.ActiveMap == null)
+            if (_state.MapSession.ActiveMap == null)
                 return;
 
             DrawLayers();
@@ -103,7 +103,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private void DrawLayer(MapLayerType layerType)
         {
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
             var tiles = map.Layers[layerType];
 
             for (int y = 0; y < map.Height; y++)
@@ -135,7 +135,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private void DrawPlayerSpawn()
         {
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
 
             if (map.PlayerSpawn == null)
                 return;
@@ -161,7 +161,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private void DrawEnemySpawns()
         {
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
 
             foreach (var spawn in map.EnemySpawns)
             {
@@ -188,12 +188,12 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private void DrawInteractables()
         {
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
 
             //Draw Interactable
             foreach (var interactable in map.Interactables)
             {
-                var def = _state.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
+                var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
 
                 if (def == null || string.IsNullOrEmpty(def.ImagePath))
                     continue;
@@ -219,12 +219,12 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private void DrawTraps()
         {
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
 
             //Draw Trap
             foreach (var trap in map.Traps)
             {
-                var def = _state.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
+                var def = _state.Definition.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
 
                 if (def == null || string.IsNullOrEmpty(def.ImagePath))
                     continue;
@@ -330,7 +330,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         public void UpdateHover(Point pos, int brushSize)
         {
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
             if (map == null)
                 return;
 

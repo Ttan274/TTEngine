@@ -4,6 +4,13 @@ using TTEngine.Editor.Models.Trap;
 
 namespace TTEngine.Editor.Models.Editor.EditorStates
 {
+    public enum PlacementMode
+    {
+        Tile,
+        Interactable,
+        Trap
+    }
+
     public class PlacementState : ObservableObject
     {
         private PlacementMode _activePlacementMode;

@@ -22,20 +22,20 @@
                    FontWeight="Bold"
                    Margin="0,0,0,4"/>
 
-        <ComboBox ItemsSource="{Binding TileDefinitions}"
-                  SelectedItem="{Binding SelectedTile}"
+        <ComboBox ItemsSource="{Binding Definition.TileDefinitions}"
+                  SelectedItem="{Binding Placement.SelectedTile}"
                   DisplayMemberPath="Name"
                   Margin="0,0,0,10"/>
 
         <!-- TILE NAME -->
         <TextBlock Text="Name"/>
-        <TextBox Text="{Binding SelectedTile.Name, UpdateSourceTrigger=PropertyChanged}"
+        <TextBox Text="{Binding Placement.SelectedTile.Name, UpdateSourceTrigger=PropertyChanged}"
                  Margin="0,0,0,8"/>
 
         <!-- COLLISION TYPE -->
         <TextBlock Text="Collision"/>
         <ComboBox ItemsSource="{Binding Source={StaticResource CollisionTypes}}"
-                      SelectedItem="{Binding SelectedTile.CollisionType}"
+                      SelectedItem="{Binding Placement.SelectedTile.CollisionType}"
                       Margin="0,4,0,14"/>
 
         <!-- SPRITE PREVIEW -->

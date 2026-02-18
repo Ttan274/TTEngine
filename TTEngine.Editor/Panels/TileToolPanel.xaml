@@ -12,7 +12,7 @@
                        Margin="0,0,0,6"/>
 
             <ItemsControl   x:Name="TilePalette"
-                            ItemsSource="{Binding TileDefinitions}">
+                            ItemsSource="{Binding Definition.TileDefinitions}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="4"/>
@@ -47,7 +47,7 @@
                         Foreground="White"
                         Margin="0,0,0,6"/>
 
-            <ItemsControl ItemsSource="{Binding InteractableDefinitions}">
+            <ItemsControl ItemsSource="{Binding Definition.InteractableDefinitions}">
                 
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -82,7 +82,7 @@
            Foreground="White"
            Margin="0,0,0,6"/>
 
-            <ItemsControl ItemsSource="{Binding TrapDefinitions}">
+            <ItemsControl ItemsSource="{Binding Definition.TrapDefinitions}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="4"/>

@@ -91,9 +91,9 @@ namespace TTEngine.Editor
 
         private void ChangeEventBindings()
         {
-            editorState.PropertyChanged += (_, e) =>
+            editorState.MapSession.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName == nameof(editorState.ActiveMap))
+                if (e.PropertyName == nameof(editorState.MapSession.ActiveMap))
                     _renderer.DrawStatic();
             };
 
@@ -116,7 +116,7 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (editorState.IsDefaultMap)
+            if (editorState.MapSession.IsDefaultMap)
                 return;
 
             if (editorState.Layer.IsActiveLayerLocked)
@@ -144,7 +144,7 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (editorState.IsDefaultMap)
+            if (editorState.MapSession.IsDefaultMap)
                 return;
 
             _renderer.UpdateHover(e.GetPosition(MapCanvas), _brushSize);
@@ -212,10 +212,10 @@ namespace TTEngine.Editor
             x = 0;
             y = 0;
 
-            if (editorState.ActiveMap == null)
+            if (editorState.MapSession.ActiveMap == null)
                 return false;
 
-            var map = editorState.ActiveMap;
+            var map = editorState.MapSession.ActiveMap;
 
             x = (int)(pos.X / map.TileSize);
             y = (int)(pos.Y / map.TileSize);
@@ -228,18 +228,18 @@ namespace TTEngine.Editor
 
         private void EnsureDefaultMap()
         {
-            if(!editorState.MapService.Exists(DEFAULT_MAP_ID))
+            if(!editorState.MapSession.MapService.Exists(DEFAULT_MAP_ID))
             {
                 var model = new TileMapModel();
                 model.Init();
 
-                editorState.MapService.Save(DEFAULT_MAP_ID, model);
+                editorState.MapSession.MapService.Save(DEFAULT_MAP_ID, model);
             }
 
-            var mapModel = editorState.MapService.Load(DEFAULT_MAP_ID);
+            var mapModel = editorState.MapSession.MapService.Load(DEFAULT_MAP_ID);
 
-            editorState.ActiveMapId = DEFAULT_MAP_ID;
-            editorState.ActiveMap = mapModel;
+            editorState.MapSession.ActiveMapId = DEFAULT_MAP_ID;
+            editorState.MapSession.ActiveMap = mapModel;
             editorState.Console.Log($"{DEFAULT_MAP_ID} is loaded.");
         }
 
@@ -247,7 +247,7 @@ namespace TTEngine.Editor
         {
             editorState.Console.Clear();
 
-            var result = EditorValidator.ValidateMap(editorState.ActiveMap);
+            var result = EditorValidator.ValidateMap(editorState.MapSession.ActiveMap);
 
             foreach (var error in result.Errors)
                 editorState.Console.Log(error);

@@ -73,7 +73,7 @@ namespace TTEngine.Editor.Panels
             if (SelectedMap == null)
                 return;
 
-            var model = _editorState.MapService.Load(SelectedMap.Id);
+            var model = _editorState.MapSession.MapService.Load(SelectedMap.Id);
 
             if (model == null)
             {
@@ -81,8 +81,8 @@ namespace TTEngine.Editor.Panels
                 model.Init();
             }
 
-            _editorState.ActiveMapId = SelectedMap.Id;
-            _editorState.ActiveMap = model;
+            _editorState.MapSession.ActiveMapId = SelectedMap.Id;
+            _editorState.MapSession.ActiveMap = model;
         }
 
         #endregion
@@ -96,7 +96,7 @@ namespace TTEngine.Editor.Panels
             var model = new TileMapModel();
             model.Init();
 
-            _editorState.MapService.Save(id, model);
+            _editorState.MapSession.MapService.Save(id, model);
 
             var map = new MapDefinition { Id = id };
             Maps.Add(map);
@@ -128,7 +128,7 @@ namespace TTEngine.Editor.Panels
             if (result != MessageBoxResult.Yes)
                 return;
 
-            _editorState.MapService.Delete(SelectedMap.Id);
+            _editorState.MapSession.MapService.Delete(SelectedMap.Id);
             int index = Maps.IndexOf(SelectedMap);
             Maps.Remove(SelectedMap);
 
@@ -136,8 +136,8 @@ namespace TTEngine.Editor.Panels
                 SelectedMap = Maps[Math.Max(0, index - 1)];
             else if(Maps.Count == 0)
             {
-                _editorState.ActiveMapId = null;
-                _editorState.ActiveMap = null;
+                _editorState.MapSession.ActiveMapId = null;
+                _editorState.MapSession.ActiveMap = null;
             }
         }
 

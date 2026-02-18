@@ -18,7 +18,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
         public void HandleSelection(int x, int y)
         {
-            var map = _state.ActiveMap;
+            var map = _state.MapSession.ActiveMap;
             if (map == null)
                 return;
 
@@ -42,7 +42,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 map.PlayerSpawn.Position.X == x &&
                 map.PlayerSpawn.Position.Y == y)
             {
-                var def = _state.EntityDefinitions.FirstOrDefault(d => d.Id == map.PlayerSpawn.DefinitionId);
+                var def = _state.Definition.EntityDefinitions.FirstOrDefault(d => d.Id == map.PlayerSpawn.DefinitionId);
 
                 if(def != null)
                     _state.CurrentSelection = new PlayerSelectionViewModel(x, y, def);
@@ -56,7 +56,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
             if (enemy != null)
             {
-                var def = _state.EntityDefinitions.FirstOrDefault(d => d.Id == enemy.DefinitionId);
+                var def = _state.Definition.EntityDefinitions.FirstOrDefault(d => d.Id == enemy.DefinitionId);
 
                 if (def != null)
                     _state.CurrentSelection = new EnemySelectionViewModel(x, y, def);
@@ -73,7 +73,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
             if (interactable != null)
             {
-                var def = _state.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
+                var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
 
                 if (def != null)
                     _state.CurrentSelection = new InteractableSelectionViewModel(x, y, def.Id, def.Type);

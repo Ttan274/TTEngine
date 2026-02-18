@@ -25,8 +25,8 @@ namespace TTEngine.Editor.Panels
             InitializeComponent();
 
             _editor = editor;
-            _definitions = _editor.EntityDefinitions.ToList();
-            _repository = _editor.EntityRepository;
+            _definitions = _editor.Definition.EntityDefinitions.ToList();
+            _repository = _editor.Definition.EntityRepository;
 
             DefinitionCombo.ItemsSource = _definitions;
             DefinitionCombo.DisplayMemberPath = "Id";

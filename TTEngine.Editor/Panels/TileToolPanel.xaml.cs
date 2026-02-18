@@ -35,7 +35,7 @@ namespace TTEngine.Editor.Panels
         {
             if (sender is Border border && border.Tag is int tileId && Editor != null)
             {
-                Editor.Placement.SelectedTile = Editor.TileDefinitions.First(t => t.Id == tileId);
+                Editor.Placement.SelectedTile = Editor.Definition.TileDefinitions.First(t => t.Id == tileId);
             }
         }
         private void TileButtonLoaded(object sender, RoutedEventArgs e)
@@ -70,7 +70,7 @@ namespace TTEngine.Editor.Panels
         {
             if (sender is Border border && border.Tag is string interactableId && Editor != null)
             {
-                Editor.Placement.SelectedInteractable = Editor.InteractableDefinitions.First(t => t.Id == interactableId);
+                Editor.Placement.SelectedInteractable = Editor.Definition.InteractableDefinitions.First(t => t.Id == interactableId);
             }
         }
 
@@ -107,7 +107,7 @@ namespace TTEngine.Editor.Panels
         {
             if (sender is Border border && border.Tag is string trapId && Editor != null)
             {
-                Editor.Placement.SelectedTrap = Editor.TrapDefinitions.First(t => t.Id == trapId);
+                Editor.Placement.SelectedTrap = Editor.Definition.TrapDefinitions.First(t => t.Id == trapId);
             }
         }
 
