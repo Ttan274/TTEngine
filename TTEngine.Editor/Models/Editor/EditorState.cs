@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using TTEngine.Editor.Enums;
+using TTEngine.Editor.Models.Editor.EditorStates;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Selection;
@@ -21,103 +22,24 @@ namespace TTEngine.Editor.Models.Editor
     {
         public EditorConsole Console { get; } = new EditorConsole();
 
-        public ObservableCollection<EditorLayer> Layers { get; } =
-            new ObservableCollection<EditorLayer>
-            {
-                new EditorLayer(MapLayerType.Background),
-                new EditorLayer(MapLayerType.Collision) {IsActive = true},
-                new EditorLayer(MapLayerType.Decoration),
-                new EditorLayer(MapLayerType.Interactable)
-            };
+        //Layers -- Silinecek
+        //public ObservableCollection<EditorLayer> Layers { get; } =
+        //    new ObservableCollection<EditorLayer>
+        //    {
+        //        new EditorLayer(MapLayerType.Background),
+        //        new EditorLayer(MapLayerType.Collision) {IsActive = true},
+        //        new EditorLayer(MapLayerType.Decoration),
+        //        new EditorLayer(MapLayerType.Interactable)
+        //    };
 
-        public EditorLayer ActiveLayer =>
-            Layers.First(l => l.IsActive);
+        //public EditorLayer ActiveLayer =>
+        //    Layers.First(l => l.IsActive);
 
+        //Definitions
         public ObservableCollection<TileDefinition> TileDefinitions { get; }
         public ObservableCollection<InteractableDefinition> InteractableDefinitions { get; }
         public ObservableCollection<TrapDefinition> TrapDefinitions { get; }
         public ObservableCollection<EntityDefinitionModel> EntityDefinitions { get; }
-
-        //Tool Mode
-        private ToolMode _currentToolmode;
-        public ToolMode CurrentToolMode
-        {
-            get => _currentToolmode;
-            set
-            {
-                _currentToolmode = value;
-                OnPropertyChanged(nameof(CurrentToolMode));
-            }
-        }
-
-        //Placement
-        private PlacementMode _activePlacementMode;
-        public PlacementMode ActivePlacementMode
-        {
-            get => _activePlacementMode;
-            set
-            {
-                _activePlacementMode = value;
-                OnPropertyChanged(nameof(ActivePlacementMode));
-            }
-        }
-
-        private TileDefinition _selectedTile;
-        public TileDefinition SelectedTile
-        {
-            get => _selectedTile;
-            set
-            {
-                _selectedTile = value;
-                
-                if(value != null)
-                {
-                    SelectedInteractable = null;
-                    SelectedTrap = null;
-                    ActivePlacementMode = PlacementMode.Tile;
-                }
-
-                OnPropertyChanged(nameof(SelectedTile));
-            }
-        }
-
-        private InteractableDefinition _selectedInteractable;
-        public InteractableDefinition SelectedInteractable
-        {
-            get => _selectedInteractable;
-            set
-            {
-                _selectedInteractable = value;
-
-                if (value != null)
-                {
-                    SelectedTile = null;
-                    SelectedTrap = null;
-                    ActivePlacementMode = PlacementMode.Interactable;
-                }
-
-                OnPropertyChanged(nameof(SelectedInteractable));
-            }
-        }
-
-        private TrapDefinition _selectedTrap;
-        public TrapDefinition SelectedTrap
-        {
-            get => _selectedTrap;
-            set
-            {
-                _selectedTrap = value;
-
-                if(value != null)
-                {
-                    SelectedTile = null;
-                    SelectedInteractable = null;
-                    ActivePlacementMode = PlacementMode.Trap;
-                }
-
-                OnPropertyChanged(nameof(SelectedTrap));
-            }
-        }
 
         //Selection
         private SelectionViewModel _currentSelection;
@@ -132,8 +54,10 @@ namespace TTEngine.Editor.Models.Editor
         }
 
         //Active Layer & Active Map
-        public bool IsActiveLayerLocked =>
-            ActiveLayer != null && ActiveLayer.IsLocked;
+        
+        //silinecek
+        //public bool IsActiveLayerLocked =>
+        //    ActiveLayer != null && ActiveLayer.IsLocked;
 
         private TileMapModel _activeMap;
         public TileMapModel ActiveMap
@@ -162,6 +86,8 @@ namespace TTEngine.Editor.Models.Editor
 
         //Services
         public MapService MapService { get; }
+        public LevelService LevelService { get; }
+        public AnimationService AnimationService { get; }
 
         //Repositories
         public JsonRepository<EntityDefinitionModel> EntityRepository { get; }
@@ -169,9 +95,23 @@ namespace TTEngine.Editor.Models.Editor
         public JsonRepository<InteractableDefinition> InteractableRepository { get; }
         public JsonRepository<TrapDefinition> TrapRepository { get; }
 
-        public EditorState()
+        //States
+        public ToolState Tool { get; }
+        public PlacementState Placement { get; }
+        public LayerState Layer { get; }
+
+        public EditorState(ToolState tool, PlacementState placement, LayerState layer)
         {
+            //State binding
+            Tool = tool;
+            Placement = placement;
+            Layer = layer;
+
+            //Services
             MapService = new MapService();
+            LevelService = new LevelService();
+            AnimationService = new AnimationService(EditorPaths.Animation);
+            AnimationService.LoadAll();
 
             //Entity Repo + Load Definitions
             EntityRepository = new JsonRepository<EntityDefinitionModel>(EditorPaths.EntityDefs);
@@ -190,13 +130,14 @@ namespace TTEngine.Editor.Models.Editor
             TrapDefinitions = new ObservableCollection<TrapDefinition>(TrapRepository.GetAll()); 
         }
 
-        public void SetActiveLayer(EditorLayer layer)
-        {
-            foreach (var l in Layers)
-                l.IsActive = false;
+        //silinecek
+        //public void SetActiveLayer(EditorLayer layer)
+        //{
+        //    foreach (var l in Layers)
+        //        l.IsActive = false;
 
-            layer.IsActive = true;
-        }
+        //    layer.IsActive = true;
+        //}
 
         public void SaveActiveMap()
         {

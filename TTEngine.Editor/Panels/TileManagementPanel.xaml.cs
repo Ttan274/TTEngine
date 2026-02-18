@@ -28,9 +28,9 @@ namespace TTEngine.Editor.Panels
                 {
                     Editor.PropertyChanged += (_, e) =>
                     {
-                        if (e.PropertyName == nameof(Editor.SelectedTile))
+                        if (e.PropertyName == nameof(Editor.Placement.SelectedTile))
                         {
-                            UpdatePreview(Editor.SelectedTile.SpritePath);
+                            UpdatePreview(Editor.Placement.SelectedTile.SpritePath);
                         }
                     };
                 }
@@ -52,24 +52,24 @@ namespace TTEngine.Editor.Panels
             };
 
             Editor.TileDefinitions.Add(tile);
-            Editor.SelectedTile = tile;
+            Editor.Placement.SelectedTile = tile;
 
             SaveAll();
         }
 
         private void Remove_Click(object sender, RoutedEventArgs e)
         {
-            if (Editor.SelectedTile == null)
+            if (Editor.Placement.SelectedTile == null)
                 return;
 
-            if(Editor.SelectedTile.Name == "Empty")
+            if(Editor.Placement.SelectedTile.Name == "Empty")
             {
                 MessageBox.Show("You cannot delete default tile");
                 return;
             }
 
-            Editor.TileDefinitions.Remove(Editor.SelectedTile);
-            Editor.SelectedTile = null;
+            Editor.TileDefinitions.Remove(Editor.Placement.SelectedTile);
+            Editor.Placement.SelectedTile = null;
 
             SaveAll();
         }
@@ -84,13 +84,13 @@ namespace TTEngine.Editor.Panels
 
         private void BrowseSprite_Click(object sender, RoutedEventArgs e)
         {
-            if (Editor.SelectedTile == null)
+            if (Editor.Placement.SelectedTile == null)
                 return;
 
             var file = BrowseTextureFile();
             if(file != null)
             {
-                Editor.SelectedTile.SpritePath = file;
+                Editor.Placement.SelectedTile.SpritePath = file;
                 UpdatePreview(file);
             }
         }

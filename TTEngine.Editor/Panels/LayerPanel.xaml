@@ -9,7 +9,7 @@
                        FontWeight="Bold"
                        Margin="0,0,0,8"/>
 
-            <ItemsControl ItemsSource="{Binding Layers}">
+            <ItemsControl ItemsSource="{Binding Layer.Layers}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
 

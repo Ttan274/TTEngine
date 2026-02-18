@@ -30,7 +30,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
             // Default Tile
             int index = map.GetIndex(x, y);
-            int tileValue = map.Layers[_state.ActiveLayer.LayerType][index];
+            int tileValue = map.Layers[_state.Layer.ActiveLayer.LayerType][index];
 
             _state.CurrentSelection = new TileSelectionViewModel(x, y, tileValue);
         }

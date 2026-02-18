@@ -18,7 +18,7 @@ namespace TTEngine.Editor.Panels
         {
             if(DataContext is EditorState state && sender is TextBlock tb && tb.DataContext is EditorLayer layer)
             {
-                state.SetActiveLayer(layer);
+                state.Layer.SetActiveLayer(layer);
             }
         }
     }

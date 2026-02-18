@@ -35,7 +35,7 @@ namespace TTEngine.Editor.Panels
         {
             if (sender is Border border && border.Tag is int tileId && Editor != null)
             {
-                Editor.SelectedTile = Editor.TileDefinitions.First(t => t.Id == tileId);
+                Editor.Placement.SelectedTile = Editor.TileDefinitions.First(t => t.Id == tileId);
             }
         }
         private void TileButtonLoaded(object sender, RoutedEventArgs e)
@@ -43,7 +43,7 @@ namespace TTEngine.Editor.Panels
             if (sender is Border border && border.Tag is int tileId && Editor != null)
             {
                 UpdateTileBtnVisual(border);
-                Editor.PropertyChanged += (_, __) => UpdateTileBtnVisual(border);
+                Editor.Placement.PropertyChanged += (_, __) => UpdateTileBtnVisual(border);
             }
         }
 
@@ -51,7 +51,7 @@ namespace TTEngine.Editor.Panels
         {
             if (border.Tag is int tileId && Editor != null)
             {
-                bool isSelected = Editor.SelectedTile?.Id == tileId;
+                bool isSelected = Editor.Placement.SelectedTile?.Id == tileId;
                 UpdateBtnVisual(border, isSelected);
             }
         }
@@ -70,7 +70,7 @@ namespace TTEngine.Editor.Panels
         {
             if (sender is Border border && border.Tag is string interactableId && Editor != null)
             {
-                Editor.SelectedInteractable = Editor.InteractableDefinitions.First(t => t.Id == interactableId);
+                Editor.Placement.SelectedInteractable = Editor.InteractableDefinitions.First(t => t.Id == interactableId);
             }
         }
 
@@ -79,7 +79,7 @@ namespace TTEngine.Editor.Panels
             if (sender is Border border && border.Tag is string interactableId && Editor != null)
             {
                 UpdateInteractableBtnVisual(border);
-                Editor.PropertyChanged += (_, __) => UpdateInteractableBtnVisual(border);
+                Editor.Placement.PropertyChanged += (_, __) => UpdateInteractableBtnVisual(border);
             }
         }
 
@@ -87,7 +87,7 @@ namespace TTEngine.Editor.Panels
         {
             if (border.Tag is string interactableId && Editor != null)
             {
-                bool isSelected = Editor.SelectedInteractable?.Id == interactableId;
+                bool isSelected = Editor.Placement.SelectedInteractable?.Id == interactableId;
                 UpdateBtnVisual(border, isSelected);
             }
         }
@@ -107,7 +107,7 @@ namespace TTEngine.Editor.Panels
         {
             if (sender is Border border && border.Tag is string trapId && Editor != null)
             {
-                Editor.SelectedTrap = Editor.TrapDefinitions.First(t => t.Id == trapId);
+                Editor.Placement.SelectedTrap = Editor.TrapDefinitions.First(t => t.Id == trapId);
             }
         }
 
@@ -116,7 +116,7 @@ namespace TTEngine.Editor.Panels
             if (sender is Border border && border.Tag is string trapId && Editor != null)
             {
                 UpdateTrapBtnVisual(border);
-                Editor.PropertyChanged += (_, __) => UpdateTrapBtnVisual(border);
+                Editor.Placement.PropertyChanged += (_, __) => UpdateTrapBtnVisual(border);
             }
         }
 
@@ -124,7 +124,7 @@ namespace TTEngine.Editor.Panels
         {
             if (border.Tag is string trapId && Editor != null)
             {
-                bool isSelected = Editor.SelectedTrap?.Id == trapId;
+                bool isSelected = Editor.Placement.SelectedTrap?.Id == trapId;
                 UpdateBtnVisual(border, isSelected);
             }
         }

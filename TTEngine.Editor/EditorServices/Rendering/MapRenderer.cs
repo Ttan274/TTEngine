@@ -92,7 +92,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private void DrawLayers()
         {
-            foreach (var layer in _state.Layers)
+            foreach (var layer in _state.Layer.Layers)
             {
                 if (!layer.IsVisible)
                     continue;
@@ -346,7 +346,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
             _hoverRect.Visibility = Visibility.Visible;
             _hoverRect.Width = brushSize * map.TileSize;
             _hoverRect.Height = brushSize * map.TileSize;
-            _hoverRect.Stroke = _state.IsActiveLayerLocked ? Brushes.Gray : Brushes.Yellow;
+            _hoverRect.Stroke = _state.Layer.IsActiveLayerLocked ? Brushes.Gray : Brushes.Yellow;
 
             Canvas.SetLeft(_hoverRect, x * map.TileSize);
             Canvas.SetTop(_hoverRect, y * map.TileSize);

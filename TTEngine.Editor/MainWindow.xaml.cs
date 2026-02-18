@@ -23,14 +23,16 @@ namespace TTEngine.Editor
         public const string DEFAULT_MAP_ID = "Map_Default";
 
         //Editor State
-        public EditorState editorState { get; } = new EditorState();
+        public EditorState editorState { get; }
         
         //Engine Launcher
         private EngineLauncher _engineLauncher = new EngineLauncher();
 
-        public MainWindow()
+        public MainWindow(EditorState editor)
         {
             InitializeComponent();
+            editorState = editor;
+            DataContext = editorState;
             ContextSetup();
             WindowSetup();
             ChangeEventBindings();
@@ -95,11 +97,11 @@ namespace TTEngine.Editor
                     _renderer.DrawStatic();
             };
 
-            foreach (var layer in editorState.Layers)
+            foreach (var layer in editorState.Layer.Layers)
                 layer.VisibilityChanged += OnLayerVisibilityChanged;
 
             //Tile Tool Panel Events
-            TileTools.ToolModeChanged += mode => editorState.CurrentToolMode = mode;
+            TileTools.ToolModeChanged += mode => editorState.Tool.CurrentToolMode = mode;
             TileTools.BrushSizechanged += size =>
             {
                 _brushSize = size;
@@ -117,7 +119,7 @@ namespace TTEngine.Editor
             if (editorState.IsDefaultMap)
                 return;
 
-            if (editorState.IsActiveLayerLocked)
+            if (editorState.Layer.IsActiveLayerLocked)
                 return;
 
             Point pos = e.GetPosition(MapCanvas);

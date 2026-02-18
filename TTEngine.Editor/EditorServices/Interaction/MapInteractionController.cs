@@ -31,13 +31,13 @@ namespace TTEngine.Editor.EditorServices.Interaction
         #region Mouse
         public void OnMouseDown(Point pos, MouseButtonEventArgs e)
         {
-            if (_state.ActiveMap == null || _state.IsActiveLayerLocked)
+            if (_state.ActiveMap == null || _state.Layer.IsActiveLayerLocked)
                 return;
 
             _isPainting = true;
             _currentBatch = new TileBatchCommand();
 
-            switch (_state.CurrentToolMode)
+            switch (_state.Tool.CurrentToolMode)
             {
                 case ToolMode.Brush:
                     HandleBrush(pos, e);
@@ -63,7 +63,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
             if (!_isPainting)
                 return;
 
-            if (_state.CurrentToolMode != ToolMode.Brush)
+            if (_state.Tool.CurrentToolMode != ToolMode.Brush)
                 return;
 
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -124,7 +124,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                         continue;
 
                     int index = map.GetIndex(tx, ty);
-                    int newValue = isPaint ? _state.SelectedTile?.Id ?? 0 : 0;
+                    int newValue = isPaint ? _state.Placement.SelectedTile?.Id ?? 0 : 0;
 
                     ApplyTileChange(index, newValue);
                 }
@@ -142,7 +142,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
             if (!IsInLayer(MapLayerType.Collision))
                 return;
 
-            if (_state.SelectedTile == null)
+            if (_state.Placement.SelectedTile == null)
                 return;
 
             int x = (int)(pos.X / map.TileSize);
@@ -151,11 +151,11 @@ namespace TTEngine.Editor.EditorServices.Interaction
             if (!IsValid(x, y))
                 return;
 
-            int[] tiles = map.Layers[_state.ActiveLayer.LayerType];
+            int[] tiles = map.Layers[_state.Layer.ActiveLayer.LayerType];
 
             int startIndex = map.GetIndex(x, y);
             int targetValue = tiles[startIndex];
-            int newValue = _state.SelectedTile.Id;
+            int newValue = _state.Placement.SelectedTile.Id;
 
             if (targetValue == newValue)
                 return;
@@ -254,10 +254,10 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
         private void HandlePlacementModes(Point pos, MouseButtonEventArgs e)
         {
-            if (_state.ActivePlacementMode == PlacementMode.Interactable)
+            if (_state.Placement.ActivePlacementMode == PlacementMode.Interactable)
                 HandleInteractablePlacement(pos, e);
 
-            if (_state.ActivePlacementMode == PlacementMode.Trap)
+            if (_state.Placement.ActivePlacementMode == PlacementMode.Trap)
                 HandleTrapPlacement(pos, e);
         }
 
@@ -276,7 +276,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (_state.SelectedInteractable == null)
+                if (_state.Placement.SelectedInteractable == null)
                     return;
 
                 if (!EditorValidator.CanPlaceObject(map, x, y))
@@ -288,7 +288,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                     {
                         X = x,
                         Y = y,
-                        DefinitionId = _state.SelectedInteractable.Id
+                        DefinitionId = _state.Placement.SelectedInteractable.Id
                     });
                 }
             }
@@ -317,7 +317,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (_state.SelectedTrap == null)
+                if (_state.Placement.SelectedTrap == null)
                     return;
 
                 if (!EditorValidator.CanPlaceObject(map, x, y))
@@ -329,7 +329,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                     {
                         X = x,
                         Y = y,
-                        DefinitionId = _state.SelectedTrap.Id
+                        DefinitionId = _state.Placement.SelectedTrap.Id
                     });
                 }
             }
@@ -353,7 +353,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 return;
 
             var batch = _undoStack.Pop();
-            batch.Undo(_state.ActiveMap.Layers[_state.ActiveLayer.LayerType]);
+            batch.Undo(_state.ActiveMap.Layers[_state.Layer.ActiveLayer.LayerType]);
             _redoStack.Push(batch);
             _redraw();
         }
@@ -364,7 +364,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 return;
 
             var batch = _redoStack.Pop();
-            batch.Redo(_state.ActiveMap.Layers[_state.ActiveLayer.LayerType]);
+            batch.Redo(_state.ActiveMap.Layers[_state.Layer.ActiveLayer.LayerType]);
             _undoStack.Push(batch);
             _redraw();
         }
@@ -375,7 +375,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
         private void ApplyTileChange(int index, int newValue)
         {
-            var tiles = _state.ActiveMap.Layers[_state.ActiveLayer.LayerType];
+            var tiles = _state.ActiveMap.Layers[_state.Layer.ActiveLayer.LayerType];
             int oldValue = tiles[index];
 
             if (oldValue == newValue)
@@ -392,7 +392,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
             return x >= 0 && y >= 0 && x < map.Width && y < map.Height;
         }
 
-        private bool IsInLayer(MapLayerType type) => _state.ActiveLayer.LayerType == type;
+        private bool IsInLayer(MapLayerType type) => _state.Layer.ActiveLayer.LayerType == type;
        
         #endregion
     }
