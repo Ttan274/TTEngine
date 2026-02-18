@@ -1,23 +1,18 @@
-﻿using System.ComponentModel;
-using TTEngine.Editor.Models.Editor.EditorStates;
+﻿using TTEngine.Editor.Models.Editor.EditorStates;
 using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Models.Editor
 {
-    public class EditorState : INotifyPropertyChanged
+    public class EditorState : ObservableObject
     {
         //Selection
         private SelectionViewModel _currentSelection;
         public SelectionViewModel CurrentSelection
         {
             get => _currentSelection;
-            set
-            {
-                _currentSelection = value;
-                OnPropertyChanged(nameof(CurrentSelection));
-            }
+            set => SetProperty(ref _currentSelection, value);
         }
 
         //Services
@@ -70,9 +65,5 @@ namespace TTEngine.Editor.Models.Editor
         //Definition Helper
         public TileDefinition? GetTileById(int id)
            => Definition.TileDefinitions.FirstOrDefault(d => d.Id == id);
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string name)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
