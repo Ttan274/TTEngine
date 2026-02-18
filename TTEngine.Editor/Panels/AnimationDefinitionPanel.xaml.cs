@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TTEngine.Editor.Models.Animation;
+using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Panels
@@ -39,17 +41,18 @@ namespace TTEngine.Editor.Panels
         private void OnPropertyChanged(string name)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-        public AnimationDefinitionPanel()
+        private readonly EditorState _editor;
+
+        public AnimationDefinitionPanel(EditorState editor)
         {
             InitializeComponent();
+            _editor = editor;
 
-            
             Animations = new ObservableCollection<AnimationDefinition>(
-                    AnimationDefinitionService.All
+                    _editor.AnimationService.All
                 );
 
-            SelectedAnimation = AnimationDefinitionService.All.FirstOrDefault()
-                              ?? AnimationDefinitionService.Create();
+            SelectedAnimation = Animations.FirstOrDefault();
 
             DataContext = this;
 
@@ -69,9 +72,11 @@ namespace TTEngine.Editor.Panels
 
             try
             {
+                var fullpath = Path.Combine(EditorPaths.Textures, SelectedAnimation.SpriteSheetPath);
+
                 _spriteSheet = new BitmapImage();
                 _spriteSheet.BeginInit();
-                _spriteSheet.UriSource = new Uri(SelectedAnimation.SpriteSheetPath, UriKind.Absolute);
+                _spriteSheet.UriSource = new Uri(fullpath, UriKind.Absolute);
                 _spriteSheet.CacheOption = BitmapCacheOption.OnLoad;
                 _spriteSheet.EndInit();
             }
@@ -92,7 +97,7 @@ namespace TTEngine.Editor.Panels
             if (dialog.ShowDialog() != true)
                 return;
 
-            SelectedAnimation.SpriteSheetPath = dialog.FileName;
+            SelectedAnimation.SpriteSheetPath = Path.GetFileName(dialog.FileName);
             LoadSpriteSheet();
             _currentFrame = 0;
             UpdatePreviewFrame();
@@ -254,7 +259,7 @@ namespace TTEngine.Editor.Panels
 
         private void SaveClicked(object sender, RoutedEventArgs e)
         {
-            AnimationDefinitionService.Save(SelectedAnimation);
+            _editor.AnimationService.Save(SelectedAnimation);
         }
         
         private void OnTimelineFrameClicked(object sender, MouseButtonEventArgs e)
@@ -276,7 +281,20 @@ namespace TTEngine.Editor.Panels
 
         private void AddAnimationClick(object sender, RoutedEventArgs e)
         {
-            var anim = AnimationDefinitionService.Create();
+            string id = _editor.AnimationService.GenerateUniqueId();
+
+            var anim = new AnimationDefinition
+            {
+                Id = id,
+                FrameWidth = 128,
+                FrameHeight = 128,
+                FrameCount = 1,
+                FrameTime = 0.1f,
+                Loop = true,
+                EventFrames = new()
+            };
+
+            _editor.AnimationService.Save(anim);
 
             _spriteSheet = null;
             Animations.Add(anim);
@@ -289,10 +307,13 @@ namespace TTEngine.Editor.Panels
             if (SelectedAnimation == null)
                 return;
 
-            AnimationDefinitionService.Delete(SelectedAnimation.Id);
+            string path = _editor.AnimationService.GetPath(SelectedAnimation.Id);
+            if(File.Exists(path))
+                File.Delete(path);
+
             Animations.Remove(SelectedAnimation);
 
-            SelectedAnimation = AnimationDefinitionService.All.FirstOrDefault();
+            SelectedAnimation = Animations.FirstOrDefault();
             ReloadAnimation();
         }
 

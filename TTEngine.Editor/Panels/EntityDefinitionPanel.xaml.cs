@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using TTEngine.Editor.Models.Animation;
+using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Services;
 
@@ -17,13 +18,15 @@ namespace TTEngine.Editor.Panels
         private EntityDefinitionModel _current;
         private const string BaseId = "NewEntity";
         private readonly JsonRepository<EntityDefinitionModel> _repository;
+        private readonly EditorState _editor;
 
-        public EntityDefinitionPanel(List<EntityDefinitionModel> definitions, JsonRepository<EntityDefinitionModel> repository)
+        public EntityDefinitionPanel(EditorState editor)
         {
             InitializeComponent();
 
-            _definitions = definitions;
-            _repository = repository;
+            _editor = editor;
+            _definitions = _editor.EntityDefinitions.ToList();
+            _repository = _editor.EntityRepository;
 
             DefinitionCombo.ItemsSource = _definitions;
             DefinitionCombo.DisplayMemberPath = "Id";
@@ -32,7 +35,7 @@ namespace TTEngine.Editor.Panels
 
         private void OnDefinitionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _animations = AnimationDefinitionService.All.ToList();
+            _animations = _editor.AnimationService.All.ToList();
 
             _current = DefinitionCombo.SelectedItem as EntityDefinitionModel;
             if (_current == null) return;

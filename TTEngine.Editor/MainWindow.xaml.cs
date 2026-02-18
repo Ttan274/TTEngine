@@ -80,7 +80,6 @@ namespace TTEngine.Editor
 
         private void ContextSetup()
         {
-            AnimationDefinitionService.LoadAll();
             LayerEditor.DataContext = editorState;
             TileTools.DataContext = editorState;
             ConsoleEditor.DataContext = editorState;

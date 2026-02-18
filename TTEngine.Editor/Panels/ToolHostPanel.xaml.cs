@@ -23,9 +23,9 @@ namespace TTEngine.Editor.Panels
         private void OpenTiles(object sender, RoutedEventArgs e)
             => ContentHost.Content = new TileManagementPanel(_editorState);
         private void OpenEntities(object sender, RoutedEventArgs e)
-            => ContentHost.Content = new EntityDefinitionPanel(_editorState.EntityDefinitions.ToList(), _editorState.EntityRepository);
+            => ContentHost.Content = new EntityDefinitionPanel(_editorState);
         private void OpenAnimations(object sender, RoutedEventArgs e)
-            => ContentHost.Content = new AnimationDefinitionPanel();
+            => ContentHost.Content = new AnimationDefinitionPanel(_editorState);
         private void OpenMaps(object sender, RoutedEventArgs e)
             => ContentHost.Content = new MapsPanel(_editorState);
         private void OpenLevels(object sender, RoutedEventArgs e)

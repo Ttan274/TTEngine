@@ -64,7 +64,7 @@ namespace TTEngine.Editor.Panels
         {
             Levels.Clear();
 
-            var loaded = LevelFileService.Load();
+            var loaded = _editorState.LevelService.Load();
 
             if(loaded.Count == 0)
             {
@@ -90,7 +90,7 @@ namespace TTEngine.Editor.Panels
 
         private void SaveLevels()
         {
-            LevelFileService.Save(Levels);
+            _editorState.LevelService.Save(Levels);
         }
 
         #region UI region
