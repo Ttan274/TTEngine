@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +29,7 @@ namespace TTEngine.Editor.Panels
             = new ObservableCollection<AssetNode>();
 
         public event Action<string> AssetCreated;
+        public event Action<string> AssetOpened;
 
         public AssetPanel(ProjectSession session, AssetFileService fileService)
         {
@@ -55,6 +57,21 @@ namespace TTEngine.Editor.Panels
         private void Refresh()
         {
             LoadTree();
+        }
+
+        //Double Click
+        private void DoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            if (AssetTree.SelectedItem is not AssetNode node)
+                return;
+
+            if (node.IsFolder)
+                return;
+
+            if (!node.FullPath.EndsWith(".json"))   //Only open json files for now
+                return;
+
+            AssetOpened?.Invoke(node.FullPath);
         }
 
         //Right Click
@@ -206,6 +223,41 @@ namespace TTEngine.Editor.Panels
             Refresh();
 
             AssetCreated?.Invoke(fullPath);
+        }
+
+        private void AddFile_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog
+            {
+                Title = "Select file to add",
+                IsFolderPicker = false,
+                Multiselect = true
+            };
+
+            dialog.Filters.Add(new CommonFileDialogFilter("Json Files", "*.json"));
+
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+
+            if (AssetTree.SelectedItem is not AssetNode node)
+                return;
+
+            string targetFolder = GetTargetFolder(node);
+            int importedCount = 0;
+
+            foreach (var file in dialog.FileNames)
+            {
+                string destPath = Path.Combine(targetFolder, Path.GetFileName(file));
+
+                if (File.Exists(destPath))
+                    continue;
+
+                File.Copy(file, destPath);
+                importedCount++;
+            }
+
+            Refresh();
+            MessageBox.Show($"{importedCount} file(s) imported succesfully.");
         }
     }
 }

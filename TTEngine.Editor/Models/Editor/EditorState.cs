@@ -8,8 +8,8 @@ namespace TTEngine.Editor.Models.Editor
     public class EditorState : ObservableObject
     {
         //Selection
-        private SelectionViewModel _currentSelection;
-        public SelectionViewModel CurrentSelection
+        private object _currentSelection;
+        public object CurrentSelection
         {
             get => _currentSelection;
             set => SetProperty(ref _currentSelection, value);
@@ -36,7 +36,6 @@ namespace TTEngine.Editor.Models.Editor
             MapSessionState mapSession,
             DefinitionCatalog definition,
             EditorConsole console,
-            LevelService level,
             AnimationService anim)
         {
             //State bindings
@@ -50,7 +49,7 @@ namespace TTEngine.Editor.Models.Editor
             Console = console;
 
             //Services
-            LevelService = level;
+            //LevelService = level;
             AnimationService = anim;
             AnimationService.LoadAll();
         }

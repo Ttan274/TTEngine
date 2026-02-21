@@ -44,7 +44,8 @@ namespace TTEngine.Editor
             editorState = editor;
             DataContext = editorState;
             _assetPanel = assetPanel;
-            _assetPanel.AssetCreated += OnAssetCreated;
+            _assetPanel.AssetCreated += OpenAsset;
+            _assetPanel.AssetOpened += OpenAsset;
             AssetPanelHost.Content = _assetPanel;
             ContextSetup();
             WindowSetup();
@@ -273,7 +274,7 @@ namespace TTEngine.Editor
         private void UpdateRunBtn() => TileTools.SetStartButtonTxt(_engineLauncher.IsRunning ? "Stop" : "Start");
 
         //Migh be changed
-        private void OnAssetCreated(string path)
+        private void OpenAsset(string path)
         {
             if (!File.Exists(path))
                 return;
@@ -290,19 +291,17 @@ namespace TTEngine.Editor
 
         private object DeserializeByPath(string path)
         {
-            string json = File.ReadAllText(path);
-
             if (path.Contains("Entities"))
-                return JsonSerializer.Deserialize<EntityDefinitionModel>(json);
+                return JsonFileService.Load<EntityDefinitionModel>(path);
 
             if (path.Contains("Tiles"))
-                return JsonSerializer.Deserialize<TileDefinition>(json);
+                return JsonFileService.Load<TileDefinition>(path);
 
             if (path.Contains("Traps"))
-                return JsonSerializer.Deserialize<TrapDefinition>(json);
+                return JsonFileService.Load<TrapDefinition>(path);
 
             if (path.Contains("Interactables"))
-                return JsonSerializer.Deserialize<InteractableDefinition>(json);
+                return JsonFileService.Load<InteractableDefinition>(path);
 
             return null;
         }

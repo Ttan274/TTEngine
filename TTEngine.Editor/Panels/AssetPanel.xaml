@@ -29,7 +29,8 @@
                       Grid.Row="1"
                       Background="#2B2B2B"
                       BorderThickness="0"
-                      Foreground="White">
+                      Foreground="White"
+                      MouseDoubleClick="DoubleClicked">
 
                 <TreeView.ContextMenu>
                     <ContextMenu>
@@ -52,7 +53,7 @@
                                     <MenuItem Header="Create"
                                               Visibility="{Binding IsFolder,
                                               Converter={StaticResource BoolToVisibilityConverter}}">
-
+                                          
                                         <MenuItem Header="Folder"
                                                   Click="NewFolder_Click"/>
 
@@ -74,6 +75,14 @@
                                                   Click="CreateInteractable_Click"/>
                                     </MenuItem>
 
+                                    <MenuItem Header="Add"
+                                              Visibility="{Binding IsFolder,
+                                                          Converter={StaticResource BoolToVisibilityConverter}}">
+                                        
+                                        <MenuItem  Header="From Json File" 
+                                                   Click="AddFile_Click"/>
+                                    </MenuItem>
+                                    
                                     <Separator/>
 
                                     <MenuItem Header="Rename"

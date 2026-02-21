@@ -53,8 +53,8 @@
         <!-- RIGHT: INSPECTOR -->
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="200"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="300"/>
             </Grid.RowDefinitions>
 
             <panels:InspectorPanel  x:Name="Inspector" Grid.Row="0"/>
