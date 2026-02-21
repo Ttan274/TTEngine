@@ -1,0 +1,88 @@
+﻿<Window x:Class="TTEngine.Editor.ProjectHubWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TTEngine Hub"
+        Height="500"
+        Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E">
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT: RECENT PROJECTS -->
+        <StackPanel Grid.Column="0">
+
+            <TextBlock Text="Recent Projects"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       Margin="0,0,0,10"/>
+
+            <ListBox x:Name="RecentList"
+                     MouseDoubleClick="RecentList_DoubleClick"
+                     Background="#2B2B2B"
+                     BorderThickness="0"
+                     Foreground="White"
+                     Height="350"
+                     SelectionMode="Single">
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5">
+                            <TextBlock Text="{Binding Name}"
+                           FontWeight="Bold"
+                           FontSize="14"
+                           Foreground="White"/>
+
+                            <TextBlock Text="{Binding Path}"
+                           FontSize="11"
+                           Foreground="Gray"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Show in Explorer"
+                                  Click="ShowInExplorer_Click"/>
+                        <MenuItem Header="Remove Project"
+                                  Click="RemoveProject_Click"/>
+
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+                
+            </ListBox>
+        </StackPanel>
+
+        <!-- RIGHT: ACTIONS -->
+        <StackPanel Grid.Column="1"
+                    Margin="20,0,0,0">
+
+            <TextBlock Text="Actions"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       Margin="0,0,0,20"/>
+
+            <Button Content="Create Project"
+                    Height="40"
+                    Margin="0,0,0,10"
+                    Click="CreateProject_Click"/>
+
+            <Button Content="Open Project"
+                    Height="40"
+                    Margin="0,0,0,10"
+                    Click="OpenProject_Click"/>
+
+            <Button Content="Delete Project"
+                    Height="40"
+                    Click="DeleteProject_Click"/>
+
+        </StackPanel>
+    </Grid>
+</Window>

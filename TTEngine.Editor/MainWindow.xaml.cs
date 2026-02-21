@@ -1,11 +1,18 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 using TTEngine.Editor.EditorServices.EngineLauncher;
 using TTEngine.Editor.EditorServices.Interaction;
 using TTEngine.Editor.EditorServices.Rendering;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Entity;
+using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Models.Validation;
+using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor
@@ -22,17 +29,23 @@ namespace TTEngine.Editor
         private int _brushSize = 1;
         public const string DEFAULT_MAP_ID = "Map_Default";
 
+        //Assets
+        private readonly AssetPanel _assetPanel;
+
         //Editor State
         public EditorState editorState { get; }
         
         //Engine Launcher
         private EngineLauncher _engineLauncher = new EngineLauncher();
 
-        public MainWindow(EditorState editor)
+        public MainWindow(EditorState editor, AssetPanel assetPanel)
         {
             InitializeComponent();
             editorState = editor;
             DataContext = editorState;
+            _assetPanel = assetPanel;
+            _assetPanel.AssetCreated += OnAssetCreated;
+            AssetPanelHost.Content = _assetPanel;
             ContextSetup();
             WindowSetup();
             ChangeEventBindings();
@@ -85,7 +98,7 @@ namespace TTEngine.Editor
             LayerEditor.DataContext = editorState;
             TileTools.DataContext = editorState;
             ConsoleEditor.DataContext = editorState;
-            ToolHost.BindEditor(editorState);
+            //ToolHost.BindEditor(editorState);
             Inspector.DataContext = editorState;
         }
 
@@ -228,6 +241,8 @@ namespace TTEngine.Editor
 
         private void EnsureDefaultMap()
         {
+            return;
+
             if(!editorState.MapSession.MapService.Exists(DEFAULT_MAP_ID))
             {
                 var model = new TileMapModel();
@@ -256,5 +271,57 @@ namespace TTEngine.Editor
         }
 
         private void UpdateRunBtn() => TileTools.SetStartButtonTxt(_engineLauncher.IsRunning ? "Stop" : "Start");
+
+        //Migh be changed
+        private void OnAssetCreated(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            object model = DeserializeByPath(path);
+
+            if (model == null)
+                return;
+
+            object selection = CreateAssetSelection(model, path);
+
+            editorState.CurrentSelection = selection;
+        }
+
+        private object DeserializeByPath(string path)
+        {
+            string json = File.ReadAllText(path);
+
+            if (path.Contains("Entities"))
+                return JsonSerializer.Deserialize<EntityDefinitionModel>(json);
+
+            if (path.Contains("Tiles"))
+                return JsonSerializer.Deserialize<TileDefinition>(json);
+
+            if (path.Contains("Traps"))
+                return JsonSerializer.Deserialize<TrapDefinition>(json);
+
+            if (path.Contains("Interactables"))
+                return JsonSerializer.Deserialize<InteractableDefinition>(json);
+
+            return null;
+        }
+
+        private object CreateAssetSelection(object model, string path)
+        {
+            if (model is EntityDefinitionModel e)
+                return new EntityAssetSelectionViewModel(e, path);
+
+            if (model is TileDefinition t)
+                return new TileAssetSelectionViewModel(t, path);
+
+            if (model is InteractableDefinition i)
+                return new InteractableAssetSelectionViewModel(i, path);
+
+            if(model is TrapDefinition trap)
+                return new TrapAssetSelectionViewModel(trap, path);
+
+            return null;
+        }
     }
 }
