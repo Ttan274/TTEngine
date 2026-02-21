@@ -80,7 +80,10 @@ namespace TTEngine.Editor.Panels
         }
 
         private void SaveAll()
-            => Editor.Definition.TileRepository.SaveAll(Editor.Definition.TileDefinitions.ToList());
+        {
+
+            //=> Editor.Definition.TileRepository.SaveAll(Editor.Definition.TileDefinitions.ToList());
+        }
 
         private void BrowseSprite_Click(object sender, RoutedEventArgs e)
         {

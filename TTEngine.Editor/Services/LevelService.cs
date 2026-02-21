@@ -14,14 +14,14 @@ namespace TTEngine.Editor.Services
 
         public List<LevelDefinition> Load()
         {
-           var dto = _repository.Get();
+            LevelFileDto dto = new LevelFileDto();    //_repository.Get();
            return LevelMapper.FromDto(dto);
         }
 
         public void Save(IEnumerable<LevelDefinition> levels)
         {
             var dto = LevelMapper.ToDto(levels);
-            _repository.Save(dto);
+           // _repository.Save(dto);
         }
     }
 }

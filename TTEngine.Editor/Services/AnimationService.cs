@@ -24,7 +24,7 @@ namespace TTEngine.Editor.Services
             foreach (var file in Directory.GetFiles(_folder, "*.json"))
             {
                 var repo = new JsonRepository<AnimationDefinition>(file);
-                var anim = repo.Get();
+                AnimationDefinition anim = null; //repo.Get();
 
                 if (anim != null && !string.IsNullOrEmpty(anim.Id))
                     _cache[anim.Id] = anim;
@@ -38,7 +38,7 @@ namespace TTEngine.Editor.Services
 
             var repo = new JsonRepository<AnimationDefinition>(GetPath(def.Id));
         
-            repo.Save(def);
+            //repo.Save(def);
             _cache[def.Id] = def;
         }
 

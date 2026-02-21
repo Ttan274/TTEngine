@@ -12,7 +12,7 @@ namespace TTEngine.Editor.Services
             var path = EditorPaths.GetMapPath(mapId);
             var repo = new JsonRepository<TileMapData>(path);
 
-            var dto = repo.Get();
+            TileMapData dto = null; // repo.Get();
             if (dto == null)
                 return null;
 
@@ -25,7 +25,7 @@ namespace TTEngine.Editor.Services
             var repo = new JsonRepository<TileMapData>(path);
 
             var dto = MapMapper.ToDto(model);
-            repo.Save(dto);
+            //repo.Save(dto);
         }
 
         public void Delete(string mapId)

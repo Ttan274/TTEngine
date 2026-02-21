@@ -16,12 +16,8 @@ namespace TTEngine.Editor.Services
         public static string Maps => Combine("Assets", "Maps");
         public static string Textures => Combine("Assets", "Textures");
         public static string Animation => Combine("Assets", "Animation");
-
+        
         //Data Files
-        public static string EntityDefs => Path.Combine(Data, "entity_def.json");
-        public static string TileDefs => Path.Combine(Data, "tile_def.json");
-        public static string InteractableDefs => Path.Combine(Data, "Interactables.json");
-        public static string TrapDefs => Path.Combine(Data, "TrapDef.json");
         public static string LevelDefs => Path.Combine(Data, "Levels.json");
 
         //Helper

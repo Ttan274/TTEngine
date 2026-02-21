@@ -143,7 +143,7 @@ namespace TTEngine.Editor.Panels
                 return;
             }
 
-            _repository.SaveAll(Interactables.ToList());
+            //_repository.SaveAll(Interactables.ToList());
         }
     }
 }

@@ -1,0 +1,211 @@
+﻿using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using TTEngine.Editor.Models.Animation;
+using TTEngine.Editor.Models.Asset;
+using TTEngine.Editor.Models.Entity;
+using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.Project;
+using TTEngine.Editor.Models.Tile;
+using TTEngine.Editor.Models.Trap;
+using TTEngine.Editor.Services;
+using TTEngine.Editor.Services.Asset;
+
+namespace TTEngine.Editor.Panels
+{
+    /// <summary>
+    /// Interaction logic for AssetPanel.xaml
+    /// </summary>
+    public partial class AssetPanel : UserControl
+    {
+        private readonly ProjectSession _session;
+        private readonly AssetFileService _fileService;
+
+        private ObservableCollection<AssetNode> _assetTree
+            = new ObservableCollection<AssetNode>();
+
+        public event Action<string> AssetCreated;
+
+        public AssetPanel(ProjectSession session, AssetFileService fileService)
+        {
+            InitializeComponent();
+
+            _session = session;
+            _fileService = fileService;
+
+            AssetTree.ItemsSource = _assetTree;
+            AssetTree.PreviewMouseRightButtonDown += RightClicked;
+
+            LoadTree();
+        }
+
+        private void LoadTree()
+        {
+            _assetTree.Clear();
+
+            var nodes = AssetTreeBuilder.Build(_session.AssetsPath);
+
+            foreach(var n in nodes)
+                _assetTree.Add(n);
+        }
+
+        private void Refresh()
+        {
+            LoadTree();
+        }
+
+        //Right Click
+        private void RightClicked(object sender, MouseButtonEventArgs e)
+        {
+            var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
+
+            if(item != null)
+                item.IsSelected = true;
+        }
+
+        private static T VisualUpwardSearch<T>(DependencyObject? source) where T : DependencyObject
+        {
+            while(source != null && source is not T)
+                source = VisualTreeHelper.GetParent(source);
+
+            return source as T;
+        }
+
+        //Context Menu Actions      
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem menuItem)
+                return;
+
+            if(menuItem.DataContext is not AssetNode node)
+                return;
+
+            if(node.IsSystemFile)
+            {
+                MessageBox.Show("Cannot delete system files.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (MessageBox.Show($"Delete '{node.Name}'?",
+                "Confirm",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                return;
+
+            _fileService.Delete(node.FullPath);
+
+            Refresh();
+        }
+
+        private void Rename_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem menuItem)
+                return;
+
+            if (menuItem.DataContext is not AssetNode node)
+                return;
+
+            if (node.IsSystemFile)
+            {
+                MessageBox.Show("Cannot rename system files.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var dialog = new InputDialog(node.Name);
+            dialog.Owner = Window.GetWindow(this);
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            string newName = dialog.Result;
+
+            if (string.IsNullOrWhiteSpace(newName))
+                return;
+
+            _fileService.Rename(node.FullPath, newName);
+
+            Refresh();
+        }
+
+        private void ShowInExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            if (AssetTree.SelectedItem is not AssetNode node)
+                return;
+
+            System.Diagnostics.Process.Start("explorer.exe", node.FullPath);
+        }
+
+        //Create Related Actions
+        private void NewFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (AssetTree.SelectedItem is not AssetNode node)
+                return;
+
+            _fileService.CreateFolder(GetTargetFolder(node), "NewFolder");
+
+            Refresh();
+        }
+
+        private void CreateEntity_Click(object sender, RoutedEventArgs e)
+        {
+            CreateJsonAsset<EntityDefinitionModel>("NewEntity");
+        }
+
+        private void CreateAnimation_Click(object sender, RoutedEventArgs e)
+        {
+            CreateJsonAsset<AnimationDefinition>("NewAnimation");
+        }
+
+        private void CreateTile_Click(object sender, RoutedEventArgs e)
+        {
+            CreateJsonAsset<TileDefinition>("NewTile");
+        }
+
+        private void CreateTrap_Click(object sender, RoutedEventArgs e)
+        {
+            CreateJsonAsset<TrapDefinition>("NewTrap"); 
+        }
+
+        private void CreateInteractable_Click(object sender, RoutedEventArgs e)
+        {
+            CreateJsonAsset<InteractableDefinition>("NewInteractable");
+        }
+
+        //Helpers
+        private string GetTargetFolder(AssetNode node)
+        {
+            if(node.IsFolder)
+                return node.FullPath;
+
+            return Path.GetDirectoryName(node.FullPath);
+        }
+
+        private void CreateJsonAsset<T>(string defaultName) where T : new()
+        {
+            if (AssetTree.SelectedItem is not AssetNode node)
+                return;
+
+            string parentPath = GetTargetFolder(node);
+
+            string fileName = defaultName + ".json";
+            string fullPath = Path.Combine(parentPath, fileName);
+
+            if(File.Exists(fullPath))
+            {
+                MessageBox.Show("File already exists");
+                return;
+            }
+
+            var newObject = new T();
+
+            JsonFileService.Save(fullPath, newObject);
+
+            Refresh();
+
+            AssetCreated?.Invoke(fullPath);
+        }
+    }
+}

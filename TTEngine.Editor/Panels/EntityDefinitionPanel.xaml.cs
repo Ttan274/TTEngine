@@ -77,7 +77,7 @@ namespace TTEngine.Editor.Panels
             _current.HurtAnimation = (HurtAnimCombo.SelectedItem as AnimationDefinition)?.Id;
             _current.DeathAnimation = (DeathAnimCombo.SelectedItem as AnimationDefinition)?.Id;
 
-            _repository.SaveAll(_definitions);
+            //_repository.SaveAll(_definitions);
         }
 
         private void NewDefClicked(object sender, RoutedEventArgs e)

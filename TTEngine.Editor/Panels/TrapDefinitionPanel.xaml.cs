@@ -160,7 +160,7 @@ namespace TTEngine.Editor.Panels
                 return;
             }
 
-            _repository.SaveAll(Traps.ToList());
+            //_repository.SaveAll(Traps.ToList());
         }
     }
 }
