@@ -70,6 +70,7 @@ namespace TTEngine.Editor.Services
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Fonts"));
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Maps"));
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Textures"));
+            Directory.CreateDirectory(Path.Combine(assetsRoot, "Scenes"));
 
             //Sub Asset folders
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Data", "Entities"));

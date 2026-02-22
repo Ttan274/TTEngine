@@ -38,10 +38,10 @@ namespace TTEngine.Editor.Services
             services.AddSingleton<EditorConsole>();
 
             //Services
-            services.AddSingleton<MapService>();
-           // services.AddSingleton<LevelService>();
             services.AddSingleton<AnimationService>(
                 _ => new AnimationService(session.AnimPath));
+            services.AddSingleton<SceneService>(
+                _ => new SceneService(session.ScenePath));
 
             //Repositories
             services.AddSingleton<JsonRepository<EntityDefinitionModel>>(
@@ -62,13 +62,11 @@ namespace TTEngine.Editor.Services
             //States
             services.AddSingleton<ToolState>();
             services.AddSingleton<PlacementState>();
-            services.AddSingleton<LayerState>();
-            services.AddSingleton<MapSessionState>();
+            services.AddSingleton<SceneSessionState>();
 
             //Assets
             services.AddSingleton<AssetFileService>();
             services.AddSingleton<AssetPanel>();
-            //services.AddSingleton<InspectorPanel>();
 
             //Root State
             services.AddSingleton<EditorState>();

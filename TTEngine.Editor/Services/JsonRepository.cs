@@ -10,8 +10,8 @@ namespace TTEngine.Editor.Services
         {
             _path = path;
 
-            if(!Directory.Exists(_path))
-                Directory.CreateDirectory(_path);
+            //if(!Directory.Exists(_path))
+            //    Directory.CreateDirectory(_path);
         }
 
         public List<T> GetAll()

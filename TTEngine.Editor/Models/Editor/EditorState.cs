@@ -1,5 +1,4 @@
 ﻿using TTEngine.Editor.Models.Editor.EditorStates;
-using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
@@ -16,15 +15,13 @@ namespace TTEngine.Editor.Models.Editor
         }
 
         //Services
-        public LevelService LevelService { get; }
         public AnimationService AnimationService { get; }
 
         //States
         public ToolState Tool { get; }
         public PlacementState Placement { get; }
-        public LayerState Layer { get; }
         public DefinitionCatalog Definition { get; }
-        public MapSessionState MapSession { get; }
+        public SceneSessionState SceneSession { get; }
 
         //Console 
         public EditorConsole Console { get; }
@@ -32,8 +29,7 @@ namespace TTEngine.Editor.Models.Editor
         public EditorState(
             ToolState tool, 
             PlacementState placement, 
-            LayerState layer,
-            MapSessionState mapSession,
+            SceneSessionState sceneSession,
             DefinitionCatalog definition,
             EditorConsole console,
             AnimationService anim)
@@ -41,15 +37,13 @@ namespace TTEngine.Editor.Models.Editor
             //State bindings
             Tool = tool;
             Placement = placement;
-            Layer = layer;
-            MapSession = mapSession;
+            SceneSession = sceneSession;
             Definition = definition;
 
             //Console
             Console = console;
 
             //Services
-            //LevelService = level;
             AnimationService = anim;
             AnimationService.LoadAll();
         }
@@ -57,8 +51,8 @@ namespace TTEngine.Editor.Models.Editor
         //Map Session Helper
         public void SaveActiveMap()
         {
-            MapSession.Save();
-            Console.Log($"{MapSession.ActiveMapId} saved");
+            SceneSession.Save();
+            Console.Log("Active scene saved");
         }
 
         //Definition Helper
