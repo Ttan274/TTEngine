@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using TTEngine.Editor.EditorServices.EngineLauncher;
@@ -34,7 +33,7 @@ namespace TTEngine.Editor
 
         //Editor State
         public EditorState editorState { get; }
-        
+
         //Engine Launcher
         private EngineLauncher _engineLauncher = new EngineLauncher();
 
@@ -73,8 +72,9 @@ namespace TTEngine.Editor
             _renderer = new MapRenderer(MapCanvas, editorState);
             _interaction = new MapInteractionController(editorState, () => _renderer.DrawStatic());
             _selection = new SelectionController(editorState);
-           
-            EnsureDefaultMap();
+
+            EnsureScene();
+
             _renderer.InitializeGrid();
             _renderer.DrawStatic();
 
@@ -96,23 +96,22 @@ namespace TTEngine.Editor
 
         private void ContextSetup()
         {
-            LayerEditor.DataContext = editorState;
             TileTools.DataContext = editorState;
             ConsoleEditor.DataContext = editorState;
-            //ToolHost.BindEditor(editorState);
             Inspector.DataContext = editorState;
+            ScenePanel.Bind(editorState);
         }
 
         private void ChangeEventBindings()
         {
-            editorState.MapSession.PropertyChanged += (_, e) =>
+            editorState.SceneSession.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName == nameof(editorState.MapSession.ActiveMap))
+                if (e.PropertyName == nameof(editorState.SceneSession.ActiveScene))
+                {
+                    _renderer.InitializeGrid();
                     _renderer.DrawStatic();
+                }
             };
-
-            foreach (var layer in editorState.Layer.Layers)
-                layer.VisibilityChanged += OnLayerVisibilityChanged;
 
             //Tile Tool Panel Events
             TileTools.ToolModeChanged += mode => editorState.Tool.CurrentToolMode = mode;
@@ -130,12 +129,6 @@ namespace TTEngine.Editor
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (editorState.MapSession.IsDefaultMap)
-                return;
-
-            if (editorState.Layer.IsActiveLayerLocked)
-                return;
-
             Point pos = e.GetPosition(MapCanvas);
 
             //Selection override
@@ -147,20 +140,17 @@ namespace TTEngine.Editor
             }
 
             Mouse.Capture(MapCanvas);
-           
-            // Selection
+
+             //Selection
             if (TryGetTilePosition(pos, out int x, out int y))
                 _selection.HandleSelection(x, y);
 
-            // Interaction
+             //Interaction
             _interaction.OnMouseDown(pos, e);
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (editorState.MapSession.IsDefaultMap)
-                return;
-
             _renderer.UpdateHover(e.GetPosition(MapCanvas), _brushSize);
             _interaction.OnMouseMove(e.GetPosition(MapCanvas), e);
         }
@@ -182,14 +172,11 @@ namespace TTEngine.Editor
 
         private void OnStartRequested()
         {
-            if(_engineLauncher.IsRunning)
+            if (_engineLauncher.IsRunning)
                 StopGame();
             else
                 StartEngine();
         }
-
-        private void OnLayerVisibilityChanged(EditorLayer layer)
-            => _renderer.DrawStatic();
 
         private void StartEngine()
         {
@@ -226,10 +213,10 @@ namespace TTEngine.Editor
             x = 0;
             y = 0;
 
-            if (editorState.MapSession.ActiveMap == null)
+            if (editorState.SceneSession.ActiveScene == null)
                 return false;
 
-            var map = editorState.MapSession.ActiveMap;
+            var map = editorState.SceneSession.ActiveScene.Map;
 
             x = (int)(pos.X / map.TileSize);
             y = (int)(pos.Y / map.TileSize);
@@ -240,30 +227,11 @@ namespace TTEngine.Editor
             return true;
         }
 
-        private void EnsureDefaultMap()
-        {
-            return;
-
-            if(!editorState.MapSession.MapService.Exists(DEFAULT_MAP_ID))
-            {
-                var model = new TileMapModel();
-                model.Init();
-
-                editorState.MapSession.MapService.Save(DEFAULT_MAP_ID, model);
-            }
-
-            var mapModel = editorState.MapSession.MapService.Load(DEFAULT_MAP_ID);
-
-            editorState.MapSession.ActiveMapId = DEFAULT_MAP_ID;
-            editorState.MapSession.ActiveMap = mapModel;
-            editorState.Console.Log($"{DEFAULT_MAP_ID} is loaded.");
-        }
-
         private EditorValidationResult ValidateMap()
         {
             editorState.Console.Clear();
 
-            var result = EditorValidator.ValidateMap(editorState.MapSession.ActiveMap);
+            var result = EditorValidator.ValidateMap(editorState.SceneSession.ActiveScene);
 
             foreach (var error in result.Errors)
                 editorState.Console.Log(error);
@@ -273,7 +241,7 @@ namespace TTEngine.Editor
 
         private void UpdateRunBtn() => TileTools.SetStartButtonTxt(_engineLauncher.IsRunning ? "Stop" : "Start");
 
-        //Migh be changed
+        //Might be changed
         private void OpenAsset(string path)
         {
             if (!File.Exists(path))
@@ -317,10 +285,24 @@ namespace TTEngine.Editor
             if (model is InteractableDefinition i)
                 return new InteractableAssetSelectionViewModel(i, path);
 
-            if(model is TrapDefinition trap)
+            if (model is TrapDefinition trap)
                 return new TrapAssetSelectionViewModel(trap, path);
 
             return null;
+        }   
+        
+        private void EnsureScene()
+        {
+            var scenes = editorState.SceneSession.GetAllScenes();
+
+            if(scenes.Count == 0)
+            {
+                editorState.SceneSession.Create("DefaultScene");
+            }
+            else
+            {
+                editorState.SceneSession.Load(scenes.First());
+            }
         }
     }
 }

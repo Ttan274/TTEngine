@@ -1,10 +1,13 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.EditorServices.Rendering
@@ -44,10 +47,11 @@ namespace TTEngine.Editor.EditorServices.Rendering
         {
             _gridLayer.Children.Clear();
 
-            if (_state.MapSession.ActiveMap == null)
+            var scene = _state.SceneSession.ActiveScene;
+            if (scene == null)
                 return;
 
-            var map = _state.MapSession.ActiveMap;
+            var map = scene.Map;
 
             _root.Width = map.Width * map.TileSize;
             _root.Height = map.Height * map.TileSize;
@@ -80,49 +84,34 @@ namespace TTEngine.Editor.EditorServices.Rendering
             _tileLayer.Children.Clear();
             _objectLayer.Children.Clear();
 
-            if (_state.MapSession.ActiveMap == null)
+            var scene = _state.SceneSession.ActiveScene;
+            if (scene == null)
                 return;
 
-            DrawLayers();
-            DrawPlayerSpawn();
-            DrawEnemySpawns();
-            DrawInteractables();
-            DrawTraps();
+            DrawCollisionTiles(scene);
+            DrawSpawns(scene);
         }
 
-        private void DrawLayers()
+        private void DrawCollisionTiles(Scene scene)
         {
-            foreach (var layer in _state.Layer.Layers)
-            {
-                if (!layer.IsVisible)
-                    continue;
-
-                DrawLayer(layer.LayerType);
-            }
-        }
-
-        private void DrawLayer(MapLayerType layerType)
-        {
-            var map = _state.MapSession.ActiveMap;
-            var tiles = map.Layers[layerType];
+            var map = scene.Map;
 
             for (int y = 0; y < map.Height; y++)
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                    int index = map.GetIndex(x, y);
-                    int tile = tiles[index];
+                    int tileId = map.CollisionTiles[y][x];
 
-                    if (tile == 0)
+                    if (tileId == 0)
                         continue;
 
                     Rectangle rect = new Rectangle
                     {
                         Width = map.TileSize,
                         Height = map.TileSize,
-                        Stroke = GetTileStroke(tile, layerType),
-                        StrokeThickness = (layerType == MapLayerType.Collision) ? 2.0 : 0.0,
-                        Fill = GetTileBrush(tile, layerType),
+                        Stroke = GetTileStroke(tileId),
+                        StrokeThickness = 2,
+                        Fill = GetTileBrush(tileId),
                         IsHitTestVisible = false
                     };
 
@@ -133,40 +122,37 @@ namespace TTEngine.Editor.EditorServices.Rendering
             }
         }
 
-        private void DrawPlayerSpawn()
+        private void DrawSpawns(Scene scene)
         {
-            var map = _state.MapSession.ActiveMap;
+            var map = scene.Map;
 
-            if (map.PlayerSpawn == null)
-                return;
-
-            double cx = (map.PlayerSpawn.Position.X + 0.5) * map.TileSize;
-            double cy = (map.PlayerSpawn.Position.Y + 0.5) * map.TileSize;
-
-            Ellipse marker = new Ellipse
+            //Player
+            if(scene.Spawns.Player != null)
             {
-                Width = map.TileSize * 0.6,
-                Height = map.TileSize * 0.6,
-                Stroke = Brushes.Gold,
-                StrokeThickness = 2,
-                Fill = Brushes.Transparent,
-                IsHitTestVisible = false
-            };
+                double cx = (scene.Spawns.Player.X + 0.5) * map.TileSize;
+                double cy = (scene.Spawns.Player.Y + 0.5) * map.TileSize;
 
-            Canvas.SetLeft(marker, cx - marker.Width / 2);
-            Canvas.SetTop(marker, cy - marker.Height / 2);
+                Ellipse marker = new Ellipse
+                {
+                    Width = map.TileSize * 0.6,
+                    Height = map.TileSize * 0.6,
+                    Stroke = Brushes.Gold,
+                    StrokeThickness = 2,
+                    Fill = Brushes.Transparent,
+                    IsHitTestVisible = false
+                };
 
-            _objectLayer.Children.Add(marker);
-        }
+                Canvas.SetLeft(marker, cx - marker.Width / 2);
+                Canvas.SetTop(marker, cy - marker.Height / 2);
 
-        private void DrawEnemySpawns()
-        {
-            var map = _state.MapSession.ActiveMap;
+                _objectLayer.Children.Add(marker);
+            }
 
-            foreach (var spawn in map.EnemySpawns)
+            //Enemies
+            foreach(var e in scene.Spawns.Enemies)
             {
-                double cx = (spawn.Position.X + 0.5) * map.TileSize;
-                double cy = (spawn.Position.Y + 0.5) * map.TileSize;
+                double ex = (e.X + 0.5) * map.TileSize;
+                double ey = (e.Y + 0.5) * map.TileSize;
 
                 Ellipse marker = new Ellipse
                 {
@@ -179,19 +165,20 @@ namespace TTEngine.Editor.EditorServices.Rendering
                     Tag = "EnemySpawn"
                 };
 
-                Canvas.SetLeft(marker, cx - marker.Width / 2);
-                Canvas.SetTop(marker, cy - marker.Height / 2);
+                Canvas.SetLeft(marker, ex - marker.Width / 2);
+                Canvas.SetTop(marker, ey - marker.Height / 2);
 
                 _objectLayer.Children.Add(marker);
             }
+
+            //Interactables-Traps
+            DrawInteractables(scene, map);            
         }
 
-        private void DrawInteractables()
+        private void DrawInteractables(Scene scene, MapData map)
         {
-            var map = _state.MapSession.ActiveMap;
-
-            //Draw Interactable
-            foreach (var interactable in map.Interactables)
+            //Draw Interactables
+            foreach (var interactable in scene.Spawns.Interactables)
             {
                 var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
 
@@ -215,14 +202,9 @@ namespace TTEngine.Editor.EditorServices.Rendering
                 Canvas.SetTop(img, interactable.Y * map.TileSize);
                 _objectLayer.Children.Add(img);
             }
-        }
 
-        private void DrawTraps()
-        {
-            var map = _state.MapSession.ActiveMap;
-
-            //Draw Trap
-            foreach (var trap in map.Traps)
+            //Draw Traps
+            foreach (var trap in scene.Spawns.Traps)
             {
                 var def = _state.Definition.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
 
@@ -271,12 +253,9 @@ namespace TTEngine.Editor.EditorServices.Rendering
         #endregion
 
         #region Paint
-        private Brush GetTileStroke(int tile, MapLayerType layer)
+        private Brush GetTileStroke(int tileId)
         {
-            if (layer != MapLayerType.Collision)
-                return Brushes.Transparent;
-
-            var def = _state.GetTileById(tile);
+            var def = _state.GetTileById(tileId);
             if (def == null)
                 return Brushes.Transparent;
 
@@ -288,13 +267,10 @@ namespace TTEngine.Editor.EditorServices.Rendering
             };
         }
 
-        private Brush GetTileBrush(int tile, MapLayerType layer)
+        private Brush GetTileBrush(int tileId)
         {
-            var def = _state.GetTileById(tile);
+            var def = _state.GetTileById(tileId);
             if (def == null)
-                return Brushes.Transparent;
-
-            if (layer == MapLayerType.Collision)
                 return Brushes.Transparent;
 
             return def.CollisionType switch
@@ -330,9 +306,11 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         public void UpdateHover(Point pos, int brushSize)
         {
-            var map = _state.MapSession.ActiveMap;
-            if (map == null)
+            var scene = _state.SceneSession.ActiveScene;
+            if (scene == null)
                 return;
+
+            var map = scene.Map;
 
             int x = (int)(pos.X / map.TileSize);
             int y = (int)(pos.Y / map.TileSize);
@@ -346,7 +324,6 @@ namespace TTEngine.Editor.EditorServices.Rendering
             _hoverRect.Visibility = Visibility.Visible;
             _hoverRect.Width = brushSize * map.TileSize;
             _hoverRect.Height = brushSize * map.TileSize;
-            _hoverRect.Stroke = _state.Layer.IsActiveLayerLocked ? Brushes.Gray : Brushes.Yellow;
 
             Canvas.SetLeft(_hoverRect, x * map.TileSize);
             Canvas.SetTop(_hoverRect, y * map.TileSize);

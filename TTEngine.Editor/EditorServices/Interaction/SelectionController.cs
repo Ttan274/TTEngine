@@ -1,9 +1,6 @@
-﻿using System;
-using System.Windows.Controls;
-using TTEngine.Editor.Models.Editor;
+﻿using TTEngine.Editor.Models.Editor;
+using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Selection;
-using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Panels;
 
 namespace TTEngine.Editor.EditorServices.Interaction
 {
@@ -18,31 +15,31 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
         public void HandleSelection(int x, int y)
         {
-            var map = _state.MapSession.ActiveMap;
-            if (map == null)
+            var scene = _state.SceneSession.ActiveScene;
+            if (scene == null)
                 return;
 
-            if (CheckInteractables(map, x, y))
+            if (CheckInteractables(scene, x, y))
                 return;
 
-            if (CheckEntities(map, x, y))
+            if (CheckEntities(scene, x, y))
                 return;
 
-            // Default Tile
-            int index = map.GetIndex(x, y);
-            int tileValue = map.Layers[_state.Layer.ActiveLayer.LayerType][index];
-
-            _state.CurrentSelection = new TileSelectionViewModel(x, y, tileValue);
+            if(IsValid(x, y, scene.Map))
+            {
+                int tileValue = scene.Map.CollisionTiles[y][x];
+                _state.CurrentSelection = new TileSelectionViewModel(x, y, tileValue);
+            }
         }
 
-        private bool CheckEntities(TileMapModel map, int x, int y)
+        private bool CheckEntities(Scene scene, int x, int y)
         {
-            // Player
-            if (map.PlayerSpawn != null &&
-                map.PlayerSpawn.Position.X == x &&
-                map.PlayerSpawn.Position.Y == y)
+            var player = scene.Spawns.Player;
+
+            if(player != null && player.X == x && player.Y == y)
             {
-                var def = _state.Definition.EntityDefinitions.FirstOrDefault(d => d.Id == map.PlayerSpawn.DefinitionId);
+                var def = _state.Definition.EntityDefinitions.
+                    FirstOrDefault(d => d.Id == "Player");
 
                 if(def != null)
                     _state.CurrentSelection = new PlayerSelectionViewModel(x, y, def);
@@ -50,9 +47,7 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 return true;
             }
 
-            // Enemy
-            var enemy = map.EnemySpawns
-                .FirstOrDefault(e => e.Position.X == x && e.Position.Y == y);
+            var enemy = scene.Spawns.Enemies.FirstOrDefault(e => e.X == x && e.Y == y);
 
             if (enemy != null)
             {
@@ -67,9 +62,9 @@ namespace TTEngine.Editor.EditorServices.Interaction
             return false;
         }
 
-        private bool CheckInteractables(TileMapModel map, int x, int y)
+        private bool CheckInteractables(Scene scene, int x, int y)
         {
-            var interactable = map.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
+            var interactable = scene.Spawns.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
 
             if (interactable != null)
             {
@@ -81,9 +76,27 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 return true;
             }
 
-            //trap eklenicek
+            //var trap = scene.Spawns.Traps.FirstOrDefault(t => t.X == x && t.Y == y);
+
+            //if(trap != null)
+            //{
+            //    var def = _state.Definition.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
+
+            //    if (def != null)
+            //    {
+            //        //Trap selection view model eklenicek
+            //        //_state.CurrentSelection = new TrapSelectionViewModel(x, y, def.Id,);
+            //    }
+            //    return true;
+            //}
 
             return false;
+        }
+
+        //Helper
+        private bool IsValid(int x, int y, MapData map)
+        {
+            return x >= 0 && y >= 0 && x < map.Width && y < map.Height;
         }
     }
 }

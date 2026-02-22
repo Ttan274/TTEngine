@@ -29,10 +29,10 @@
                 <RowDefinition Height="180"/>
                 <!-- Console -->
             </Grid.RowDefinitions>
-
-            <panels:LayerPanel x:Name="LayerEditor" Grid.Row="0"/>
+            
+            <panels:ScenePanel x:Name="ScenePanel" Grid.Row="0"/>
             <panels:TileToolPanel x:Name="TileTools" Grid.Row="1"/>
-
+            
             <!-- CONSOLE -->
             <panels:EditorConsolePanel x:Name="ConsoleEditor" Grid.Row="3"/>
         </Grid>

@@ -1,4 +1,6 @@
-﻿namespace TTEngine.Editor.Models.Tile
+﻿using TTEngine.Editor.Models.Scene;
+
+namespace TTEngine.Editor.Models.Tile
 {
     public class TileBatchCommand
     {
@@ -11,16 +13,16 @@
 
         public bool IsEmpty() => _commands.Count == 0;
 
-        public void Undo(int[] tiles)
+        public void Undo(MapData map)
         {
             for (int i = _commands.Count - 1; i >= 0; i--)
-                _commands[i].Undo(tiles);
+                _commands[i].Undo(map);
         }
 
-        public void Redo(int[] tiles)
+        public void Redo(MapData map)
         {
             foreach (var cmd in _commands)
-                cmd.Redo(tiles);
+                cmd.Redo(map);
         }
     }
 }
