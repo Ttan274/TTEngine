@@ -14,9 +14,6 @@ namespace TTEngine.Editor.Models.Editor
             set => SetProperty(ref _currentSelection, value);
         }
 
-        //Services
-        public AnimationService AnimationService { get; }
-
         //States
         public ToolState Tool { get; }
         public PlacementState Placement { get; }
@@ -31,8 +28,7 @@ namespace TTEngine.Editor.Models.Editor
             PlacementState placement, 
             SceneSessionState sceneSession,
             DefinitionCatalog definition,
-            EditorConsole console,
-            AnimationService anim)
+            EditorConsole console)
         {
             //State bindings
             Tool = tool;
@@ -42,10 +38,6 @@ namespace TTEngine.Editor.Models.Editor
 
             //Console
             Console = console;
-
-            //Services
-            AnimationService = anim;
-            AnimationService.LoadAll();
         }
 
         //Map Session Helper

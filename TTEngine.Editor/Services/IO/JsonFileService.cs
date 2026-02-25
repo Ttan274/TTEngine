@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace TTEngine.Editor.Services
+namespace TTEngine.Editor.Services.IO
 {
     public static class JsonFileService
     {

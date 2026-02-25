@@ -1,7 +1,12 @@
-﻿using TTEngine.Editor.Enums;
-
-namespace TTEngine.Editor.Models.Tile
+﻿namespace TTEngine.Editor.Models.Tile
 {
+    public enum CollisionType
+    {
+        None = 0,
+        Ground,
+        Wall
+    }
+
     public class TileDefinition
     {
         public int Id { get; set; }

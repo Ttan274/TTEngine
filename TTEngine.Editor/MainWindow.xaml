@@ -58,7 +58,7 @@
             </Grid.RowDefinitions>
 
             <panels:InspectorPanel  x:Name="Inspector" Grid.Row="0"/>
-            <ContentControl Grid.Row="1" x:Name="AssetPanelHost"/>
+            <TabControl Grid.Row="1" x:Name="DocumentTabs"/>
         </Grid>
     </Grid>
 </Window>

@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Services;
+using TTEngine.Editor.Services.IO;
 
 namespace TTEngine.Editor.Panels
 {

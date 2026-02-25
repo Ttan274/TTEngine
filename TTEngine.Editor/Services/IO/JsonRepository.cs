@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace TTEngine.Editor.Services
+namespace TTEngine.Editor.Services.IO
 {
     public class JsonRepository<T>
     {

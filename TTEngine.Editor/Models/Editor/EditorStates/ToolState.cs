@@ -1,7 +1,13 @@
-﻿using TTEngine.Editor.Enums;
-
-namespace TTEngine.Editor.Models.Editor.EditorStates
+﻿namespace TTEngine.Editor.Models.Editor.EditorStates
 {
+    public enum ToolMode
+    {
+        Brush,
+        Fill,
+        PlayerSpawn,
+        EnemySpawn
+    }
+
     public class ToolState : ObservableObject
     {
         private ToolMode _currentToolmode;

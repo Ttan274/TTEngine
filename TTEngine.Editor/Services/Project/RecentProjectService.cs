@@ -2,7 +2,7 @@
 using System.Text.Json;
 using TTEngine.Editor.Models.Project;
 
-namespace TTEngine.Editor.Services
+namespace TTEngine.Editor.Services.Project
 {
     public class RecentProjectService
     {

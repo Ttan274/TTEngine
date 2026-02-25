@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.IO;
 using System.Windows;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
@@ -10,6 +9,7 @@ using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services.Asset;
+using TTEngine.Editor.Services.IO;
 
 namespace TTEngine.Editor.Services
 {
@@ -32,14 +32,13 @@ namespace TTEngine.Editor.Services
 
         private static void ConfigureServices(IServiceCollection services, ProjectSession session)
         {
+            //Project Session
             services.AddSingleton(session); 
 
             //Console
             services.AddSingleton<EditorConsole>();
 
             //Services
-            services.AddSingleton<AnimationService>(
-                _ => new AnimationService(session.AnimPath));
             services.AddSingleton<SceneService>(
                 _ => new SceneService(session.ScenePath));
 
@@ -63,6 +62,9 @@ namespace TTEngine.Editor.Services
             services.AddSingleton<ToolState>();
             services.AddSingleton<PlacementState>();
             services.AddSingleton<SceneSessionState>();
+
+            //Animation
+            services.AddTransient<AnimationPanel>();
 
             //Assets
             services.AddSingleton<AssetFileService>();

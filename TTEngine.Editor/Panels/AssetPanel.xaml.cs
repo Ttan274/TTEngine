@@ -12,8 +12,8 @@ using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Trap;
-using TTEngine.Editor.Services;
 using TTEngine.Editor.Services.Asset;
+using TTEngine.Editor.Services.IO;
 
 namespace TTEngine.Editor.Panels
 {

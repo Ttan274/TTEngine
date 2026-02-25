@@ -1,13 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
-using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Scene;
+using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.EditorServices.Rendering

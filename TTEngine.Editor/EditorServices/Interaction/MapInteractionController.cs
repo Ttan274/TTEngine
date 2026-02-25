@@ -1,13 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using TTEngine.Editor.Enums;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
-using TTEngine.Editor.Models.Entity;
-using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Models.Validation;
 
 namespace TTEngine.Editor.EditorServices.Interaction

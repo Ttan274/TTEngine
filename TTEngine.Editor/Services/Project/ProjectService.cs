@@ -2,7 +2,7 @@
 using System.Text.Json;
 using TTEngine.Editor.Models.Project;
 
-namespace TTEngine.Editor.Services
+namespace TTEngine.Editor.Services.Project
 {
     public class ProjectService
     {
@@ -68,7 +68,6 @@ namespace TTEngine.Editor.Services
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Animations"));
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Data"));
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Fonts"));
-            Directory.CreateDirectory(Path.Combine(assetsRoot, "Maps"));
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Textures"));
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Scenes"));
 

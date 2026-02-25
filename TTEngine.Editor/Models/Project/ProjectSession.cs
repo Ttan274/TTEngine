@@ -21,7 +21,6 @@ namespace TTEngine.Editor.Models.Project
         //Asset folders
         public string AnimPath => Path.Combine(AssetsPath, "Animations");
         public string DataPath => Path.Combine(AssetsPath, "Data");
-        public string MapsPath => Path.Combine(AssetsPath, "Maps");
         public string FontsPath => Path.Combine(AssetsPath, "Fonts");
         public string TexturesPath => Path.Combine(AssetsPath, "Textures");
         public string ScenePath => Path.Combine(AssetsPath, "Scenes");

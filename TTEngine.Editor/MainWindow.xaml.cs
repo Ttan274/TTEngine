@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TTEngine.Editor.EditorServices.EngineLauncher;
 using TTEngine.Editor.EditorServices.Interaction;
@@ -13,6 +14,7 @@ using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Models.Validation;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services;
+using TTEngine.Editor.Services.IO;
 
 namespace TTEngine.Editor
 {
@@ -30,6 +32,8 @@ namespace TTEngine.Editor
 
         //Assets
         private readonly AssetPanel _assetPanel;
+        private readonly AnimationPanel _animationPanel;
+        private bool IsAnimTabOpened = false;
 
         //Editor State
         public EditorState editorState { get; }
@@ -37,15 +41,18 @@ namespace TTEngine.Editor
         //Engine Launcher
         private EngineLauncher _engineLauncher = new EngineLauncher();
 
-        public MainWindow(EditorState editor, AssetPanel assetPanel)
+        public MainWindow(EditorState editor, AssetPanel assetPanel, AnimationPanel animationPanel)
         {
             InitializeComponent();
             editorState = editor;
-            DataContext = editorState;
             _assetPanel = assetPanel;
+            _animationPanel = animationPanel;
+            DataContext = editorState;
+
             _assetPanel.AssetCreated += OpenAsset;
             _assetPanel.AssetOpened += OpenAsset;
-            AssetPanelHost.Content = _assetPanel;
+            AddTab("Assets", assetPanel);
+
             ContextSetup();
             WindowSetup();
             ChangeEventBindings();
@@ -271,6 +278,19 @@ namespace TTEngine.Editor
             if (path.Contains("Interactables"))
                 return JsonFileService.Load<InteractableDefinition>(path);
 
+            if(path.Contains("Animations"))
+            {
+                _animationPanel.LoadFile(path);
+
+                if(!IsAnimTabOpened)
+                {
+                    AddTab("Animation", _animationPanel);
+                    IsAnimTabOpened = true;
+                }
+
+                return null;
+            }
+
             return null;
         }
 
@@ -303,6 +323,18 @@ namespace TTEngine.Editor
             {
                 editorState.SceneSession.Load(scenes.First());
             }
+        }
+
+        private void AddTab(string header, object panel)
+        {
+            var tab = new TabItem
+            {
+                Header = header,
+                Content = panel
+            };
+
+            DocumentTabs.Items.Add(tab);
+            DocumentTabs.SelectedItem = tab;
         }
     }
 }
