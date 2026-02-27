@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
-using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Models.Tile;
@@ -43,8 +43,8 @@ namespace TTEngine.Editor.Services
                 _ => new SceneService(session.ScenePath));
 
             //Repositories
-            services.AddSingleton<JsonRepository<EntityDefinitionModel>>(
-                _ => new JsonRepository<EntityDefinitionModel>(session.EntityDefsPath));
+            services.AddSingleton<JsonRepository<EntityDefinition>>(
+                _ => new JsonRepository<EntityDefinition>(session.EntityDefsPath));
 
             services.AddSingleton<JsonRepository<TileDefinition>>(
                 _ => new JsonRepository<TileDefinition>(session.TileDefsPath));

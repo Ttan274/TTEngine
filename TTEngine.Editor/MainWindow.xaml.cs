@@ -5,8 +5,8 @@ using System.Windows.Input;
 using TTEngine.Editor.EditorServices.EngineLauncher;
 using TTEngine.Editor.EditorServices.Interaction;
 using TTEngine.Editor.EditorServices.Rendering;
+using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Editor;
-using TTEngine.Editor.Models.Entity;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
@@ -267,7 +267,7 @@ namespace TTEngine.Editor
         private object DeserializeByPath(string path)
         {
             if (path.Contains("Entities"))
-                return JsonFileService.Load<EntityDefinitionModel>(path);
+                return JsonFileService.Load<EntityDefinition>(path);
 
             if (path.Contains("Tiles"))
                 return JsonFileService.Load<TileDefinition>(path);
@@ -296,7 +296,7 @@ namespace TTEngine.Editor
 
         private object CreateAssetSelection(object model, string path)
         {
-            if (model is EntityDefinitionModel e)
+            if (model is EntityDefinition e)
                 return new EntityAssetSelectionViewModel(e, path);
 
             if (model is TileDefinition t)

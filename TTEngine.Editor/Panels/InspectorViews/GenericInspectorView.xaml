@@ -42,12 +42,30 @@
                       Foreground="White"/>
         </DataTemplate>
 
+        <DataTemplate x:Key="DictionaryTemplate">
+            <ItemsControl ItemsSource="{Binding DictionaryItems}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBox    Width="100"
+                                        Text="{Binding Key, Mode=TwoWay}"/>
+                            
+                            <TextBox    Width="150"
+                                        Margin="6,0,0,0"
+                                        Text="{Binding Value, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </DataTemplate>
+        
         <!-- TEMPLATE SELECTOR -->
         <local:PropertyEditorTemplateSelector x:Key="EditorSelector"
                                               StringTemplate="{StaticResource StringTemplate}"
                                               NumberTemplate="{StaticResource NumberTemplate}"
                                               BoolTemplate="{StaticResource BoolTemplate}"
-                                              EnumTemplate="{StaticResource EnumTemplate}"/>
+                                              EnumTemplate="{StaticResource EnumTemplate}"
+                                              DictionaryTemplate="{StaticResource DictionaryTemplate}"/>
 
     </UserControl.Resources>
     

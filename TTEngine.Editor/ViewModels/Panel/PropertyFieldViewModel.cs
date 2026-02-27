@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.ObjectModel;
+using System.Reflection;
 using TTEngine.Editor.Models.Editor;
 
 namespace TTEngine.Editor.ViewModels.Panel
@@ -21,11 +22,20 @@ namespace TTEngine.Editor.ViewModels.Panel
                 }
             }
         }
+        public ObservableCollection<DictionaryItemViewModel> DictionaryItems { get; }
 
         public PropertyFieldViewModel(object targetObject, PropertyInfo property)
         {
             TargetObject = targetObject;
             Property = property;
+
+            if(IsStringDictionary)
+            {
+                var dict = (Dictionary<string, string>)Property.GetValue(targetObject);
+
+                DictionaryItems = new ObservableCollection<DictionaryItemViewModel>(
+                    dict.Select(kv => new DictionaryItemViewModel(dict, kv.Key, kv.Value)));
+            }
         }
 
         //Helpers to determine property type for editor purposes
@@ -36,7 +46,9 @@ namespace TTEngine.Editor.ViewModels.Panel
             PropertyType == typeof(int)     ||
             PropertyType == typeof(double)  ||
             PropertyType == typeof(float);
-
+        public bool IsStringDictionary =>
+            PropertyType == typeof(Dictionary<string, string>);
+         
         public Array EnumValues => IsEnum ? Enum.GetValues(PropertyType) : null;
 
         private bool TryConvert(string value, out object result)

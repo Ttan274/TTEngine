@@ -1,4 +1,4 @@
-﻿using TTEngine.Editor.Models.Entity;
+﻿using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Models.Trap;
@@ -26,10 +26,10 @@ namespace TTEngine.Editor.Models.Selection
 
     public class EntityAssetSelectionViewModel : AssetSelectionViewModel
     {
-        public EntityDefinitionModel Model { get; }
+        public EntityDefinition Model { get; }
         public GenericInspectorViewModel Inspector { get; }
 
-        public EntityAssetSelectionViewModel(EntityDefinitionModel model, string filePath) 
+        public EntityAssetSelectionViewModel(EntityDefinition model, string filePath) 
             : base(filePath)
         {
             Model = model;

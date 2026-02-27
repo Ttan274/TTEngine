@@ -1,11 +1,13 @@
-﻿using System.IO;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using TTEngine.Editor.Models.Animation;
+using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Services.IO;
 
@@ -33,11 +35,34 @@ namespace TTEngine.Editor.Panels
         {
             _filePath = filePath;
             _model = JsonFileService.Load<AnimationDefinition>(_filePath);
+            _model.PropertyChanged += OnModelChanged;
 
             DataContext = _model;
 
             BuildTimeline();
             UpdatePreview();
+        }
+
+        private void OnModelChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(AnimationDefinition.FrameCount))
+            {
+                _currentFrame = Math.Clamp(_currentFrame, 0, _model.FrameCount);
+                BuildTimeline();
+            }
+
+            if(e.PropertyName == nameof(AnimationDefinition.SpriteSheetPath))
+            {
+                _currentFrame = 0;
+                UpdatePreview();
+            }
+
+            if(e.PropertyName == nameof(AnimationDefinition.FrameWidth)  ||
+               e.PropertyName == nameof(AnimationDefinition.FrameHeight) ||
+               e.PropertyName == nameof(AnimationDefinition.FrameCount))
+            {
+                UpdatePreview();
+            }
         }
 
         #region Event Frames
@@ -118,8 +143,21 @@ namespace TTEngine.Editor.Panels
             bitmap.UriSource = new Uri(absolutePath, UriKind.Absolute);
             bitmap.EndInit();
 
+            if (_model.FrameWidth <= 0 || _model.FrameHeight <= 0)
+                return;
+
+            int xFrame = bitmap.PixelWidth / _model.FrameWidth;
+            if (xFrame <= 0)
+                return;
+
+            int safeFrame = Math.Clamp(_currentFrame, 0, xFrame - 1);
+            int x = _currentFrame * _model.FrameWidth;
+
+            if (x + _model.FrameWidth > bitmap.PixelWidth || _model.FrameHeight > bitmap.PixelHeight)
+                return;
+
             var rect = new Int32Rect(
-                _currentFrame * _model.FrameWidth,
+                x,
                 0,
                 _model.FrameWidth,
                 _model.FrameHeight);
@@ -133,7 +171,17 @@ namespace TTEngine.Editor.Panels
 
         private void BrowseSpriteSheet(object sender, RoutedEventArgs e)
         {
-            //şimdilik kalsın
+            var dialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = false,
+                Title = "Select animation picture (.png)"
+            };
+
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+
+            _model.SpriteSheetPath = dialog.FileName;
+            UpdatePreview();
         }
 
         private void PlayClick(object sender, RoutedEventArgs e)
@@ -147,6 +195,7 @@ namespace TTEngine.Editor.Panels
                     _currentFrame = _model.Loop ? 0 : _model.FrameCount - 1;
 
                 UpdatePreview();
+                HighlightCurrentFrame();
             };
 
             _timer.Start();

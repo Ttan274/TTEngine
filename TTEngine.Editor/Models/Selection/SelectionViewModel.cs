@@ -1,4 +1,4 @@
-﻿using TTEngine.Editor.Models.Entity;
+﻿using TTEngine.Editor.Models.Definitions;
 
 namespace TTEngine.Editor.Models.Selection
 {
@@ -33,7 +33,7 @@ namespace TTEngine.Editor.Models.Selection
         public float AttackInterval { get; }
         public float MaxHP { get; }
 
-        public PlayerSelectionViewModel(int x, int y, EntityDefinitionModel def)
+        public PlayerSelectionViewModel(int x, int y, EntityDefinition def)
             : base(x, y)
         {
             Type = def.Id;
@@ -52,7 +52,7 @@ namespace TTEngine.Editor.Models.Selection
         public float AttackInterval { get; }
         public float MaxHP { get; }
 
-        public EnemySelectionViewModel(int x, int y, EntityDefinitionModel def)
+        public EnemySelectionViewModel(int x, int y, EntityDefinition def)
             : base(x, y)
         {
             Type = def.Id;

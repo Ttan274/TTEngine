@@ -17,7 +17,7 @@
             <!-- Sprite Sheet -->
             <TextBlock Text="Sprite Sheet"/>
             <StackPanel Orientation="Horizontal">
-                <TextBox Text="{Binding SpriteSheetPath}" Width="200"/>
+                <TextBox Text="{Binding SpriteSheetPath}" Width="200" IsReadOnly="True"/>
                 <Button Content="..."
                         Width="40"
                         Margin="4,0,0,0"
@@ -32,17 +32,17 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="W"/>
                 <TextBox Width="50"
-                         Text="{Binding FrameWidth}"/>
+                         Text="{Binding FrameWidth, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="H" Margin="6,0,0,0"/>
                 <TextBox Width="50"
-                         Text="{Binding FrameHeight}"/>
+                         Text="{Binding FrameHeight, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
             <TextBlock Text="Frame Count"/>
-            <TextBox Text="{Binding FrameCount}"/>
+            <TextBox Text="{Binding FrameCount, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Text="Frame Time (sec)"/>
-            <TextBox Text="{Binding FrameTime}"/>
+            <TextBox Text="{Binding FrameTime, UpdateSourceTrigger=PropertyChanged}"/>
 
             <CheckBox Content="Loop"
                       IsChecked="{Binding Loop}"

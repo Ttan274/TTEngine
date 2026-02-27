@@ -5,9 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using TTEngine.Editor.Models.Animation;
 using TTEngine.Editor.Models.Asset;
-using TTEngine.Editor.Models.Entity;
+using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Models.Tile;
@@ -168,7 +167,7 @@ namespace TTEngine.Editor.Panels
 
         private void CreateEntity_Click(object sender, RoutedEventArgs e)
         {
-            CreateJsonAsset<EntityDefinitionModel>("NewEntity");
+            CreateJsonAsset<EntityDefinition>("NewEntity");
         }
 
         private void CreateAnimation_Click(object sender, RoutedEventArgs e)
