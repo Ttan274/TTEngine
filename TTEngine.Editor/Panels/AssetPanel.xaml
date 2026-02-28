@@ -59,20 +59,15 @@
 
                                         <Separator/>
 
-                                        <MenuItem Header="Entity"
-                                                  Click="CreateEntity_Click"/>
+                                        <MenuItem Header="GameObject"
+                                                  Click="CreateGameObject_Click"/>
 
                                         <MenuItem Header="Animation"
                                                   Click="CreateAnimation_Click"/>
 
                                         <MenuItem Header="Tile"
                                                   Click="CreateTile_Click"/>
-
-                                        <MenuItem Header="Trap"
-                                                  Click="CreateTrap_Click"/>
-
-                                        <MenuItem Header="Interactable"
-                                                  Click="CreateInteractable_Click"/>
+                
                                     </MenuItem>
 
                                     <MenuItem Header="Add"

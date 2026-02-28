@@ -6,11 +6,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using TTEngine.Editor.Models.Asset;
+using TTEngine.Editor.Models.Component;
 using TTEngine.Editor.Models.Definitions;
-using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.GameObject;
 using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Services.Asset;
 using TTEngine.Editor.Services.IO;
 
@@ -165,11 +165,6 @@ namespace TTEngine.Editor.Panels
             Refresh();
         }
 
-        private void CreateEntity_Click(object sender, RoutedEventArgs e)
-        {
-            CreateJsonAsset<EntityDefinition>("NewEntity");
-        }
-
         private void CreateAnimation_Click(object sender, RoutedEventArgs e)
         {
             CreateJsonAsset<AnimationDefinition>("NewAnimation");
@@ -180,14 +175,35 @@ namespace TTEngine.Editor.Panels
             CreateJsonAsset<TileDefinition>("NewTile");
         }
 
-        private void CreateTrap_Click(object sender, RoutedEventArgs e)
+        private void CreateGameObject_Click(object sender, RoutedEventArgs e)
         {
-            CreateJsonAsset<TrapDefinition>("NewTrap"); 
-        }
+            if (AssetTree.SelectedItem is not AssetNode node)
+                return;
 
-        private void CreateInteractable_Click(object sender, RoutedEventArgs e)
-        {
-            CreateJsonAsset<InteractableDefinition>("NewInteractable");
+            string parentPath = GetTargetFolder(node);
+
+            string fileName = "NewGameObject.json";
+            string fullPath = Path.Combine(parentPath, fileName);
+
+            if (File.Exists(fullPath))
+            {
+                MessageBox.Show("File already exists");
+                return;
+            }
+
+            var go = new GameObject
+            {
+                Id = "NewGameObject"
+            };
+
+            //Zorunlu olarak transform ekliyoruz
+            go.Components.Add(new TransformComponent());
+
+            JsonFileService.Save(fullPath, go);
+            
+            Refresh();
+
+            AssetCreated?.Invoke(fullPath);
         }
 
         //Helpers

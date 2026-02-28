@@ -34,47 +34,47 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
         private bool CheckEntities(Scene scene, int x, int y)
         {
-            var player = scene.Spawns.Player;
+            //var player = scene.Spawns.Player;
 
-            if(player != null && player.X == x && player.Y == y)
-            {
-                var def = _state.Definition.EntityDefinitions.
-                    FirstOrDefault(d => d.Id == "Player");
+            //if(player != null && player.X == x && player.Y == y)
+            //{
+            //    var def = _state.Definition.EntityDefinitions.
+            //        FirstOrDefault(d => d.Id == "Player");
 
-                if(def != null)
-                    _state.CurrentSelection = new PlayerSelectionViewModel(x, y, def);
+            //    if(def != null)
+            //        _state.CurrentSelection = new PlayerSelectionViewModel(x, y, def);
 
-                return true;
-            }
+            //    return true;
+            //}
 
-            var enemy = scene.Spawns.Enemies.FirstOrDefault(e => e.X == x && e.Y == y);
+            //var enemy = scene.Spawns.Enemies.FirstOrDefault(e => e.X == x && e.Y == y);
 
-            if (enemy != null)
-            {
-                var def = _state.Definition.EntityDefinitions.FirstOrDefault(d => d.Id == enemy.DefinitionId);
+            //if (enemy != null)
+            //{
+            //    var def = _state.Definition.EntityDefinitions.FirstOrDefault(d => d.Id == enemy.DefinitionId);
 
-                if (def != null)
-                    _state.CurrentSelection = new EnemySelectionViewModel(x, y, def);
+            //    if (def != null)
+            //        _state.CurrentSelection = new EnemySelectionViewModel(x, y, def);
 
-                return true;
-            }
+            //    return true;
+            //}
 
             return false;
         }
 
         private bool CheckInteractables(Scene scene, int x, int y)
         {
-            var interactable = scene.Spawns.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
+            //var interactable = scene.Spawns.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
 
-            if (interactable != null)
-            {
-                var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
+            //if (interactable != null)
+            //{
+            //    var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
 
-                if (def != null)
-                    _state.CurrentSelection = new InteractableSelectionViewModel(x, y, def.Id, def.Type);
+            //    if (def != null)
+            //        _state.CurrentSelection = new InteractableSelectionViewModel(x, y, def.Id, def.Type);
 
-                return true;
-            }
+            //    return true;
+            //}
 
             //var trap = scene.Spawns.Traps.FirstOrDefault(t => t.X == x && t.Y == y);
 

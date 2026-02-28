@@ -11,7 +11,7 @@
             <views:TileInspectorView/>
         </DataTemplate>
        
-      
+      <!--
         <DataTemplate DataType="{x:Type vm:PlayerSelectionViewModel}">
             <views:PlayerInspectorView/>
         </DataTemplate>
@@ -24,7 +24,7 @@
        
         <DataTemplate DataType="{x:Type vm:InteractableSelectionViewModel}">
             <views:InteractableInspectorView/>
-        </DataTemplate>
+        </DataTemplate>-->
 
         <!-- trap eklicez inşallah
         <DataTemplate DataType="{x:Type vm:TrapSelectionViewModel}">
@@ -32,24 +32,16 @@
         </DataTemplate>
         -->
 
-        <!--  Asset Selections  -->
-
-        <DataTemplate DataType="{x:Type vm:EntityAssetSelectionViewModel}">
-            <views:GenericInspectorView/>
-        </DataTemplate>
+        <!--Asset Selection-->
 
         <DataTemplate DataType="{x:Type vm:TileAssetSelectionViewModel}">
-            <views:GenericInspectorView/>
+            <views:GenericInspectorView DataContext="{Binding Inspector}"/>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vm:InteractableAssetSelectionViewModel}">
-            <views:GenericInspectorView/>
-        </DataTemplate> 
-        
-        <DataTemplate DataType="{x:Type vm:TrapAssetSelectionViewModel}">
-            <views:GenericInspectorView/>
-        </DataTemplate> 
-        
+        <DataTemplate DataType="{x:Type vm:GameObjectAssetSelectionViewModel}">
+            <views:GameObjectInspectorView/>
+        </DataTemplate>
+
     </UserControl.Resources>
 
     <Grid>

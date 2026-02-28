@@ -26,9 +26,7 @@ namespace TTEngine.Editor.Models.Project
         public string ScenePath => Path.Combine(AssetsPath, "Scenes");
 
         //Sub Asset folders
-        public string EntityDefsPath => Path.Combine(DataPath, "Entities");
         public string TileDefsPath => Path.Combine(DataPath, "Tiles");
-        public string InteractableDefsPath => Path.Combine(DataPath, "Interactables");
-        public string TrapDefsPath => Path.Combine(DataPath, "Traps");
+        public string GameObjectDefs => Path.Combine(DataPath, "GameObjects");
     }
 }

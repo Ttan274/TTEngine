@@ -13,7 +13,8 @@ namespace TTEngine.Editor.Services.IO
                 PropertyNameCaseInsensitive = true,
                 Converters =
                 {
-                    new JsonStringEnumConverter()
+                    new JsonStringEnumConverter(),
+                    new ComponentJsonConverter()
                 }
             };
 

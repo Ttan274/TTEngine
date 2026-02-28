@@ -78,7 +78,7 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" 
                       Grid.Row="0">
 
-            <ItemsControl ItemsSource="{Binding Inspector.Fields}">
+            <ItemsControl ItemsSource="{Binding Fields}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
 

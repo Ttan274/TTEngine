@@ -175,57 +175,57 @@ namespace TTEngine.Editor.EditorServices.Rendering
 
         private void DrawInteractables(Scene scene, MapData map)
         {
-            //Draw Interactables
-            foreach (var interactable in scene.Spawns.Interactables)
-            {
-                var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
+            ////Draw Interactables
+            //foreach (var interactable in scene.Spawns.Interactables)
+            //{
+            //    var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
 
-                if (def == null || string.IsNullOrEmpty(def.ImagePath))
-                    continue;
+            //    if (def == null || string.IsNullOrEmpty(def.ImagePath))
+            //        continue;
 
-                string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
+            //    string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
 
-                if (!System.IO.File.Exists(targetPath))
-                    continue;
+            //    if (!System.IO.File.Exists(targetPath))
+            //        continue;
 
-                Image img = new Image
-                {
-                    Source = GetImage(targetPath),
-                    Width = map.TileSize,
-                    Height = map.TileSize,
-                    IsHitTestVisible = false
-                };
+            //    Image img = new Image
+            //    {
+            //        Source = GetImage(targetPath),
+            //        Width = map.TileSize,
+            //        Height = map.TileSize,
+            //        IsHitTestVisible = false
+            //    };
 
-                Canvas.SetLeft(img, interactable.X * map.TileSize);
-                Canvas.SetTop(img, interactable.Y * map.TileSize);
-                _objectLayer.Children.Add(img);
-            }
+            //    Canvas.SetLeft(img, interactable.X * map.TileSize);
+            //    Canvas.SetTop(img, interactable.Y * map.TileSize);
+            //    _objectLayer.Children.Add(img);
+            //}
 
-            //Draw Traps
-            foreach (var trap in scene.Spawns.Traps)
-            {
-                var def = _state.Definition.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
+            ////Draw Traps
+            //foreach (var trap in scene.Spawns.Traps)
+            //{
+            //    var def = _state.Definition.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
 
-                if (def == null || string.IsNullOrEmpty(def.ImagePath))
-                    continue;
+            //    if (def == null || string.IsNullOrEmpty(def.ImagePath))
+            //        continue;
 
-                string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
+            //    string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
 
-                if (!System.IO.File.Exists(targetPath))
-                    continue;
+            //    if (!System.IO.File.Exists(targetPath))
+            //        continue;
 
-                Image img = new Image
-                {
-                    Source = GetImage(targetPath),
-                    Width = map.TileSize,
-                    Height = map.TileSize,
-                    IsHitTestVisible = false
-                };
+            //    Image img = new Image
+            //    {
+            //        Source = GetImage(targetPath),
+            //        Width = map.TileSize,
+            //        Height = map.TileSize,
+            //        IsHitTestVisible = false
+            //    };
 
-                Canvas.SetLeft(img, trap.X * map.TileSize);
-                Canvas.SetTop(img, trap.Y * map.TileSize);
-                _objectLayer.Children.Add(img);
-            }
+            //    Canvas.SetLeft(img, trap.X * map.TileSize);
+            //    Canvas.SetTop(img, trap.Y * map.TileSize);
+            //    _objectLayer.Children.Add(img);
+            //}
         }
         #endregion
 

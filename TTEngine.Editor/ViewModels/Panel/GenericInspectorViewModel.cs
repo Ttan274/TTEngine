@@ -16,7 +16,7 @@ namespace TTEngine.Editor.ViewModels.Panel
 
             var props = target.GetType()
                               .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                              .Where(p => p.CanRead && p.CanWrite);
+                              .Where(p => p.CanRead && p.CanWrite && p.Name != "Components");
 
             foreach (var prop in props)
                 Fields.Add(new PropertyFieldViewModel(target, prop));

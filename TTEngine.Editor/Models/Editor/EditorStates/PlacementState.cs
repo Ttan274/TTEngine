@@ -1,6 +1,4 @@
-﻿using TTEngine.Editor.Models.Interactable;
-using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Trap;
+﻿using TTEngine.Editor.Models.Tile;
 
 namespace TTEngine.Editor.Models.Editor.EditorStates
 {
@@ -28,48 +26,48 @@ namespace TTEngine.Editor.Models.Editor.EditorStates
             {
                 if(SetProperty(ref _selectedTile, value) && value != null)
                 {
-                    SelectedInteractable = null;
-                    SelectedTrap = null;
+                    //SelectedInteractable = null;
+                    //SelectedTrap = null;
                     ActivePlacementMode = PlacementMode.Tile;
                 }
             }
         }
 
-        private InteractableDefinition _selectedInteractable;
-        public InteractableDefinition SelectedInteractable
-        {
-            get => _selectedInteractable;
-            set
-            {
-                if (SetProperty(ref _selectedInteractable, value) && value != null)
-                {
-                    SelectedTile = null;
-                    SelectedTrap = null;
-                    ActivePlacementMode = PlacementMode.Interactable;
-                }
-            }
-        }
+        //private InteractableDefinition _selectedInteractable;
+        //public InteractableDefinition SelectedInteractable
+        //{
+        //    get => _selectedInteractable;
+        //    set
+        //    {
+        //        if (SetProperty(ref _selectedInteractable, value) && value != null)
+        //        {
+        //            SelectedTile = null;
+        //            SelectedTrap = null;
+        //            ActivePlacementMode = PlacementMode.Interactable;
+        //        }
+        //    }
+        //}
 
-        private TrapDefinition _selectedTrap;
-        public TrapDefinition SelectedTrap
-        {
-            get => _selectedTrap;
-            set
-            {
-                if (SetProperty(ref _selectedTrap, value) && value != null)
-                {
-                    SelectedTile = null;
-                    SelectedInteractable = null;
-                    ActivePlacementMode = PlacementMode.Trap;
-                }
-            }
-        }
+        //private TrapDefinition _selectedTrap;
+        //public TrapDefinition SelectedTrap
+        //{
+        //    get => _selectedTrap;
+        //    set
+        //    {
+        //        if (SetProperty(ref _selectedTrap, value) && value != null)
+        //        {
+        //            SelectedTile = null;
+        //            SelectedInteractable = null;
+        //            ActivePlacementMode = PlacementMode.Trap;
+        //        }
+        //    }
+        //}
 
         public void ClearSelection()
         {
             SelectedTile = null;
-            SelectedInteractable = null;
-            SelectedTrap = null;
+            //SelectedInteractable = null;
+            //SelectedTrap = null;
         }
     }
 }

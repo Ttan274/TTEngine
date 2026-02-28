@@ -72,10 +72,8 @@ namespace TTEngine.Editor.Services.Project
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Scenes"));
 
             //Sub Asset folders
-            Directory.CreateDirectory(Path.Combine(assetsRoot, "Data", "Entities"));
             Directory.CreateDirectory(Path.Combine(assetsRoot, "Data", "Tiles"));
-            Directory.CreateDirectory(Path.Combine(assetsRoot, "Data", "Interactables"));
-            Directory.CreateDirectory(Path.Combine(assetsRoot, "Data", "Traps"));
+            Directory.CreateDirectory(Path.Combine(assetsRoot, "Data", "GameObjects"));
         }
     }
 }

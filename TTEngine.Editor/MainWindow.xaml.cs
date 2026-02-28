@@ -5,12 +5,10 @@ using System.Windows.Input;
 using TTEngine.Editor.EditorServices.EngineLauncher;
 using TTEngine.Editor.EditorServices.Interaction;
 using TTEngine.Editor.EditorServices.Rendering;
-using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Editor;
-using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.GameObject;
 using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Models.Validation;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services;
@@ -266,17 +264,8 @@ namespace TTEngine.Editor
 
         private object DeserializeByPath(string path)
         {
-            if (path.Contains("Entities"))
-                return JsonFileService.Load<EntityDefinition>(path);
-
             if (path.Contains("Tiles"))
                 return JsonFileService.Load<TileDefinition>(path);
-
-            if (path.Contains("Traps"))
-                return JsonFileService.Load<TrapDefinition>(path);
-
-            if (path.Contains("Interactables"))
-                return JsonFileService.Load<InteractableDefinition>(path);
 
             if(path.Contains("Animations"))
             {
@@ -291,22 +280,19 @@ namespace TTEngine.Editor
                 return null;
             }
 
+            if (path.Contains("GameObjects"))
+                return JsonFileService.Load<GameObject>(path);
+
             return null;
         }
 
         private object CreateAssetSelection(object model, string path)
         {
-            if (model is EntityDefinition e)
-                return new EntityAssetSelectionViewModel(e, path);
-
             if (model is TileDefinition t)
                 return new TileAssetSelectionViewModel(t, path);
 
-            if (model is InteractableDefinition i)
-                return new InteractableAssetSelectionViewModel(i, path);
-
-            if (model is TrapDefinition trap)
-                return new TrapAssetSelectionViewModel(trap, path);
+            if (model is GameObject g)
+                return new GameObjectAssetSelectionViewModel(g, path);
 
             return null;
         }   

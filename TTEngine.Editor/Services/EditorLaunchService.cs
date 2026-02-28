@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
-using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
-using TTEngine.Editor.Models.Interactable;
+using TTEngine.Editor.Models.GameObject;
 using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services.Asset;
 using TTEngine.Editor.Services.IO;
@@ -43,17 +41,11 @@ namespace TTEngine.Editor.Services
                 _ => new SceneService(session.ScenePath));
 
             //Repositories
-            services.AddSingleton<JsonRepository<EntityDefinition>>(
-                _ => new JsonRepository<EntityDefinition>(session.EntityDefsPath));
-
             services.AddSingleton<JsonRepository<TileDefinition>>(
                 _ => new JsonRepository<TileDefinition>(session.TileDefsPath));
 
-            services.AddSingleton<JsonRepository<InteractableDefinition>>(
-                _ => new JsonRepository<InteractableDefinition>(session.InteractableDefsPath));
-
-            services.AddSingleton<JsonRepository<TrapDefinition>>(
-                _ => new JsonRepository<TrapDefinition>(session.TrapDefsPath));
+            services.AddSingleton<JsonRepository<GameObject>>(
+                _ => new JsonRepository<GameObject>(session.GameObjectDefs));
 
             //Catalog
             services.AddSingleton<DefinitionCatalog>();

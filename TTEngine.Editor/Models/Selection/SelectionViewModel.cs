@@ -25,43 +25,43 @@ namespace TTEngine.Editor.Models.Selection
         }
     }
 
-    public class PlayerSelectionViewModel : SelectionViewModel
-    {
-        public string Type { get; }
-        public float Speed { get; }
-        public float Damage { get; }
-        public float AttackInterval { get; }
-        public float MaxHP { get; }
+    //public class PlayerSelectionViewModel : SelectionViewModel
+    //{
+    //    public string Type { get; }
+    //    public float Speed { get; }
+    //    public float Damage { get; }
+    //    public float AttackInterval { get; }
+    //    public float MaxHP { get; }
 
-        public PlayerSelectionViewModel(int x, int y, EntityDefinition def)
-            : base(x, y)
-        {
-            Type = def.Id;
-            Speed = def.Speed;
-            Damage = def.AttackDamage;
-            AttackInterval = def.AttackInterval;
-            MaxHP = def.MaxHP;
-        }
-    }
+    //    public PlayerSelectionViewModel(int x, int y, EntityDefinition def)
+    //        : base(x, y)
+    //    {
+    //        Type = def.Id;
+    //        Speed = def.Speed;
+    //        Damage = def.AttackDamage;
+    //        AttackInterval = def.AttackInterval;
+    //        MaxHP = def.MaxHP;
+    //    }
+    //}
 
-    public class EnemySelectionViewModel : SelectionViewModel
-    {
-        public string Type { get; }
-        public float Speed { get; }
-        public float Damage { get; }
-        public float AttackInterval { get; }
-        public float MaxHP { get; }
+    //public class EnemySelectionViewModel : SelectionViewModel
+    //{
+    //    public string Type { get; }
+    //    public float Speed { get; }
+    //    public float Damage { get; }
+    //    public float AttackInterval { get; }
+    //    public float MaxHP { get; }
 
-        public EnemySelectionViewModel(int x, int y, EntityDefinition def)
-            : base(x, y)
-        {
-            Type = def.Id;
-            Speed = def.Speed;
-            Damage = def.AttackDamage;
-            AttackInterval = def.AttackInterval;
-            MaxHP = def.MaxHP;
-        }
-    }
+    //    public EnemySelectionViewModel(int x, int y, EntityDefinition def)
+    //        : base(x, y)
+    //    {
+    //        Type = def.Id;
+    //        Speed = def.Speed;
+    //        Damage = def.AttackDamage;
+    //        AttackInterval = def.AttackInterval;
+    //        MaxHP = def.MaxHP;
+    //    }
+    //}
 
     public class InteractableSelectionViewModel : SelectionViewModel
     {

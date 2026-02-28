@@ -240,16 +240,16 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 if (!EditorValidator.CanPlaceObject(scene, x, y))
                     return;
 
-                if (existing == null && _state.Definition.EntityDefinitions.Any())
-                {
-                    scene.Spawns.Enemies.Add(
-                        new SpawnDef
-                        {
-                            DefinitionId = "Samurai",
-                            X = x,
-                            Y = y
-                        });
-                }
+                //if (existing == null && _state.Definition.EntityDefinitions.Any())
+                //{
+                //    scene.Spawns.Enemies.Add(
+                //        new SpawnDef
+                //        {
+                //            DefinitionId = "Samurai",
+                //            X = x,
+                //            Y = y
+                //        });
+                //}
             }
             else if (e.RightButton == MouseButtonState.Pressed)
             {
@@ -286,21 +286,21 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (_state.Placement.SelectedInteractable == null)
-                    return;
+                //if (_state.Placement.SelectedInteractable == null)
+                //    return;
 
                 if (!EditorValidator.CanPlaceObject(scene, x, y))
                     return;
 
-                if (!scene.Spawns.Interactables.Any(i => i.X == x && i.Y == y))
-                {
-                    scene.Spawns.Interactables.Add(new SpawnDef
-                    {
-                        X = x,
-                        Y = y,
-                        DefinitionId = _state.Placement.SelectedInteractable.Id
-                    });
-                }
+                //if (!scene.Spawns.Interactables.Any(i => i.X == x && i.Y == y))
+                //{
+                //    scene.Spawns.Interactables.Add(new SpawnDef
+                //    {
+                //        X = x,
+                //        Y = y,
+                //        DefinitionId = _state.Placement.SelectedInteractable.Id
+                //    });
+                //}
             }
             else if (e.RightButton == MouseButtonState.Pressed)
             {
@@ -327,21 +327,21 @@ namespace TTEngine.Editor.EditorServices.Interaction
                 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (_state.Placement.SelectedTrap == null)
-                    return;
+                //if (_state.Placement.SelectedTrap == null)
+                //    return;
 
                 if (!EditorValidator.CanPlaceObject(scene, x, y))
                     return;
 
-                if (!scene.Spawns.Traps.Any(t => t.X == x && t.Y == y))
-                {
-                    scene.Spawns.Traps.Add(new SpawnDef
-                    {
-                        X = x,
-                        Y = y,
-                        DefinitionId = _state.Placement.SelectedTrap.Id
-                    });
-                }
+                //if (!scene.Spawns.Traps.Any(t => t.X == x && t.Y == y))
+                //{
+                //    scene.Spawns.Traps.Add(new SpawnDef
+                //    {
+                //        X = x,
+                //        Y = y,
+                //        DefinitionId = _state.Placement.SelectedTrap.Id
+                //    });
+                //}
             }
             else if (e.RightButton == MouseButtonState.Pressed)
             {

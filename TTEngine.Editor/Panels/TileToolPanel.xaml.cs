@@ -6,9 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
-using TTEngine.Editor.Models.Interactable;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Trap;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Panels
@@ -68,10 +66,10 @@ namespace TTEngine.Editor.Panels
 
         private void OnInteractableClicked(object sender, RoutedEventArgs e)
         {
-            if (sender is Border border && border.Tag is string interactableId && Editor != null)
-            {
-                Editor.Placement.SelectedInteractable = Editor.Definition.InteractableDefinitions.First(t => t.Id == interactableId);
-            }
+            //if (sender is Border border && border.Tag is string interactableId && Editor != null)
+            //{
+            //    Editor.Placement.SelectedInteractable = Editor.Definition.InteractableDefinitions.First(t => t.Id == interactableId);
+            //}
         }
 
         private void InteractableButtonLoaded(object sender, RoutedEventArgs e)
@@ -85,19 +83,19 @@ namespace TTEngine.Editor.Panels
 
         private void UpdateInteractableBtnVisual(Border border)
         {
-            if (border.Tag is string interactableId && Editor != null)
-            {
-                bool isSelected = Editor.Placement.SelectedInteractable?.Id == interactableId;
-                UpdateBtnVisual(border, isSelected);
-            }
+            //if (border.Tag is string interactableId && Editor != null)
+            //{
+            //    bool isSelected = Editor.Placement.SelectedInteractable?.Id == interactableId;
+            //    UpdateBtnVisual(border, isSelected);
+            //}
         }
 
         private void InteractableImageLoaded(object sender, RoutedEventArgs e)
         {
-            if (sender is Image img && img.DataContext is InteractableDefinition def && !string.IsNullOrEmpty(def.ImagePath))
-            {
-                LoadImage(img, def.ImagePath);
-            }
+            //if (sender is Image img && img.DataContext is InteractableDefinition def && !string.IsNullOrEmpty(def.ImagePath))
+            //{
+            //    LoadImage(img, def.ImagePath);
+            //}
         }
 
         #endregion
@@ -105,36 +103,36 @@ namespace TTEngine.Editor.Panels
         #region Trap Methods
         private void OnTrapClicked(object sender, RoutedEventArgs e)
         {
-            if (sender is Border border && border.Tag is string trapId && Editor != null)
-            {
-                Editor.Placement.SelectedTrap = Editor.Definition.TrapDefinitions.First(t => t.Id == trapId);
-            }
+            //if (sender is Border border && border.Tag is string trapId && Editor != null)
+            //{
+            //    Editor.Placement.SelectedTrap = Editor.Definition.TrapDefinitions.First(t => t.Id == trapId);
+            //}
         }
 
         private void TrapButtonLoaded(object sender, RoutedEventArgs e)
         {
-            if (sender is Border border && border.Tag is string trapId && Editor != null)
-            {
-                UpdateTrapBtnVisual(border);
-                Editor.Placement.PropertyChanged += (_, __) => UpdateTrapBtnVisual(border);
-            }
+            //if (sender is Border border && border.Tag is string trapId && Editor != null)
+            //{
+            //    UpdateTrapBtnVisual(border);
+            //    Editor.Placement.PropertyChanged += (_, __) => UpdateTrapBtnVisual(border);
+            //}
         }
 
         private void UpdateTrapBtnVisual(Border border)
         {
-            if (border.Tag is string trapId && Editor != null)
-            {
-                bool isSelected = Editor.Placement.SelectedTrap?.Id == trapId;
-                UpdateBtnVisual(border, isSelected);
-            }
+            //if (border.Tag is string trapId && Editor != null)
+            //{
+            //    bool isSelected = Editor.Placement.SelectedTrap?.Id == trapId;
+            //    UpdateBtnVisual(border, isSelected);
+            //}
         }
 
         private void TrapImageLoaded(object sender, RoutedEventArgs e)
         {
-            if (sender is Image img && img.DataContext is TrapDefinition def && !string.IsNullOrEmpty(def.ImagePath))
-            {
-                LoadImage(img, def.ImagePath);
-            }
+            //if (sender is Image img && img.DataContext is TrapDefinition def && !string.IsNullOrEmpty(def.ImagePath))
+            //{
+            //    LoadImage(img, def.ImagePath);
+            //}
         }
         #endregion
 
