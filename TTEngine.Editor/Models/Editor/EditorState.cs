@@ -1,4 +1,5 @@
 ﻿using TTEngine.Editor.Models.Editor.EditorStates;
+using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
@@ -45,6 +46,15 @@ namespace TTEngine.Editor.Models.Editor
         {
             SceneSession.Save();
             Console.Log("Active scene saved");
+        }
+
+        public void SaveCurrentAsset()
+        {
+            if(CurrentSelection is AssetSelectionViewModel asset)
+            {
+                asset.Save();
+                Console.Log($"Asset saved");
+            }
         }
 
         //Definition Helper

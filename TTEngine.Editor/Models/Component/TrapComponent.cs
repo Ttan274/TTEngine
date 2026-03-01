@@ -3,8 +3,8 @@
     public class TrapComponent : ComponentBase
     {
         public TrapComponent()
+            : base("Trap")
         {
-            Type = "Trap";
         }
 
         private string _id;

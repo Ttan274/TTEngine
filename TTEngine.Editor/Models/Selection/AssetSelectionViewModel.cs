@@ -2,15 +2,23 @@
 using System.Windows;
 using TTEngine.Editor.Models.Component;
 using TTEngine.Editor.Models.Component.ComponentRegistry;
+using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services.IO;
 using TTEngine.Editor.ViewModels.Panel;
 
 namespace TTEngine.Editor.Models.Selection
 {
-    public abstract class AssetSelectionViewModel
+    public abstract class AssetSelectionViewModel : ObservableObject
     {
         public string FilePath { get; }
+
+        private bool _isDirty;
+        public bool IsDirty
+        {
+            get => _isDirty;
+            set => SetProperty(ref _isDirty, value);
+        }
 
         protected AssetSelectionViewModel(string filePath)
         {
@@ -22,6 +30,7 @@ namespace TTEngine.Editor.Models.Selection
         public void Save()
         {
             JsonFileService.Save(FilePath, GetModel());
+            IsDirty = false;
         }
     }
 
@@ -55,9 +64,10 @@ namespace TTEngine.Editor.Models.Selection
         {
             Model = model;
             RootInspector = new GenericInspectorViewModel(model);
+            RootInspector.OnValueChanged = () => IsDirty = true;
 
             foreach (var comp in Model.Components)
-                Components.Add(new ComponentViewModel(comp));
+                CompVmCreator(comp);
         }
 
         public void AddComponent(string typeName)
@@ -81,7 +91,8 @@ namespace TTEngine.Editor.Models.Selection
             var instance = (ComponentBase)Activator.CreateInstance(typeInfo.DefType);
 
             Model.Components.Add(instance);
-            Components.Add(new ComponentViewModel(instance));
+            CompVmCreator(instance);
+            IsDirty = true;
         }
 
         public void RemoveComponent(ComponentViewModel comp)
@@ -91,11 +102,21 @@ namespace TTEngine.Editor.Models.Selection
 
             Model.Components.Remove(comp.Model);
             Components.Remove(comp);
+
+            IsDirty = true;
         }
 
         public override object GetModel()
         {
             return Model;
+        }
+
+        //Helper 
+        private void CompVmCreator(ComponentBase instance)
+        {
+            var compVm = new ComponentViewModel(instance);
+            compVm.Inspector.OnValueChanged = () => IsDirty = true;
+            Components.Add(compVm);
         }
     }
 }

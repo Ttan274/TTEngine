@@ -95,7 +95,7 @@ namespace TTEngine.Editor
 
             CommandBindings.Add(new CommandBinding(
                 ApplicationCommands.Save,
-                (_, _) => editorState.SaveActiveMap()
+                (_, _) => editorState.SaveCurrentAsset()
             ));
         }
 

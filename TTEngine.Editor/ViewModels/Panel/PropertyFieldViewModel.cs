@@ -19,9 +19,13 @@ namespace TTEngine.Editor.ViewModels.Panel
                 {
                     Property.SetValue(TargetObject, converted);
                     OnPropertyChanged();
+                    ValueChanged?.Invoke();
                 }
             }
         }
+
+        public event Action ValueChanged;
+
         public ObservableCollection<DictionaryItemViewModel> DictionaryItems { get; }
 
         public PropertyFieldViewModel(object targetObject, PropertyInfo property)

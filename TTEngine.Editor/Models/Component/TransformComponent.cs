@@ -3,8 +3,8 @@
     public class TransformComponent : ComponentBase
     {
         public TransformComponent()
+            : base("Transform")
         {
-            Type = "Transform";
         }
 
         private float _x;

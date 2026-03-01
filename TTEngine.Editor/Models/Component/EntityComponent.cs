@@ -3,8 +3,8 @@
     public class EntityComponent : ComponentBase
     {
         public EntityComponent()
+            : base("EntityStats")
         {
-            Type = "EntityStats";
         }
 
         //Stats

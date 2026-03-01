@@ -3,8 +3,8 @@
     public class AnimatorComponent : ComponentBase
     {
         public AnimatorComponent()
+            : base("Animator")
         {
-            Type = "Animator";
         }
 
         public Dictionary<string, string> Animations { get; set; } = new();

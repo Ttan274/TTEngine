@@ -3,8 +3,8 @@
     public class InteractableComponent : ComponentBase
     {
         public InteractableComponent()
+            : base("Interactable")
         {
-            Type = "Interactable";
         }
 
         private string _id;

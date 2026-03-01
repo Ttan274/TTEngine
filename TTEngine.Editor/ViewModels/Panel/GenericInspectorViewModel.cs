@@ -10,6 +10,8 @@ namespace TTEngine.Editor.ViewModels.Panel
 
         public object Target { get; }
 
+        public Action OnValueChanged {  get; set; }
+
         public GenericInspectorViewModel(object target)
         {
             Target = target;
@@ -19,7 +21,11 @@ namespace TTEngine.Editor.ViewModels.Panel
                               .Where(p => p.CanRead && p.CanWrite && p.Name != "Components");
 
             foreach (var prop in props)
-                Fields.Add(new PropertyFieldViewModel(target, prop));
+            {
+                var fieldVM = new PropertyFieldViewModel(target, prop);
+                fieldVM.ValueChanged += () => OnValueChanged?.Invoke();
+                Fields.Add(fieldVM);
+            }
         }
     }
 }

@@ -75,8 +75,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" 
-                      Grid.Row="0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
 
             <ItemsControl ItemsSource="{Binding Fields}">
                 <ItemsControl.ItemTemplate>
@@ -105,19 +104,5 @@
             </ItemsControl>
 
         </ScrollViewer>
-
-        <!---Save Button-->
-        <Border Grid.Row ="1"
-                Background="#1E1E1E"
-                Padding="10"
-                BorderBrush="#333"
-                BorderThickness="0,1,0,0">
-
-            <Button Content="Save"
-                    HorizontalAlignment="Right"
-                    Width="100"
-                    Click="Save_Click"/>
-
-        </Border>
     </Grid>
 </UserControl>

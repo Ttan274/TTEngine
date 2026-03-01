@@ -6,6 +6,10 @@
 
     <StackPanel>
 
+        <TextBlock  Text="*"
+                    Foreground="Orange"
+                    Visibility="{Binding IsDirty, Converter={StaticResource BoolToVisibility}}"/>
+
         <!--Root Field-->
         <views:GenericInspectorView DataContext="{Binding RootInspector}"/>
 
