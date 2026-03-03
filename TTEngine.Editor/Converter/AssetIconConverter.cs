@@ -8,15 +8,15 @@ namespace TTEngine.Editor.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is not AssetType type)
+            if (value is not FileExtension type)
                 return "📄";
 
             return type switch
             {
-                AssetType.Folder => "📁",
-                AssetType.Json => "📄",
-                AssetType.Texture => "🖼",
-                AssetType.Font => "🔤",
+                FileExtension.Folder => "📁",
+                FileExtension.Json => "📄",
+                FileExtension.Texture => "🖼",
+                FileExtension.Font => "🔤",
                 _ => "📦"
             };
         }

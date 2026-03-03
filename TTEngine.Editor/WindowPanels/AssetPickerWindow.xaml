@@ -1,0 +1,44 @@
+﻿<Window x:Class="TTEngine.Editor.WindowPanels.AssetPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Select Asset" 
+        Height="400" 
+        Width="400"
+        Background="#2B2B2B">
+
+    <ScrollViewer>
+        <ItemsControl x:Name="AssetList">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="4"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="6"
+                            BorderBrush="DimGray"
+                            BorderThickness="1"
+                            Background="#2D2D2D"
+                            MouseLeftButtonDown="OnAssetClicked">
+
+
+                        <StackPanel>
+                            <Image      Width="70"
+                                        Height="70"
+                                        Stretch="Uniform"
+                                        Loaded="AssetImageLoaded"/>
+
+                            <TextBlock  Text="{Binding FileName}"
+                                        Foreground="White"
+                                        FontSize="10"
+                                        TextAlignment="Center"
+                                        TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+    
+</Window>

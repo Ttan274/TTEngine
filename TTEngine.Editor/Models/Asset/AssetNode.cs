@@ -2,13 +2,13 @@
 
 namespace TTEngine.Editor.Models.Asset
 {
-    public enum AssetType
+    public enum FileExtension
     {
         Unknown,
         Folder,
         Json,
         Texture,
-        Font
+        Font 
     }
 
     public class AssetNode
@@ -16,7 +16,7 @@ namespace TTEngine.Editor.Models.Asset
         public string Name { get; set; }
         public string FullPath { get; set; }
         public bool IsFolder { get; set; }
-        public AssetType Type { get; set; }
+        public FileExtension Type { get; set; }
         public bool IsSystemFile { get; set; }
 
         public ObservableCollection<AssetNode> Children { get; set; }
