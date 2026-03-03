@@ -1,8 +1,10 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TTEngine.Editor.Models.Component;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Tile;
@@ -87,7 +89,7 @@ namespace TTEngine.Editor.EditorServices.Rendering
                 return;
 
             DrawCollisionTiles(scene);
-            DrawSpawns(scene);
+            DrawSceneObjects(scene);
         }
 
         private void DrawCollisionTiles(Scene scene)
@@ -120,113 +122,50 @@ namespace TTEngine.Editor.EditorServices.Rendering
             }
         }
 
-        private void DrawSpawns(Scene scene)
+        private void DrawSceneObjects(Scene scene)
         {
             var map = scene.Map;
 
-            //Player
-            if(scene.Spawns.Player != null)
+            foreach (var obj in scene.SceneObjects)
             {
-                double cx = (scene.Spawns.Player.X + 0.5) * map.TileSize;
-                double cy = (scene.Spawns.Player.Y + 0.5) * map.TileSize;
+                if (!obj.IsActive)
+                    continue;
 
-                Ellipse marker = new Ellipse
+                var prefab = _state.Definition.GameObjects
+                    .FirstOrDefault(p => p.Id == obj.PrefabId);
+
+                if (prefab == null)
+                    continue;
+
+                var sprite = prefab.Components.
+                    OfType<SpriteRendererComponent>().FirstOrDefault();
+
+                if (sprite == null || string.IsNullOrEmpty(sprite.SpritePath))
+                    continue;
+
+                string fullPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), sprite.SpritePath);
+
+                if (!File.Exists(fullPath))
+                    continue;
+
+                double x = obj.X * map.TileSize;
+                double y = obj.Y * map.TileSize;
+
+                Image img = new Image
                 {
-                    Width = map.TileSize * 0.6,
-                    Height = map.TileSize * 0.6,
-                    Stroke = Brushes.Gold,
-                    StrokeThickness = 2,
-                    Fill = Brushes.Transparent,
+                    Source = GetImage(fullPath),
+                    Width = map.TileSize,
+                    Height = map.TileSize,
                     IsHitTestVisible = false
                 };
 
-                Canvas.SetLeft(marker, cx - marker.Width / 2);
-                Canvas.SetTop(marker, cy - marker.Height / 2);
+                Canvas.SetLeft(img, x);
+                Canvas.SetTop(img, y);
 
-                _objectLayer.Children.Add(marker);
+                _objectLayer.Children.Add(img);
             }
-
-            //Enemies
-            foreach(var e in scene.Spawns.Enemies)
-            {
-                double ex = (e.X + 0.5) * map.TileSize;
-                double ey = (e.Y + 0.5) * map.TileSize;
-
-                Ellipse marker = new Ellipse
-                {
-                    Width = map.TileSize * 0.5,
-                    Height = map.TileSize * 0.5,
-                    Stroke = Brushes.Red,
-                    StrokeThickness = 2,
-                    Fill = Brushes.Transparent,
-                    IsHitTestVisible = false,
-                    Tag = "EnemySpawn"
-                };
-
-                Canvas.SetLeft(marker, ex - marker.Width / 2);
-                Canvas.SetTop(marker, ey - marker.Height / 2);
-
-                _objectLayer.Children.Add(marker);
-            }
-
-            //Interactables-Traps
-            DrawInteractables(scene, map);            
         }
 
-        private void DrawInteractables(Scene scene, MapData map)
-        {
-            ////Draw Interactables
-            //foreach (var interactable in scene.Spawns.Interactables)
-            //{
-            //    var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
-
-            //    if (def == null || string.IsNullOrEmpty(def.ImagePath))
-            //        continue;
-
-            //    string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
-
-            //    if (!System.IO.File.Exists(targetPath))
-            //        continue;
-
-            //    Image img = new Image
-            //    {
-            //        Source = GetImage(targetPath),
-            //        Width = map.TileSize,
-            //        Height = map.TileSize,
-            //        IsHitTestVisible = false
-            //    };
-
-            //    Canvas.SetLeft(img, interactable.X * map.TileSize);
-            //    Canvas.SetTop(img, interactable.Y * map.TileSize);
-            //    _objectLayer.Children.Add(img);
-            //}
-
-            ////Draw Traps
-            //foreach (var trap in scene.Spawns.Traps)
-            //{
-            //    var def = _state.Definition.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
-
-            //    if (def == null || string.IsNullOrEmpty(def.ImagePath))
-            //        continue;
-
-            //    string targetPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), def.ImagePath);
-
-            //    if (!System.IO.File.Exists(targetPath))
-            //        continue;
-
-            //    Image img = new Image
-            //    {
-            //        Source = GetImage(targetPath),
-            //        Width = map.TileSize,
-            //        Height = map.TileSize,
-            //        IsHitTestVisible = false
-            //    };
-
-            //    Canvas.SetLeft(img, trap.X * map.TileSize);
-            //    Canvas.SetTop(img, trap.Y * map.TileSize);
-            //    _objectLayer.Children.Add(img);
-            //}
-        }
         #endregion
 
         #region Image Cache

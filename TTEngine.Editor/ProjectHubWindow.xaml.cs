@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using TTEngine.Editor.Models.Project;
-using TTEngine.Editor.Services;
+using TTEngine.Editor.Services.Editor;
 using TTEngine.Editor.Services.Project;
 
 namespace TTEngine.Editor

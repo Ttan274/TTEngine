@@ -4,8 +4,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TTEngine.Editor.Models.Component;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
+using TTEngine.Editor.Models.GameObject;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
@@ -62,79 +64,47 @@ namespace TTEngine.Editor.Panels
         }
         #endregion
 
-        #region Interactable Methods
+        #region Prefab
 
-        private void OnInteractableClicked(object sender, RoutedEventArgs e)
+        private void OnPrefabClicked(object sender, RoutedEventArgs e)
         {
-            //if (sender is Border border && border.Tag is string interactableId && Editor != null)
-            //{
-            //    Editor.Placement.SelectedInteractable = Editor.Definition.InteractableDefinitions.First(t => t.Id == interactableId);
-            //}
-        }
-
-        private void InteractableButtonLoaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is Border border && border.Tag is string interactableId && Editor != null)
+            if (sender is Border border && border.Tag is string prefabId && Editor != null)
             {
-                UpdateInteractableBtnVisual(border);
-                Editor.Placement.PropertyChanged += (_, __) => UpdateInteractableBtnVisual(border);
+                Editor.Placement.SelectedPrefab = Editor.Definition.GameObjects.First(p => p.Id == prefabId);
             }
         }
 
-        private void UpdateInteractableBtnVisual(Border border)
+        private void PrefabButtonLoaded(object sender, RoutedEventArgs e)
         {
-            //if (border.Tag is string interactableId && Editor != null)
-            //{
-            //    bool isSelected = Editor.Placement.SelectedInteractable?.Id == interactableId;
-            //    UpdateBtnVisual(border, isSelected);
-            //}
+            if (sender is Border border && border.Tag is string prefabId && Editor != null)
+            {
+                UpdatePrefabBtnVisual(border);
+                Editor.Placement.PropertyChanged += (_, __) => UpdatePrefabBtnVisual(border);
+            }
         }
 
-        private void InteractableImageLoaded(object sender, RoutedEventArgs e)
+        private void UpdatePrefabBtnVisual(Border border)
         {
-            //if (sender is Image img && img.DataContext is InteractableDefinition def && !string.IsNullOrEmpty(def.ImagePath))
-            //{
-            //    LoadImage(img, def.ImagePath);
-            //}
+            if (border.Tag is string prefabId && Editor != null)
+            {
+                bool isSelected = Editor.Placement.SelectedPrefab?.Id == prefabId;
+                UpdateBtnVisual(border, isSelected);
+            }
+        }
+
+        private void PrefabImageLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is Image img && img.DataContext is GameObject gameObject)
+            {
+                var sprite = gameObject.Components.OfType<SpriteRendererComponent>().FirstOrDefault();
+
+                if (sprite != null && !string.IsNullOrEmpty(sprite.SpritePath))
+                    LoadImage(img, sprite.SpritePath);
+            }
         }
 
         #endregion
 
-        #region Trap Methods
-        private void OnTrapClicked(object sender, RoutedEventArgs e)
-        {
-            //if (sender is Border border && border.Tag is string trapId && Editor != null)
-            //{
-            //    Editor.Placement.SelectedTrap = Editor.Definition.TrapDefinitions.First(t => t.Id == trapId);
-            //}
-        }
-
-        private void TrapButtonLoaded(object sender, RoutedEventArgs e)
-        {
-            //if (sender is Border border && border.Tag is string trapId && Editor != null)
-            //{
-            //    UpdateTrapBtnVisual(border);
-            //    Editor.Placement.PropertyChanged += (_, __) => UpdateTrapBtnVisual(border);
-            //}
-        }
-
-        private void UpdateTrapBtnVisual(Border border)
-        {
-            //if (border.Tag is string trapId && Editor != null)
-            //{
-            //    bool isSelected = Editor.Placement.SelectedTrap?.Id == trapId;
-            //    UpdateBtnVisual(border, isSelected);
-            //}
-        }
-
-        private void TrapImageLoaded(object sender, RoutedEventArgs e)
-        {
-            //if (sender is Image img && img.DataContext is TrapDefinition def && !string.IsNullOrEmpty(def.ImagePath))
-            //{
-            //    LoadImage(img, def.ImagePath);
-            //}
-        }
-        #endregion
 
         //Helpers
         private void UpdateBtnVisual(Border border, bool status)
@@ -179,10 +149,6 @@ namespace TTEngine.Editor.Panels
             => ToolModeChanged?.Invoke(ToolMode.Brush);
         private void Fill_Checked(object sender, RoutedEventArgs e)
             => ToolModeChanged?.Invoke(ToolMode.Fill);
-        private void PlayerSpawn_Checked(object sender, RoutedEventArgs e)
-            => ToolModeChanged?.Invoke(ToolMode.PlayerSpawn);
-        private void EnemySpawn_Checked(object sender, RoutedEventArgs e)
-            => ToolModeChanged?.Invoke(ToolMode.EnemySpawn);
 
         //Button Clicks
         private void StartGame_Click(object sender, RoutedEventArgs e)

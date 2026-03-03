@@ -32,7 +32,13 @@
                 "Interactable",
                 typeof(InteractableComponent),
                 allowMultiple: false,
-                isRemovable: true)
+                isRemovable: true),
+
+            new ComponentTypeInfo(
+                "SpriteRenderer",
+                typeof(SpriteRendererComponent),
+                allowMultiple : false,
+                isRemovable : true)
         };
 
         public static IReadOnlyList<ComponentTypeInfo> Types => _types;

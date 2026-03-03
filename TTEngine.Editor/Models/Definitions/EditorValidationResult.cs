@@ -1,4 +1,4 @@
-﻿namespace TTEngine.Editor.Models.Validation
+﻿namespace TTEngine.Editor.Models.Definitions
 {
     public class EditorValidationResult
     {

@@ -4,7 +4,7 @@ using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
 using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Validation;
+using TTEngine.Editor.Services.Editor;
 
 namespace TTEngine.Editor.EditorServices.Interaction
 {
@@ -33,27 +33,26 @@ namespace TTEngine.Editor.EditorServices.Interaction
             if (scene == null)
                 return;
 
-            _isPainting = true;
-            _currentBatch = new TileBatchCommand();
-
-            switch (_state.Tool.CurrentToolMode)
+            if(_state.Placement.ActivePlacementMode == PlacementMode.Tile)
             {
-                case ToolMode.Brush:
-                    HandleBrush(pos, e);
-                    HandlePlacementModes(pos, e);
-                    break;
-                case ToolMode.Fill:
-                    if (e.LeftButton == MouseButtonState.Pressed)
-                        HandleFill(pos);
-                    break;
-                case ToolMode.PlayerSpawn:
-                    HandlePlayerSpawn(pos);
-                    break;
-                case ToolMode.EnemySpawn:
-                    HandleEnemySpawn(pos, e);
-                    break;
+                _isPainting = true;
+                _currentBatch = new TileBatchCommand();
+                switch (_state.Tool.CurrentToolMode)
+                {
+                    case ToolMode.Brush:
+                        HandleBrush(pos, e);
+                        break;
+                    case ToolMode.Fill:
+                        if (e.LeftButton == MouseButtonState.Pressed)
+                            HandleFill(pos);
+                        break;
+                }
             }
-
+            else if(_state.Placement.ActivePlacementMode == PlacementMode.Object)
+            {
+                HandleObjectPlacement(pos, e);
+            }
+           
             _redraw();
         }
 
@@ -193,13 +192,14 @@ namespace TTEngine.Editor.EditorServices.Interaction
 
         #endregion
 
-        #region Entity Spawns
+        #region Object 
 
-        private void HandlePlayerSpawn(Point pos)
+        private void HandleObjectPlacement(Point pos, MouseButtonEventArgs e)
         {
             var scene = _state.SceneSession.ActiveScene;
             if (scene == null)
                 return;
+
             var map = scene.Map;
 
             int x = (int)(pos.X / map.TileSize);
@@ -208,149 +208,34 @@ namespace TTEngine.Editor.EditorServices.Interaction
             if (!IsValid(x, y, map))
                 return;
 
-            if (!EditorValidator.CanPlaceObject(scene, x, y))
-                return;
+            var existing = scene.SceneObjects.FirstOrDefault(o => o.X == x && o.Y == y);
 
-            scene.Spawns.Player = new SpawnDef
+            if(e.LeftButton == MouseButtonState.Pressed)
             {
-                X = x,
-                Y = y,
-                DefinitionId = "Player"
-            };
-        }
-
-        private void HandleEnemySpawn(Point pos, MouseButtonEventArgs e)
-        {
-            var scene = _state.SceneSession.ActiveScene;
-            if (scene == null)
-                return;
-            var map = scene.Map;
-
-            int x = (int)(pos.X / map.TileSize);
-            int y = (int)(pos.Y / map.TileSize);
-
-            if (!IsValid(x, y, map))
-                return;
-
-            var existing = scene.Spawns.Enemies
-                .FirstOrDefault(s => s.X == x && s.Y == y);
-
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if (!EditorValidator.CanPlaceObject(scene, x, y))
+                if (_state.Placement.SelectedPrefab.Id == null)
                     return;
 
-                //if (existing == null && _state.Definition.EntityDefinitions.Any())
-                //{
-                //    scene.Spawns.Enemies.Add(
-                //        new SpawnDef
-                //        {
-                //            DefinitionId = "Samurai",
-                //            X = x,
-                //            Y = y
-                //        });
-                //}
-            }
-            else if (e.RightButton == MouseButtonState.Pressed)
-            {
-                if (existing != null)
-                    scene.Spawns.Enemies.Remove(existing);
-            }
-        }
-
-        #endregion
-
-        #region Interactables
-
-        private void HandlePlacementModes(Point pos, MouseButtonEventArgs e)
-        {
-            if (_state.Placement.ActivePlacementMode == PlacementMode.Interactable)
-                HandleInteractablePlacement(pos, e);
-
-            if (_state.Placement.ActivePlacementMode == PlacementMode.Trap)
-                HandleTrapPlacement(pos, e);
-        }
-
-        private void HandleInteractablePlacement(Point pos, MouseButtonEventArgs e)
-        {
-            var scene = _state.SceneSession.ActiveScene;
-            if (scene == null)
-                return;
-            var map = scene.Map;
-
-            int x = (int)(pos.X / map.TileSize);
-            int y = (int)(pos.Y / map.TileSize);
-
-            if (!IsValid(x, y, map))
-                return;
-
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                //if (_state.Placement.SelectedInteractable == null)
+                //if (!EditorValidator.CanPlaceObject(scene, x, y))
                 //    return;
 
-                if (!EditorValidator.CanPlaceObject(scene, x, y))
-                    return;
-
-                //if (!scene.Spawns.Interactables.Any(i => i.X == x && i.Y == y))
-                //{
-                //    scene.Spawns.Interactables.Add(new SpawnDef
-                //    {
-                //        X = x,
-                //        Y = y,
-                //        DefinitionId = _state.Placement.SelectedInteractable.Id
-                //    });
-                //}
+                if(existing == null)
+                {
+                    scene.SceneObjects.Add(new SceneObjectData
+                    {
+                        PrefabId = _state.Placement.SelectedPrefab.Id,
+                        InstanceId = Guid.NewGuid().ToString(),
+                        X = x,
+                        Y = y,
+                        IsActive = true
+                    });
+                }
             }
-            else if (e.RightButton == MouseButtonState.Pressed)
+            else if(e.RightButton == MouseButtonState.Pressed)
             {
-                var existing = scene.Spawns.Interactables
-                    .FirstOrDefault(i => i.X == x && i.Y == y);
-
-                if (existing != null)
-                    scene.Spawns.Interactables.Remove(existing);
+                if(existing != null)
+                    scene.SceneObjects.Remove(existing);
             }
-        }
 
-        private void HandleTrapPlacement(Point pos, MouseButtonEventArgs e)
-        {
-            var scene = _state.SceneSession.ActiveScene;
-            if (scene == null)
-                return;
-            var map = scene.Map;
-
-            int x = (int)(pos.X / map.TileSize);
-            int y = (int)(pos.Y / map.TileSize);
-
-            if (!IsValid(x, y, map))
-                return;
-                
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                //if (_state.Placement.SelectedTrap == null)
-                //    return;
-
-                if (!EditorValidator.CanPlaceObject(scene, x, y))
-                    return;
-
-                //if (!scene.Spawns.Traps.Any(t => t.X == x && t.Y == y))
-                //{
-                //    scene.Spawns.Traps.Add(new SpawnDef
-                //    {
-                //        X = x,
-                //        Y = y,
-                //        DefinitionId = _state.Placement.SelectedTrap.Id
-                //    });
-                //}
-            }
-            else if (e.RightButton == MouseButtonState.Pressed)
-            {
-                var existing = scene.Spawns.Traps
-                    .FirstOrDefault(t => t.X == x && t.Y == y);
-
-                if (existing != null)
-                    scene.Spawns.Traps.Remove(existing);
-            }
         }
 
         #endregion

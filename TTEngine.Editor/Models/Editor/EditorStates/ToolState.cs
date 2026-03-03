@@ -3,9 +3,7 @@
     public enum ToolMode
     {
         Brush,
-        Fill,
-        PlayerSpawn,
-        EnemySpawn
+        Fill
     }
 
     public class ToolState : ObservableObject

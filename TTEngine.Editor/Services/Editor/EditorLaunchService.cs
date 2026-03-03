@@ -9,7 +9,7 @@ using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services.Asset;
 using TTEngine.Editor.Services.IO;
 
-namespace TTEngine.Editor.Services
+namespace TTEngine.Editor.Services.Editor
 {
     public static class EditorLaunchService
     {

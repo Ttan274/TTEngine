@@ -56,7 +56,7 @@ namespace TTEngine.Editor.Services
                             .ToList();
         }
 
-        //Default Scene Creation
+        //Scene Creation
         public Scene CreateScene(string id, int w, int h, int t)
         {
             var scene = new Scene
@@ -69,7 +69,7 @@ namespace TTEngine.Editor.Services
                     TileSize = t,
                     CollisionTiles = CreateEmptyGrid(w, h)
                 },
-                Spawns = new SpawnData(),
+                SceneObjects = new List<SceneObjectData>(),
                 IsActive = true
             };
 

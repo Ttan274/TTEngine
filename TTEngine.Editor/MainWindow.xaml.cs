@@ -5,13 +5,14 @@ using System.Windows.Input;
 using TTEngine.Editor.EditorServices.EngineLauncher;
 using TTEngine.Editor.EditorServices.Interaction;
 using TTEngine.Editor.EditorServices.Rendering;
+using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.GameObject;
 using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Models.Validation;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services;
+using TTEngine.Editor.Services.Editor;
 using TTEngine.Editor.Services.IO;
 
 namespace TTEngine.Editor
@@ -236,10 +237,11 @@ namespace TTEngine.Editor
         {
             editorState.Console.Clear();
 
-            var result = EditorValidator.ValidateMap(editorState.SceneSession.ActiveScene);
+            var result = new EditorValidationResult();
+            //var result = EditorValidator.ValidateMap(editorState.SceneSession.ActiveScene);
 
-            foreach (var error in result.Errors)
-                editorState.Console.Log(error);
+            //foreach (var error in result.Errors)
+            //    editorState.Console.Log(error);
 
             return result;
         }

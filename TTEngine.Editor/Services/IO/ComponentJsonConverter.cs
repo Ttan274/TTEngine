@@ -25,6 +25,7 @@ namespace TTEngine.Editor.Services.IO
                 "EntityStats" => typeof(EntityComponent),
                 "Interactable" => typeof(InteractableComponent),
                 "Trap" => typeof(TrapComponent),
+                "SpriteRenderer" => typeof(SpriteRendererComponent),
                 _ => throw new Exception($"Unknonw component type : {type}") 
             };
 

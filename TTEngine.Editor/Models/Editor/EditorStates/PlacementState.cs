@@ -5,8 +5,7 @@ namespace TTEngine.Editor.Models.Editor.EditorStates
     public enum PlacementMode
     {
         Tile,
-        Interactable,
-        Trap
+        Object
     }
 
     public class PlacementState : ObservableObject
@@ -26,48 +25,30 @@ namespace TTEngine.Editor.Models.Editor.EditorStates
             {
                 if(SetProperty(ref _selectedTile, value) && value != null)
                 {
-                    //SelectedInteractable = null;
-                    //SelectedTrap = null;
+                    SelectedPrefab = null;
                     ActivePlacementMode = PlacementMode.Tile;
                 }
             }
         }
 
-        //private InteractableDefinition _selectedInteractable;
-        //public InteractableDefinition SelectedInteractable
-        //{
-        //    get => _selectedInteractable;
-        //    set
-        //    {
-        //        if (SetProperty(ref _selectedInteractable, value) && value != null)
-        //        {
-        //            SelectedTile = null;
-        //            SelectedTrap = null;
-        //            ActivePlacementMode = PlacementMode.Interactable;
-        //        }
-        //    }
-        //}
-
-        //private TrapDefinition _selectedTrap;
-        //public TrapDefinition SelectedTrap
-        //{
-        //    get => _selectedTrap;
-        //    set
-        //    {
-        //        if (SetProperty(ref _selectedTrap, value) && value != null)
-        //        {
-        //            SelectedTile = null;
-        //            SelectedInteractable = null;
-        //            ActivePlacementMode = PlacementMode.Trap;
-        //        }
-        //    }
-        //}
+        private GameObject.GameObject _selectedPrefab;
+        public GameObject.GameObject SelectedPrefab
+        {
+            get => _selectedPrefab;
+            set
+            {
+                if(SetProperty(ref _selectedPrefab, value) && value != null)
+                {
+                    SelectedTile = null;
+                    ActivePlacementMode = PlacementMode.Object;
+                }
+            }
+        }
 
         public void ClearSelection()
         {
             SelectedTile = null;
-            //SelectedInteractable = null;
-            //SelectedTrap = null;
+            SelectedPrefab = null;
         }
     }
 }

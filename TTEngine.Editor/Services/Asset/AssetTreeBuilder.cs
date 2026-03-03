@@ -40,7 +40,7 @@ namespace TTEngine.Editor.Services.Asset
                 Name = dir.Name,
                 FullPath = dir.FullName,
                 IsFolder = true,
-                Type = AssetType.Folder
+                Type = FileExtension.Folder
             };
 
             foreach (var subdir in dir.GetDirectories())
@@ -61,14 +61,14 @@ namespace TTEngine.Editor.Services.Asset
             return node;
         }
 
-        private static AssetType ResolveType(FileInfo file)
+        private static FileExtension ResolveType(FileInfo file)
         {
             return file.Extension.ToLower() switch
             {
-                ".json" => AssetType.Json,
-                ".png" => AssetType.Texture,
-                ".ttf" => AssetType.Font,
-                _ => AssetType.Unknown
+                ".json" => FileExtension.Json,
+                ".png" => FileExtension.Texture,
+                ".ttf" => FileExtension.Font,
+                _ => FileExtension.Unknown
             };
         }
 
