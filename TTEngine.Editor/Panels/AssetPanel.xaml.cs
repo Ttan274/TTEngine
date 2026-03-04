@@ -170,6 +170,11 @@ namespace TTEngine.Editor.Panels
             CreateJsonAsset<AnimationDefinition>("NewAnimation");
         }
 
+        private void CreateAnimator_Click(object sender, RoutedEventArgs e)
+        {
+            CreateJsonAsset<AnimatorDefinition>("NewAnimator");
+        }
+
         private void CreateTile_Click(object sender, RoutedEventArgs e)
         {
             CreateJsonAsset<TileDefinition>("NewTile");

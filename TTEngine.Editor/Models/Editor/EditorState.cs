@@ -1,4 +1,5 @@
 ﻿using TTEngine.Editor.Models.Editor.EditorStates;
+using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
@@ -24,12 +25,16 @@ namespace TTEngine.Editor.Models.Editor
         //Console 
         public EditorConsole Console { get; }
 
+        //Project
+        public ProjectSession Project { get; }
+
         public EditorState(
             ToolState tool, 
             PlacementState placement, 
             SceneSessionState sceneSession,
             DefinitionCatalog definition,
-            EditorConsole console)
+            EditorConsole console,
+            ProjectSession project)
         {
             //State bindings
             Tool = tool;
@@ -39,6 +44,9 @@ namespace TTEngine.Editor.Models.Editor
 
             //Console
             Console = console;
+
+            //Project
+            Project = project;
         }
 
         //Map Session Helper

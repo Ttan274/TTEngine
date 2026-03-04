@@ -42,6 +42,7 @@
                       Foreground="White"/>
         </DataTemplate>
 
+        <!-- DICTIONARY TEMPLATE -->
         <DataTemplate x:Key="DictionaryTemplate">
             <ItemsControl ItemsSource="{Binding DictionaryItems}">
                 <ItemsControl.ItemTemplate>
@@ -58,14 +59,31 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </DataTemplate>
-        
+
+        <!-- ASSET TEMPLATE -->
+        <DataTemplate x:Key="AssetTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBox    Text="{Binding StringValue, 
+                                   Mode=TwoWay, 
+                                   UpdateSourceTrigger=LostFocus}"
+                            Width="150"
+                            Background="#3A3A3A"
+                            Foreground="White"/>
+
+                <Button     Content="..."
+                            Margin="4,0,0,0"
+                            Click="AssetPicker_Click"/>
+            </StackPanel>
+        </DataTemplate>
+
         <!-- TEMPLATE SELECTOR -->
         <local:PropertyEditorTemplateSelector x:Key="EditorSelector"
                                               StringTemplate="{StaticResource StringTemplate}"
                                               NumberTemplate="{StaticResource NumberTemplate}"
                                               BoolTemplate="{StaticResource BoolTemplate}"
                                               EnumTemplate="{StaticResource EnumTemplate}"
-                                              DictionaryTemplate="{StaticResource DictionaryTemplate}"/>
+                                              DictionaryTemplate="{StaticResource DictionaryTemplate}"
+                                              AssetTemplate="{StaticResource AssetTemplate}"/>
 
     </UserControl.Resources>
     

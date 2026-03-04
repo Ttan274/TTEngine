@@ -10,7 +10,7 @@ using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
-namespace TTEngine.Editor.EditorServices.Rendering
+namespace TTEngine.Editor.Services.Map
 {
     public class MapRenderer
     {

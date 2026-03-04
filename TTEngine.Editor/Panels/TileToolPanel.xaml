@@ -47,32 +47,34 @@
                         Foreground="White"
                         Margin="0,0,0,6"/>
 
-            <ItemsControl ItemsSource="{Binding Definition.GameObjects}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="4"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+            <ListBox    ItemsSource="{Binding Definition.GameObjects}"
+                        SelectedItem="{Binding Placement.SelectedPrefab, Mode=TwoWay}"
+                        Background="#2D2D2D"
+                        BorderBrush="#555"
+                        Foreground="White"
+                        Height="200">
 
-                <ItemsControl.ItemTemplate>
+                <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="40"
-                                Height="40"
-                                Margin="4"
-                                Tag="{Binding Id}"
-                                BorderThickness="1"
-                                BorderBrush="DimGray"
-                                Background="#2D2D2D"
-                                MouseLeftButtonDown="OnPrefabClicked"
-                                ToolTip="{Binding Id}"
-                                Loaded="PrefabButtonLoaded">
-                            <Image      Stretch="Uniform"
-                                        Loaded="PrefabImageLoaded"/>
-
-                        </Border>
+                        <TextBlock  Text="{Binding Id}"
+                                    Padding="4"/>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                </ListBox.ItemTemplate>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Background" Value="#2D2D2D"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#444"/>
+                                <Setter Property="BorderBrush" Value="Gold"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
 
             <!-- BRUSH SIZE -->
             <TextBlock Text="Brush Size"

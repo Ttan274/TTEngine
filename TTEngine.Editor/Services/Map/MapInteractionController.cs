@@ -6,7 +6,7 @@ using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services.Editor;
 
-namespace TTEngine.Editor.EditorServices.Interaction
+namespace TTEngine.Editor.Services.Map
 {
     public class MapInteractionController
     {

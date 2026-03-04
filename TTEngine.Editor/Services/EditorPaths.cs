@@ -24,14 +24,20 @@ namespace TTEngine.Editor.Services
         private static string Combine(params string[] parts)
             => Path.GetFullPath(Path.Combine(new[] { Root }.Concat(parts).ToArray()));
 
-        //Map Helper
-        //public static string GetMapPath(string mapId)
-        //    => Path.Combine(Maps, $"{mapId}.json");
-
         //will be deleted 
         public static string GetTextureFolder()
         {
             return Path.GetFullPath(Path.Combine(Root, "Assets", "Textures"));
+        }
+
+        public static string GetAnimationFolder()
+        {
+            return Path.GetFullPath(Path.Combine(Root, "Assets", "Animations"));
+        }
+
+        public static string GetAnimatorFolder()
+        {
+            return Path.GetFullPath(Path.Combine(Root, "Assets", "Animators"));
         }
 
         //Engine Exe

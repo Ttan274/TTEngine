@@ -1,4 +1,6 @@
-﻿namespace TTEngine.Editor.Models.Component
+﻿using TTEngine.Editor.Models.Asset;
+
+namespace TTEngine.Editor.Models.Component
 {
     public class SpriteRendererComponent : ComponentBase
     {
@@ -8,6 +10,7 @@
         }
 
         private string _spritePath;
+        [AssetReference(AssetType.Texture)]
         public string SpritePath
         {
             get => _spritePath;

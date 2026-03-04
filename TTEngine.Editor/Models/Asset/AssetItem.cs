@@ -3,7 +3,8 @@
     public enum AssetType
     {
         Texture,
-        Animation       //Audio, ...
+        Animator,
+        Animation 
     }
 
     public class AssetItem

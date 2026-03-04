@@ -57,6 +57,7 @@ namespace TTEngine.Editor.Services.Editor
 
             //Animation
             services.AddTransient<AnimationPanel>();
+            services.AddTransient<AnimatorPanel>();
 
             //Assets
             services.AddSingleton<AssetFileService>();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reflection;
+using TTEngine.Editor.Models.Asset;
 using TTEngine.Editor.Models.Editor;
 
 namespace TTEngine.Editor.ViewModels.Panel
@@ -24,6 +25,8 @@ namespace TTEngine.Editor.ViewModels.Panel
             }
         }
 
+        public AssetReferenceAttribute AssetReference { get; }
+
         public event Action ValueChanged;
 
         public ObservableCollection<DictionaryItemViewModel> DictionaryItems { get; }
@@ -32,6 +35,7 @@ namespace TTEngine.Editor.ViewModels.Panel
         {
             TargetObject = targetObject;
             Property = property;
+            AssetReference = property.GetCustomAttribute<AssetReferenceAttribute>();
 
             if(IsStringDictionary)
             {
@@ -52,6 +56,7 @@ namespace TTEngine.Editor.ViewModels.Panel
             PropertyType == typeof(float);
         public bool IsStringDictionary =>
             PropertyType == typeof(Dictionary<string, string>);
+        public bool IsAssetReference => AssetReference != null;
          
         public Array EnumValues => IsEnum ? Enum.GetValues(PropertyType) : null;
 

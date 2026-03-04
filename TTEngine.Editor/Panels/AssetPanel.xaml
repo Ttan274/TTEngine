@@ -64,6 +64,9 @@
 
                                         <MenuItem Header="Animation"
                                                   Click="CreateAnimation_Click"/>
+                                        
+                                        <MenuItem Header="Animator"
+                                                  Click="CreateAnimator_Click"/>
 
                                         <MenuItem Header="Tile"
                                                   Click="CreateTile_Click"/>

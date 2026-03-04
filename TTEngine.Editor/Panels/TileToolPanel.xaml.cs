@@ -4,10 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using TTEngine.Editor.Models.Component;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
-using TTEngine.Editor.Models.GameObject;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Services;
 
@@ -30,7 +28,6 @@ namespace TTEngine.Editor.Panels
         }
 
         #region Tile Methods
-
         private void OnTileClicked(object sender, RoutedEventArgs e)
         {
             if (sender is Border border && border.Tag is int tileId && Editor != null)
@@ -52,87 +49,36 @@ namespace TTEngine.Editor.Panels
             if (border.Tag is int tileId && Editor != null)
             {
                 bool isSelected = Editor.Placement.SelectedTile?.Id == tileId;
-                UpdateBtnVisual(border, isSelected);
+
+                border.BorderBrush = isSelected
+                                ? Brushes.Gold
+                                : Brushes.DimGray;
+
+                border.BorderThickness = isSelected
+                                    ? new Thickness(2)
+                                    : new Thickness(1);
             }
         }
+
         private void TileImageLoaded(object sender, RoutedEventArgs e)
         {
             if (sender is Image img && img.DataContext is TileDefinition tile && !string.IsNullOrEmpty(tile.SpritePath))
             {
-                LoadImage(img, tile.SpritePath);
+                string path = Path.Combine(EditorPaths.GetTextureFolder(), tile.SpritePath);
+
+                if (!File.Exists(path))
+                    return;
+
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.UriSource = new Uri(path, UriKind.Absolute);
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.EndInit();
+
+                img.Source = bmp;
             }
         }
         #endregion
-
-        #region Prefab
-
-        private void OnPrefabClicked(object sender, RoutedEventArgs e)
-        {
-            if (sender is Border border && border.Tag is string prefabId && Editor != null)
-            {
-                Editor.Placement.SelectedPrefab = Editor.Definition.GameObjects.First(p => p.Id == prefabId);
-            }
-        }
-
-        private void PrefabButtonLoaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is Border border && border.Tag is string prefabId && Editor != null)
-            {
-                UpdatePrefabBtnVisual(border);
-                Editor.Placement.PropertyChanged += (_, __) => UpdatePrefabBtnVisual(border);
-            }
-        }
-
-        private void UpdatePrefabBtnVisual(Border border)
-        {
-            if (border.Tag is string prefabId && Editor != null)
-            {
-                bool isSelected = Editor.Placement.SelectedPrefab?.Id == prefabId;
-                UpdateBtnVisual(border, isSelected);
-            }
-        }
-
-        private void PrefabImageLoaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is Image img && img.DataContext is GameObject gameObject)
-            {
-                var sprite = gameObject.Components.OfType<SpriteRendererComponent>().FirstOrDefault();
-
-                if (sprite != null && !string.IsNullOrEmpty(sprite.SpritePath))
-                    LoadImage(img, sprite.SpritePath);
-            }
-        }
-
-        #endregion
-
-
-        //Helpers
-        private void UpdateBtnVisual(Border border, bool status)
-        {
-            border.BorderBrush = status
-                                ? Brushes.Gold
-                                : Brushes.DimGray;
-
-            border.BorderThickness = status
-                                ? new Thickness(2)
-                                : new Thickness(1);
-        }
-
-        private void LoadImage(Image img, string fileName)
-        {
-            string path = Path.Combine(EditorPaths.GetTextureFolder(), fileName);
-
-            if (!File.Exists(path))
-                return;
-
-            var bmp = new BitmapImage();
-            bmp.BeginInit();
-            bmp.UriSource = new Uri(path, UriKind.Absolute);
-            bmp.CacheOption = BitmapCacheOption.OnLoad;
-            bmp.EndInit();
-
-            img.Source = bmp;
-        }
 
         //Brush Size
         private void BrushSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

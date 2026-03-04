@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="TTEngine.Editor.Panels.AnimatorPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10" Width="320" Background="Wheat">
+
+            <TextBlock Text="Animator Definition"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+            <!-- ID -->
+            <TextBlock Text="Animator Id"/>
+            <TextBox Text="{Binding Id}" Margin="0,0,0,8"/>
+
+            <!-- Default State -->
+            <TextBlock Text="Default State"/>
+            <ComboBox   ItemsSource="{Binding States}"
+                        SelectedValuePath="Name"
+                        DisplayMemberPath="Name"
+                        SelectedValue="{Binding DefaultState, Mode=TwoWay}"/>
+
+            <!-- States -->
+            <TextBlock Text="States"
+                       FontWeight="Bold"
+                       Margin="0,6,0,4"/>
+
+            <ItemsControl ItemsSource="{Binding States}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#666"
+                                BorderThickness="1"
+                                Margin="0,4"
+                                Padding="6">
+
+                            <StackPanel>
+
+                                <!-- State Name -->
+                                <TextBlock Text="State Name"/>
+                                <TextBox Text="{Binding Name, Mode=TwoWay}"
+                                         Margin="0,0,0,6"/>
+
+                                <!-- Animation -->
+                                <TextBlock Text="Animation"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Text="{Binding Animation, Mode=TwoWay}"
+                                             Width="200"
+                                             IsReadOnly="True"/>
+
+                                    <Button Content="..."
+                                            Width="40"
+                                            Margin="4,0,0,0"
+                                            Click="PickAnimation_Click"/>
+                                </StackPanel>
+
+                                <Button Content="Remove"
+                                        Margin="0,6,0,0"
+                                        HorizontalAlignment="Right"
+                                        Click="RemoveState_Click"/>
+
+                            </StackPanel>
+
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Button Content="+ Add State"
+                    Margin="0,10,0,0"
+                    Click="AddState_Click"/>
+
+            <Button Content="Save Animator"
+                    Margin="0,12,0,0"
+                    Click="Save_Click"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

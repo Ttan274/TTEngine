@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 
-namespace TTEngine.Editor.EditorServices.EngineLauncher
+namespace TTEngine.Editor.Services
 {
     public class EngineLauncher
     {

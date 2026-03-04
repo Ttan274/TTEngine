@@ -2,9 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using TTEngine.Editor.EditorServices.EngineLauncher;
-using TTEngine.Editor.EditorServices.Interaction;
-using TTEngine.Editor.EditorServices.Rendering;
 using TTEngine.Editor.Models.Definitions;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.GameObject;
@@ -12,8 +9,8 @@ using TTEngine.Editor.Models.Selection;
 using TTEngine.Editor.Models.Tile;
 using TTEngine.Editor.Panels;
 using TTEngine.Editor.Services;
-using TTEngine.Editor.Services.Editor;
 using TTEngine.Editor.Services.IO;
+using TTEngine.Editor.Services.Map;
 
 namespace TTEngine.Editor
 {
@@ -32,7 +29,9 @@ namespace TTEngine.Editor
         //Assets
         private readonly AssetPanel _assetPanel;
         private readonly AnimationPanel _animationPanel;
+        private readonly AnimatorPanel _animatorPanel;
         private bool IsAnimTabOpened = false;
+        private bool IsAnimatorTabOpened = false;
 
         //Editor State
         public EditorState editorState { get; }
@@ -40,12 +39,17 @@ namespace TTEngine.Editor
         //Engine Launcher
         private EngineLauncher _engineLauncher = new EngineLauncher();
 
-        public MainWindow(EditorState editor, AssetPanel assetPanel, AnimationPanel animationPanel)
+        public MainWindow(EditorState editor, 
+            AssetPanel assetPanel, 
+            AnimationPanel animationPanel,
+            AnimatorPanel animatorPanel)
         {
             InitializeComponent();
+            //Binding
             editorState = editor;
             _assetPanel = assetPanel;
             _animationPanel = animationPanel;
+            _animatorPanel = animatorPanel;
             DataContext = editorState;
 
             _assetPanel.AssetCreated += OpenAsset;
@@ -277,6 +281,19 @@ namespace TTEngine.Editor
                 {
                     AddTab("Animation", _animationPanel);
                     IsAnimTabOpened = true;
+                }
+
+                return null;
+            }
+
+            if(path.Contains("Animators"))
+            {
+                _animatorPanel.LoadFile(path);
+
+                if(!IsAnimatorTabOpened)
+                {
+                    AddTab("Animator", _animatorPanel);
+                    IsAnimatorTabOpened = true;
                 }
 
                 return null;

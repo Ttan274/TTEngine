@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using TTEngine.Editor.Models.Asset;
+using TTEngine.Editor.Models.Project;
 using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.WindowPanels
@@ -13,22 +14,26 @@ namespace TTEngine.Editor.WindowPanels
     /// </summary>
     public partial class AssetPickerWindow : Window
     {
+        private readonly ProjectSession _session;
         private readonly AssetType _type;
         public string SelectedAsset { get; private set; }
 
-        public AssetPickerWindow(AssetType type)
+        public AssetPickerWindow(ProjectSession session, AssetType type)
         {
             InitializeComponent();
             _type = type;
+            _session = session;
             LoadAssets();
         }
 
         private void LoadAssets()
         {
+            //BU konumlar yanlış projeye özgü hale getirmemiz lazım
             string folder = _type switch
             {
-                AssetType.Animation => throw new NotImplementedException(),
-                AssetType.Texture => EditorPaths.GetTextureFolder(),
+                AssetType.Animation => _session.AnimationsPath,
+                AssetType.Animator => _session.AnimatorsPath,
+                AssetType.Texture => _session.TexturesPath,
                 _ => null
             };
 

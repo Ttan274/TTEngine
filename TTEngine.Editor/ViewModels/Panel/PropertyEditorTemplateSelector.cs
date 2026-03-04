@@ -10,6 +10,7 @@ namespace TTEngine.Editor.ViewModels.Panel
         public DataTemplate StringTemplate { get; set; }
         public DataTemplate NumberTemplate { get; set; }
         public DataTemplate DictionaryTemplate {  get; set; }
+        public DataTemplate AssetTemplate {  get; set; }
         
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -27,6 +28,9 @@ namespace TTEngine.Editor.ViewModels.Panel
 
             if(field.IsStringDictionary)
                 return DictionaryTemplate;
+
+            if (field.IsAssetReference)
+                return AssetTemplate;
 
             return StringTemplate;
         }
