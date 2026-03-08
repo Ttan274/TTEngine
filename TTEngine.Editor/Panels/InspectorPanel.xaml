@@ -5,35 +5,18 @@
              xmlns:views="clr-namespace:TTEngine.Editor.Panels.InspectorViews">
 
     <UserControl.Resources>
+        
         <!--  Map Selections -->
         
         <DataTemplate DataType="{x:Type vm:TileSelectionViewModel}">
             <views:TileInspectorView/>
         </DataTemplate>
-       
-      <!--
-        <DataTemplate DataType="{x:Type vm:PlayerSelectionViewModel}">
-            <views:PlayerInspectorView/>
-        </DataTemplate>
         
-       
-        <DataTemplate DataType="{x:Type vm:EnemySelectionViewModel}">
-            <views:EnemyInspectorView/>
+        <DataTemplate DataType="{x:Type vm:SceneObjectSelectionViewModel}">
+            <views:SceneObjectInspector/>
         </DataTemplate>
-
-       
-        <DataTemplate DataType="{x:Type vm:InteractableSelectionViewModel}">
-            <views:InteractableInspectorView/>
-        </DataTemplate>-->
-
-        <!-- trap eklicez inşallah
-        <DataTemplate DataType="{x:Type vm:TrapSelectionViewModel}">
-            <views:TrapInspector/>
-        </DataTemplate>
-        -->
 
         <!--Asset Selection-->
-
         <DataTemplate DataType="{x:Type vm:TileAssetSelectionViewModel}">
             <views:GenericInspectorView DataContext="{Binding Inspector}"/>
         </DataTemplate>

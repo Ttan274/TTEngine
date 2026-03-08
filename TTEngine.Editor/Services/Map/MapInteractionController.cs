@@ -208,7 +208,7 @@ namespace TTEngine.Editor.Services.Map
             if (!IsValid(x, y, map))
                 return;
 
-            var existing = scene.SceneObjects.FirstOrDefault(o => o.X == x && o.Y == y);
+            var prefab = scene.SceneObjects.FirstOrDefault(o => o.X == x && o.Y == y);
 
             if(e.LeftButton == MouseButtonState.Pressed)
             {
@@ -218,7 +218,7 @@ namespace TTEngine.Editor.Services.Map
                 //if (!EditorValidator.CanPlaceObject(scene, x, y))
                 //    return;
 
-                if(existing == null)
+                if(prefab == null)
                 {
                     scene.SceneObjects.Add(new SceneObjectData
                     {
@@ -232,8 +232,8 @@ namespace TTEngine.Editor.Services.Map
             }
             else if(e.RightButton == MouseButtonState.Pressed)
             {
-                if(existing != null)
-                    scene.SceneObjects.Remove(existing);
+                if(prefab != null)
+                    scene.SceneObjects.Remove(prefab);
             }
 
         }

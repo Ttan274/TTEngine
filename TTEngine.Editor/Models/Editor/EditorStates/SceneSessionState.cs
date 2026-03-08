@@ -1,4 +1,5 @@
-﻿using TTEngine.Editor.Services;
+﻿using TTEngine.Editor.Models.Scene;
+using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Models.Editor.EditorStates
 {
@@ -12,8 +13,8 @@ namespace TTEngine.Editor.Models.Editor.EditorStates
             _sceneService = sceneService;
         }
 
-        private TTEngine.Editor.Models.Scene.Scene _activeScene;
-        public TTEngine.Editor.Models.Scene.Scene ActiveScene
+        private Scene.Scene _activeScene;
+        public Scene.Scene ActiveScene
         {
             get => _activeScene;
             set => SetProperty(ref _activeScene, value);
@@ -24,6 +25,13 @@ namespace TTEngine.Editor.Models.Editor.EditorStates
         {
             get => _activeSceneId;
             set => SetProperty(ref _activeSceneId, value);
+        }
+
+        private SceneObjectData _selectedObject;
+        public SceneObjectData SelectedObject
+        {
+            get => _selectedObject;
+            set => SetProperty(ref _selectedObject, value);
         }
 
         //Save & Load

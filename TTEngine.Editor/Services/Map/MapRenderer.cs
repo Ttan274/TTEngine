@@ -28,6 +28,8 @@ namespace TTEngine.Editor.Services.Map
 
         //Hover Rectangle
         private Rectangle _hoverRect;
+        private Rectangle _selectionRect;
+        private bool _isHovering = false;
 
         public MapRenderer(Canvas root, EditorState state)
         {
@@ -40,7 +42,10 @@ namespace TTEngine.Editor.Services.Map
             _root.Children.Add(_objectLayer);
             _root.Children.Add(_overlayLayer);
 
-            CreateHoverRect();
+            _hoverRect = new Rectangle();
+            _selectionRect = new Rectangle();
+            CreateRect(_hoverRect, Brushes.Yellow);
+            CreateRect(_selectionRect, Brushes.Purple);
         }
 
         public void InitializeGrid()
@@ -220,25 +225,16 @@ namespace TTEngine.Editor.Services.Map
 
         #endregion
 
-        #region Hover
+        #region Hover/Selection
 
-        private void CreateHoverRect()
+        private void CreateRect(Rectangle rect, Brush b)
         {
-            _hoverRect = new Rectangle
-            {
-                Stroke = Brushes.Yellow,
-                StrokeThickness = 2,
-                Fill = Brushes.Transparent,
-                IsHitTestVisible = false,
-                Visibility = Visibility.Hidden
-            };
-
-            _overlayLayer.Children.Add(_hoverRect);
-        }
-
-        public void MakeHoverUnvisible()
-        {
-            _hoverRect.Visibility = Visibility.Hidden;
+            rect.Stroke = b;
+            rect.StrokeThickness = 2;
+            rect.Fill = Brushes.Transparent;
+            rect.IsHitTestVisible = false;
+            rect.Visibility = Visibility.Hidden;
+            _overlayLayer.Children.Add(rect);
         }
 
         public void UpdateHover(Point pos, int brushSize)
@@ -258,12 +254,52 @@ namespace TTEngine.Editor.Services.Map
                 return;
             }
 
+            _isHovering = true;
+            _selectionRect.Visibility = Visibility.Hidden;
+
             _hoverRect.Visibility = Visibility.Visible;
             _hoverRect.Width = brushSize * map.TileSize;
             _hoverRect.Height = brushSize * map.TileSize;
 
             Canvas.SetLeft(_hoverRect, x * map.TileSize);
             Canvas.SetTop(_hoverRect, y * map.TileSize);
+        }
+
+        public void UpdateSelection()
+        {
+            if (_isHovering)
+                return;
+
+            var selected = _state.SceneSession.SelectedObject;
+            var scene = _state.SceneSession.ActiveScene;
+
+            if(scene == null || selected == null)
+            {
+                _selectionRect.Visibility = Visibility.Hidden;
+                return; 
+            }
+
+            var map = scene.Map;
+
+            _selectionRect.Visibility = Visibility.Visible;
+            _selectionRect.Width = map.TileSize;
+            _selectionRect.Height = map.TileSize;
+
+            Canvas.SetLeft(_selectionRect, selected.X * map.TileSize);
+            Canvas.SetTop(_selectionRect, selected.Y * map.TileSize);
+        }
+
+        public void OnMouseEnter()
+        {
+            _isHovering = true;
+            _selectionRect.Visibility = Visibility.Hidden;
+        }
+
+        public void OnMouseLeave()
+        {
+            _isHovering = false;
+            _hoverRect.Visibility = Visibility.Hidden;
+            UpdateSelection();
         }
         #endregion
     }

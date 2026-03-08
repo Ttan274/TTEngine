@@ -19,10 +19,7 @@ namespace TTEngine.Editor.Services.Map
             if (scene == null)
                 return;
 
-            if (CheckInteractables(scene, x, y))
-                return;
-
-            if (CheckEntities(scene, x, y))
+            if (CheckSceneObjects(scene, x, y))
                 return;
 
             if(IsValid(x, y, scene.Map))
@@ -32,65 +29,17 @@ namespace TTEngine.Editor.Services.Map
             }
         }
 
-        private bool CheckEntities(Scene scene, int x, int y)
+        private bool CheckSceneObjects(Scene scene, int x, int y)
         {
-            //var player = scene.Spawns.Player;
+            var obj = scene.SceneObjects.FirstOrDefault(o => o.X == x && o.Y == y);
 
-            //if(player != null && player.X == x && player.Y == y)
-            //{
-            //    var def = _state.Definition.EntityDefinitions.
-            //        FirstOrDefault(d => d.Id == "Player");
+            if (obj == null)
+                return false;
 
-            //    if(def != null)
-            //        _state.CurrentSelection = new PlayerSelectionViewModel(x, y, def);
+            _state.CurrentSelection = new SceneObjectSelectionViewModel(obj);
+            _state.SceneSession.SelectedObject = obj;
 
-            //    return true;
-            //}
-
-            //var enemy = scene.Spawns.Enemies.FirstOrDefault(e => e.X == x && e.Y == y);
-
-            //if (enemy != null)
-            //{
-            //    var def = _state.Definition.EntityDefinitions.FirstOrDefault(d => d.Id == enemy.DefinitionId);
-
-            //    if (def != null)
-            //        _state.CurrentSelection = new EnemySelectionViewModel(x, y, def);
-
-            //    return true;
-            //}
-
-            return false;
-        }
-
-        private bool CheckInteractables(Scene scene, int x, int y)
-        {
-            //var interactable = scene.Spawns.Interactables.FirstOrDefault(i => i.X == x && i.Y == y);
-
-            //if (interactable != null)
-            //{
-            //    var def = _state.Definition.InteractableDefinitions.FirstOrDefault(d => d.Id == interactable.DefinitionId);
-
-            //    if (def != null)
-            //        _state.CurrentSelection = new InteractableSelectionViewModel(x, y, def.Id, def.Type);
-
-            //    return true;
-            //}
-
-            //var trap = scene.Spawns.Traps.FirstOrDefault(t => t.X == x && t.Y == y);
-
-            //if(trap != null)
-            //{
-            //    var def = _state.Definition.TrapDefinitions.FirstOrDefault(d => d.Id == trap.DefinitionId);
-
-            //    if (def != null)
-            //    {
-            //        //Trap selection view model eklenicek
-            //        //_state.CurrentSelection = new TrapSelectionViewModel(x, y, def.Id,);
-            //    }
-            //    return true;
-            //}
-
-            return false;
+            return true;
         }
 
         //Helper

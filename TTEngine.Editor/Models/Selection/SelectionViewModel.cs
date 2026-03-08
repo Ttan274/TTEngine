@@ -1,4 +1,4 @@
-﻿using TTEngine.Editor.Models.Definitions;
+﻿using TTEngine.Editor.Models.Scene;
 
 namespace TTEngine.Editor.Models.Selection
 {
@@ -25,54 +25,16 @@ namespace TTEngine.Editor.Models.Selection
         }
     }
 
-    //public class PlayerSelectionViewModel : SelectionViewModel
-    //{
-    //    public string Type { get; }
-    //    public float Speed { get; }
-    //    public float Damage { get; }
-    //    public float AttackInterval { get; }
-    //    public float MaxHP { get; }
-
-    //    public PlayerSelectionViewModel(int x, int y, EntityDefinition def)
-    //        : base(x, y)
-    //    {
-    //        Type = def.Id;
-    //        Speed = def.Speed;
-    //        Damage = def.AttackDamage;
-    //        AttackInterval = def.AttackInterval;
-    //        MaxHP = def.MaxHP;
-    //    }
-    //}
-
-    //public class EnemySelectionViewModel : SelectionViewModel
-    //{
-    //    public string Type { get; }
-    //    public float Speed { get; }
-    //    public float Damage { get; }
-    //    public float AttackInterval { get; }
-    //    public float MaxHP { get; }
-
-    //    public EnemySelectionViewModel(int x, int y, EntityDefinition def)
-    //        : base(x, y)
-    //    {
-    //        Type = def.Id;
-    //        Speed = def.Speed;
-    //        Damage = def.AttackDamage;
-    //        AttackInterval = def.AttackInterval;
-    //        MaxHP = def.MaxHP;
-    //    }
-    //}
-
-    public class InteractableSelectionViewModel : SelectionViewModel
+    public class SceneObjectSelectionViewModel : SelectionViewModel
     {
-        public string Type { get; }
-        public string Task { get; }
+        public SceneObjectData SceneObject { get; }
 
-        public InteractableSelectionViewModel(int x, int y, string type, string task)
-            : base(x, y)
+        public string PrefabId => SceneObject.PrefabId;
+
+        public SceneObjectSelectionViewModel(SceneObjectData obj) 
+            : base(obj.X, obj.Y)
         {
-            Type = type;
-            Task = task;
+            SceneObject = obj;
         }
     }
 }

@@ -55,6 +55,9 @@ namespace TTEngine.Editor.Services.Editor
             services.AddSingleton<PlacementState>();
             services.AddSingleton<SceneSessionState>();
 
+            //Hierarchy
+            services.AddSingleton<HierarchyPanel>();
+
             //Animation
             services.AddTransient<AnimationPanel>();
             services.AddTransient<AnimatorPanel>();

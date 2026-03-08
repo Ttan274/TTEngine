@@ -46,8 +46,7 @@
                     Background="Transparent"
                     MouseDown="Canvas_MouseDown"
                     MouseMove="Canvas_MouseMove"
-                    MouseUp="Canvas_MouseUp"
-                    MouseLeave="Canvas_MouseLeave"/>
+                    MouseUp="Canvas_MouseUp"/>
         </ScrollViewer>
 
         <!-- RIGHT: INSPECTOR -->

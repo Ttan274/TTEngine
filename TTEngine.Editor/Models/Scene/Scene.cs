@@ -1,10 +1,12 @@
-﻿namespace TTEngine.Editor.Models.Scene
+﻿using System.Collections.ObjectModel;
+
+namespace TTEngine.Editor.Models.Scene
 {
     public class Scene
     {
         public string Id { get; set; }
         public MapData Map { get; set; }
-        public List<SceneObjectData> SceneObjects { get; set; } = new();
+        public ObservableCollection<SceneObjectData> SceneObjects { get; set; } = new();
         public bool IsActive { get; set; }
     }
 

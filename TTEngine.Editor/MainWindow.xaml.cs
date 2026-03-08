@@ -30,6 +30,7 @@ namespace TTEngine.Editor
         private readonly AssetPanel _assetPanel;
         private readonly AnimationPanel _animationPanel;
         private readonly AnimatorPanel _animatorPanel;
+        private readonly HierarchyPanel _hierarchyPanel;
         private bool IsAnimTabOpened = false;
         private bool IsAnimatorTabOpened = false;
 
@@ -42,7 +43,8 @@ namespace TTEngine.Editor
         public MainWindow(EditorState editor, 
             AssetPanel assetPanel, 
             AnimationPanel animationPanel,
-            AnimatorPanel animatorPanel)
+            AnimatorPanel animatorPanel,
+            HierarchyPanel hierarchyPanel)
         {
             InitializeComponent();
             //Binding
@@ -50,11 +52,17 @@ namespace TTEngine.Editor
             _assetPanel = assetPanel;
             _animationPanel = animationPanel;
             _animatorPanel = animatorPanel;
+            _hierarchyPanel = hierarchyPanel;
             DataContext = editorState;
 
+            //Event Bindings
             _assetPanel.AssetCreated += OpenAsset;
             _assetPanel.AssetOpened += OpenAsset;
+            _hierarchyPanel.RequestMapRedraw += RedrawMap;
+           
+
             AddTab("Assets", assetPanel);
+            AddTab("Hierarchy", hierarchyPanel);
 
             ContextSetup();
             WindowSetup();
@@ -83,6 +91,8 @@ namespace TTEngine.Editor
             _interaction = new MapInteractionController(editorState, () => _renderer.DrawStatic());
             _selection = new SelectionController(editorState);
 
+            MapCanvas.MouseEnter += (_, _) => _renderer.OnMouseEnter();
+            MapCanvas.MouseLeave += (_, _) => _renderer.OnMouseLeave();
             EnsureScene();
 
             _renderer.InitializeGrid();
@@ -100,7 +110,7 @@ namespace TTEngine.Editor
 
             CommandBindings.Add(new CommandBinding(
                 ApplicationCommands.Save,
-                (_, _) => editorState.SaveCurrentAsset()
+                (_, _) => editorState.SaveActiveMap()
             ));
         }
 
@@ -120,6 +130,11 @@ namespace TTEngine.Editor
                 {
                     _renderer.InitializeGrid();
                     _renderer.DrawStatic();
+                }
+
+                if(e.PropertyName == nameof(editorState.SceneSession.SelectedObject))
+                {
+                    _renderer.UpdateSelection();
                 }
             };
 
@@ -171,10 +186,10 @@ namespace TTEngine.Editor
             _interaction.OnMouseUp();
         }
 
-        private void Canvas_MouseLeave(object sender, MouseEventArgs e)
-        {
-            _renderer.MakeHoverUnvisible();
-        }
+        //private void Canvas_MouseLeave(object sender, MouseEventArgs e)
+        //{
+        //    _renderer.MakeHoverUnvisible();
+        //}
 
         #endregion
 
@@ -340,6 +355,11 @@ namespace TTEngine.Editor
 
             DocumentTabs.Items.Add(tab);
             DocumentTabs.SelectedItem = tab;
+        }
+
+        private void RedrawMap()
+        {
+            _renderer.DrawStatic();
         }
     }
 }

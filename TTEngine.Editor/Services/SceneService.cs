@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
 using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Services.IO;
 
@@ -69,7 +70,7 @@ namespace TTEngine.Editor.Services
                     TileSize = t,
                     CollisionTiles = CreateEmptyGrid(w, h)
                 },
-                SceneObjects = new List<SceneObjectData>(),
+                SceneObjects = new ObservableCollection<SceneObjectData>(),
                 IsActive = true
             };
 
