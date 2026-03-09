@@ -5,17 +5,23 @@ namespace TTEngine.Editor.Services.Map
     public class MapNavigationController
     {
         private readonly MapRenderer _renderer;
+        private readonly Action _redraw;
 
         private float _moveSpeed = 400f;
         private float _zoomSpeed = 0.1f;
 
-        public MapNavigationController(MapRenderer renderer)
+        public MapNavigationController(
+            MapRenderer renderer,
+            Action redraw)
         {
             _renderer = renderer;
+            _redraw = redraw;
         }
 
         public void HandleKeyDown(Key key)
         {
+            bool moved = true;
+
             switch (key)
             {
                 case Key.W:
@@ -30,7 +36,13 @@ namespace TTEngine.Editor.Services.Map
                 case Key.D:
                     _renderer.MoveCamera(_moveSpeed, 0);
                     break;
+                default:
+                    moved = false;
+                    break;
             }
+
+            if (moved)
+                _redraw();
         }
 
         public void HandleMouseWheel(int delta)
@@ -39,6 +51,8 @@ namespace TTEngine.Editor.Services.Map
                 _renderer.ChangeZoom(_zoomSpeed);
             else
                 _renderer.ChangeZoom(-_zoomSpeed);
+
+            _redraw();
         }
     }
 }

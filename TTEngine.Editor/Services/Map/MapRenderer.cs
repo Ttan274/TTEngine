@@ -33,7 +33,6 @@ namespace TTEngine.Editor.Services.Map
         //Hover Rectangle
         private Rectangle _hoverRect;
         private Rectangle _selectionRect;
-        private bool _isHovering = false;
 
         public MapRenderer(Canvas root, EditorState state)
         {
@@ -267,7 +266,6 @@ namespace TTEngine.Editor.Services.Map
                 return;
             }
 
-            _isHovering = true;
             _selectionRect.Visibility = Visibility.Hidden;
 
             double size = ScaledTileSize(map.TileSize);
@@ -282,9 +280,6 @@ namespace TTEngine.Editor.Services.Map
 
         public void UpdateSelection()
         {
-            if (_isHovering)
-                return;
-
             var selected = _state.SceneSession.SelectedObject;
             var scene = _state.SceneSession.ActiveScene;
 
@@ -308,13 +303,11 @@ namespace TTEngine.Editor.Services.Map
 
         public void OnMouseEnter()
         {
-            _isHovering = true;
             _selectionRect.Visibility = Visibility.Hidden;
         }
 
         public void OnMouseLeave()
         {
-            _isHovering = false;
             _hoverRect.Visibility = Visibility.Hidden;
             UpdateSelection();
         }

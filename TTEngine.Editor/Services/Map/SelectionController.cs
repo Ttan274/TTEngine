@@ -26,6 +26,7 @@ namespace TTEngine.Editor.Services.Map
             {
                 int tileValue = scene.Map.CollisionTiles[y][x];
                 _state.CurrentSelection = new TileSelectionViewModel(x, y, tileValue);
+                _state.SceneSession.SelectedObject = null;
             }
         }
 

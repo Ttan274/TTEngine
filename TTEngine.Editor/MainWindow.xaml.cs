@@ -19,15 +19,15 @@ namespace TTEngine.Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        //Map
+        //Map Controllers
         private MapRenderer _renderer;
         private MapInteractionController _interaction;
         private SelectionController _selection;
         private MapNavigationController _navigation;
+        private MapInputController _input;
         private int _brushSize = 1;
-        public const string DEFAULT_MAP_ID = "Map_Default";
 
-        //Assets
+        //Panels
         private readonly AssetPanel _assetPanel;
         private readonly AnimationPanel _animationPanel;
         private readonly AnimatorPanel _animatorPanel;
@@ -95,7 +95,16 @@ namespace TTEngine.Editor
             _renderer = new MapRenderer(MapCanvas, editorState);
             _interaction = new MapInteractionController(editorState, _renderer, () => _renderer.DrawStatic());
             _selection = new SelectionController(editorState);
-            _navigation = new MapNavigationController(_renderer);
+            _navigation = new MapNavigationController(
+                _renderer,
+                () =>
+                {
+                    _renderer.InitializeGrid();
+                    _renderer.DrawStatic();
+                    _renderer.UpdateSelection();
+                });
+            _input = new MapInputController(editorState, _renderer, _interaction,
+                _selection, _navigation, () => _brushSize);
 
             MapCanvas.MouseEnter += (_, _) => _renderer.OnMouseEnter();
             MapCanvas.MouseLeave += (_, _) => _renderer.OnMouseLeave();
@@ -103,11 +112,15 @@ namespace TTEngine.Editor
 
             _renderer.InitializeGrid();
             _renderer.DrawStatic();
+            SetupCommands();
+        }
 
+        private void SetupCommands()
+        {
             CommandBindings.Add(new CommandBinding(
-              ApplicationCommands.Undo,
-              (_, _) => _interaction.Undo()
-            ));
+             ApplicationCommands.Undo,
+             (_, _) => _interaction.Undo()
+           ));
 
             CommandBindings.Add(new CommandBinding(
                 ApplicationCommands.Redo,
@@ -116,7 +129,7 @@ namespace TTEngine.Editor
 
             CommandBindings.Add(new CommandBinding(
                 ApplicationCommands.Save,
-                (_, _) => editorState.SaveActiveMap()
+                (_, _) => editorState.SaveHelper()
             ));
         }
 
@@ -156,64 +169,26 @@ namespace TTEngine.Editor
 
         #endregion
 
-        #region Mouse Events
+        #region Window Events
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Point pos = e.GetPosition(MapCanvas);
-
-            //Selection override
-            if (Keyboard.IsKeyDown(Key.LeftAlt))
-            {
-                if (TryGetTilePosition(pos, out int sx, out int sy))
-                    _selection.HandleSelection(sx, sy);
-                return;
-            }
-
-            Mouse.Capture(MapCanvas);
-
-             //Selection
-            if (TryGetTilePosition(pos, out int x, out int y))
-                _selection.HandleSelection(x, y);
-
-             //Interaction
-            _interaction.OnMouseDown(pos, e);
-        }
+            => _input.MouseDown(MapCanvas, e);
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
-        {
-            _renderer.UpdateHover(e.GetPosition(MapCanvas), _brushSize);
-            _interaction.OnMouseMove(e.GetPosition(MapCanvas), e);
-        }
+            => _input.MouseMove(MapCanvas, e);
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            Mouse.Capture(null);
-            _interaction.OnMouseUp();
-        }
+            => _input.MouseUp();
 
         private void Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            _navigation.HandleMouseWheel(e.Delta);
+            => _input.MouseWheel(e.Delta);
 
-            //Redrawing map
-            _renderer.InitializeGrid();
-            _renderer.DrawStatic();
-            _renderer.UpdateSelection();
-        }
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+           => _input.KeyDown(MapCanvas, e.Key);
 
         #endregion
 
         #region Button Events
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            _navigation.HandleKeyDown(e.Key);
-
-            _renderer.InitializeGrid();
-            _renderer.DrawStatic();
-            _renderer.UpdateSelection();
-        }
 
         private void OnStartRequested()
         {
@@ -252,25 +227,6 @@ namespace TTEngine.Editor
             UpdateRunBtn();
         }
         #endregion
-
-        private bool TryGetTilePosition(Point pos, out int x, out int y)
-        {
-            x = 0;
-            y = 0;
-
-            if (editorState.SceneSession.ActiveScene == null)
-                return false;
-
-            var map = editorState.SceneSession.ActiveScene.Map;
-
-            x = (int)(pos.X / map.TileSize);
-            y = (int)(pos.Y / map.TileSize);
-
-            if (x < 0 || y < 0 || x >= map.Width || y >= map.Height)
-                return false;
-
-            return true;
-        }
 
         private EditorValidationResult ValidateMap()
         {
