@@ -4,13 +4,13 @@ using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Editor.EditorStates;
 using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Services.Editor;
 
 namespace TTEngine.Editor.Services.Map
 {
     public class MapInteractionController
     {
         private readonly EditorState _state;
+        private readonly MapRenderer _renderer;
         private readonly Action _redraw;
 
         private readonly Stack<TileBatchCommand> _undoStack = new();
@@ -20,9 +20,10 @@ namespace TTEngine.Editor.Services.Map
         private bool _isPainting;
         private int _brushSize = 1;
 
-        public MapInteractionController(EditorState state, Action redraw)
+        public MapInteractionController(EditorState state, MapRenderer renderer, Action redraw)
         {
             _state = state;
+            _renderer = renderer;
             _redraw = redraw;
         }
 
@@ -108,15 +109,14 @@ namespace TTEngine.Editor.Services.Map
                 return;
             var map = scene.Map;
 
-            int baseX = (int)(pos.X / map.TileSize);
-            int baseY = (int)(pos.Y / map.TileSize);
+            Point basePos = GetTilePos(pos, map);
 
             for (int y = 0; y < _brushSize; y++)
             {
                 for (int x = 0; x < _brushSize; x++)
                 {
-                    int tx = baseX + x;
-                    int ty = baseY + y;
+                    int tx = (int)basePos.X + x;
+                    int ty = (int)basePos.Y + y;
 
                     if (!IsValid(tx, ty, map))
                         continue;
@@ -148,8 +148,9 @@ namespace TTEngine.Editor.Services.Map
             if (_state.Placement.SelectedTile == null)
                 return;
 
-            int x = (int)(pos.X / map.TileSize);
-            int y = (int)(pos.Y / map.TileSize);
+            Point basePos = GetTilePos(pos, map);
+            int x = (int)basePos.X;
+            int y = (int)basePos.Y;
 
             if (!IsValid(x, y, map))
                 return;
@@ -172,7 +173,7 @@ namespace TTEngine.Editor.Services.Map
             {
                 var (cx, cy) = stack.Pop();
 
-                if (!IsValid(x, y, map))
+                if (!IsValid(cx, cy, map))
                     continue;
 
                 if (map.CollisionTiles[cy][cx] != target)
@@ -202,8 +203,9 @@ namespace TTEngine.Editor.Services.Map
 
             var map = scene.Map;
 
-            int x = (int)(pos.X / map.TileSize);
-            int y = (int)(pos.Y / map.TileSize);
+            Point basePos = GetTilePos(pos, map);
+            int x = (int)basePos.X;
+            int y = (int)basePos.Y;
 
             if (!IsValid(x, y, map))
                 return;
@@ -277,6 +279,20 @@ namespace TTEngine.Editor.Services.Map
         #endregion
 
         #region Helpers
+        private Point GetTilePos(Point pos, MapData map)
+        {
+            //Screen to world pos
+            Point world = new Point(
+                    pos.X / _renderer.Zoom + _renderer.CameraX,
+                    pos.Y / _renderer.Zoom + _renderer.CameraY
+            );
+
+            int x = (int)(world.X / map.TileSize);
+            int y = (int)(world.Y / map.TileSize);
+
+            return new Point(x, y);
+        }
+
         private bool IsValid(int x, int y, MapData map)
         {
             return x >= 0 && y >= 0 && x < map.Width && y < map.Height;

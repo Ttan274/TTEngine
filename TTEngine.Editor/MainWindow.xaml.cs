@@ -23,6 +23,7 @@ namespace TTEngine.Editor
         private MapRenderer _renderer;
         private MapInteractionController _interaction;
         private SelectionController _selection;
+        private MapNavigationController _navigation;
         private int _brushSize = 1;
         public const string DEFAULT_MAP_ID = "Map_Default";
 
@@ -81,6 +82,10 @@ namespace TTEngine.Editor
                     UpdateRunBtn();
                 });
             };
+            
+            //Key eventler için yaptık
+            this.Focusable = true;
+            this.Focus();
         }
 
         #region Setup
@@ -88,8 +93,9 @@ namespace TTEngine.Editor
         private void WindowSetup()
         {
             _renderer = new MapRenderer(MapCanvas, editorState);
-            _interaction = new MapInteractionController(editorState, () => _renderer.DrawStatic());
+            _interaction = new MapInteractionController(editorState, _renderer, () => _renderer.DrawStatic());
             _selection = new SelectionController(editorState);
+            _navigation = new MapNavigationController(_renderer);
 
             MapCanvas.MouseEnter += (_, _) => _renderer.OnMouseEnter();
             MapCanvas.MouseLeave += (_, _) => _renderer.OnMouseLeave();
@@ -186,14 +192,28 @@ namespace TTEngine.Editor
             _interaction.OnMouseUp();
         }
 
-        //private void Canvas_MouseLeave(object sender, MouseEventArgs e)
-        //{
-        //    _renderer.MakeHoverUnvisible();
-        //}
+        private void Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            _navigation.HandleMouseWheel(e.Delta);
+
+            //Redrawing map
+            _renderer.InitializeGrid();
+            _renderer.DrawStatic();
+            _renderer.UpdateSelection();
+        }
 
         #endregion
 
         #region Button Events
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            _navigation.HandleKeyDown(e.Key);
+
+            _renderer.InitializeGrid();
+            _renderer.DrawStatic();
+            _renderer.UpdateSelection();
+        }
 
         private void OnStartRequested()
         {

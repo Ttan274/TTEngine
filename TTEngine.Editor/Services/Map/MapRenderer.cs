@@ -8,12 +8,16 @@ using TTEngine.Editor.Models.Component;
 using TTEngine.Editor.Models.Editor;
 using TTEngine.Editor.Models.Scene;
 using TTEngine.Editor.Models.Tile;
-using TTEngine.Editor.Services;
 
 namespace TTEngine.Editor.Services.Map
 {
     public class MapRenderer
     {
+        //Camera State
+        public float CameraX { get; set; }
+        public float CameraY { get; set; }
+        public float Zoom { get; set; } = 1f;
+
         private readonly Canvas _root;
         private readonly EditorState _state;
 
@@ -58,8 +62,10 @@ namespace TTEngine.Editor.Services.Map
 
             var map = scene.Map;
 
-            _root.Width = map.Width * map.TileSize;
-            _root.Height = map.Height * map.TileSize;
+            //_root.Width = map.Width * map.TileSize;
+            //_root.Height = map.Height * map.TileSize;
+
+            double size = ScaledTileSize(map.TileSize);
 
             for (int y = 0; y < map.Height; y++)
             {
@@ -67,16 +73,16 @@ namespace TTEngine.Editor.Services.Map
                 {
                     Rectangle grid = new Rectangle
                     {
-                        Width = map.TileSize,
-                        Height = map.TileSize,
+                        Width = size,
+                        Height = size,
                         Stroke = Brushes.DimGray,
-                        StrokeThickness = 0.5,
+                        StrokeThickness = 0.5 * Zoom,
                         Fill = Brushes.DimGray,
                         IsHitTestVisible = false
                     };
 
-                    Canvas.SetLeft(grid, x * map.TileSize);
-                    Canvas.SetTop(grid, y * map.TileSize);
+                    Canvas.SetLeft(grid, WorldToScreenX(x * map.TileSize));
+                    Canvas.SetTop(grid, WorldToScreenY(y * map.TileSize));
 
                     _gridLayer.Children.Add(grid);
                 }
@@ -110,18 +116,20 @@ namespace TTEngine.Editor.Services.Map
                     if (tileId == 0)
                         continue;
 
+                    double size = ScaledTileSize(map.TileSize);
+
                     Rectangle rect = new Rectangle
                     {
-                        Width = map.TileSize,
-                        Height = map.TileSize,
+                        Width = size,
+                        Height = size,
                         Stroke = GetTileStroke(tileId),
-                        StrokeThickness = 2,
+                        StrokeThickness = 2 * Zoom,
                         Fill = GetTileBrush(tileId),
                         IsHitTestVisible = false
                     };
 
-                    Canvas.SetLeft(rect, x * map.TileSize);
-                    Canvas.SetTop(rect, y * map.TileSize);
+                    Canvas.SetLeft(rect, WorldToScreenX(x * map.TileSize));
+                    Canvas.SetTop(rect, WorldToScreenY(y * map.TileSize));
                     _tileLayer.Children.Add(rect);
                 }
             }
@@ -148,24 +156,26 @@ namespace TTEngine.Editor.Services.Map
                 if (sprite == null || string.IsNullOrEmpty(sprite.SpritePath))
                     continue;
 
-                string fullPath = System.IO.Path.Combine(EditorPaths.GetTextureFolder(), sprite.SpritePath);
+                string fullPath = System.IO.Path.Combine(_state.Project.TexturesPath, sprite.SpritePath);
 
                 if (!File.Exists(fullPath))
                     continue;
 
-                double x = obj.X * map.TileSize;
-                double y = obj.Y * map.TileSize;
+                double screenX = WorldToScreenX(obj.X * map.TileSize);
+                double screenY = WorldToScreenY(obj.Y * map.TileSize);
+
+                double size = ScaledTileSize(map.TileSize);
 
                 Image img = new Image
                 {
                     Source = GetImage(fullPath),
-                    Width = map.TileSize,
-                    Height = map.TileSize,
+                    Width = size,
+                    Height = size,
                     IsHitTestVisible = false
                 };
 
-                Canvas.SetLeft(img, x);
-                Canvas.SetTop(img, y);
+                Canvas.SetLeft(img, screenX);
+                Canvas.SetTop(img, screenY);
 
                 _objectLayer.Children.Add(img);
             }
@@ -245,8 +255,11 @@ namespace TTEngine.Editor.Services.Map
 
             var map = scene.Map;
 
-            int x = (int)(pos.X / map.TileSize);
-            int y = (int)(pos.Y / map.TileSize);
+            double worldX = pos.X / Zoom + CameraX;
+            double worldY = pos.Y / Zoom + CameraY;
+
+            int x = (int)(worldX / map.TileSize);
+            int y = (int)(worldY / map.TileSize);
 
             if (x < 0 || y < 0 || x >= map.Width || y >= map.Height)
             {
@@ -257,12 +270,14 @@ namespace TTEngine.Editor.Services.Map
             _isHovering = true;
             _selectionRect.Visibility = Visibility.Hidden;
 
-            _hoverRect.Visibility = Visibility.Visible;
-            _hoverRect.Width = brushSize * map.TileSize;
-            _hoverRect.Height = brushSize * map.TileSize;
+            double size = ScaledTileSize(map.TileSize);
 
-            Canvas.SetLeft(_hoverRect, x * map.TileSize);
-            Canvas.SetTop(_hoverRect, y * map.TileSize);
+            _hoverRect.Visibility = Visibility.Visible;
+            _hoverRect.Width = brushSize * size;
+            _hoverRect.Height = brushSize * size;
+
+            Canvas.SetLeft(_hoverRect, WorldToScreenX(x * map.TileSize));
+            Canvas.SetTop(_hoverRect, WorldToScreenY(y * map.TileSize));
         }
 
         public void UpdateSelection()
@@ -281,12 +296,14 @@ namespace TTEngine.Editor.Services.Map
 
             var map = scene.Map;
 
-            _selectionRect.Visibility = Visibility.Visible;
-            _selectionRect.Width = map.TileSize;
-            _selectionRect.Height = map.TileSize;
+            double size = ScaledTileSize(map.TileSize);
 
-            Canvas.SetLeft(_selectionRect, selected.X * map.TileSize);
-            Canvas.SetTop(_selectionRect, selected.Y * map.TileSize);
+            _selectionRect.Visibility = Visibility.Visible;
+            _selectionRect.Width = size;
+            _selectionRect.Height = size;
+
+            Canvas.SetLeft(_selectionRect, WorldToScreenX(selected.X * map.TileSize));
+            Canvas.SetTop(_selectionRect, WorldToScreenY(selected.Y * map.TileSize));
         }
 
         public void OnMouseEnter()
@@ -301,6 +318,35 @@ namespace TTEngine.Editor.Services.Map
             _hoverRect.Visibility = Visibility.Hidden;
             UpdateSelection();
         }
+        #endregion
+
+        #region Camera Movement
+
+        public void MoveCamera(float dx, float dy)
+        {
+            CameraX += dx;
+            CameraY += dy;
+        }
+
+        public void ChangeZoom(float delta)
+        {
+            Zoom += delta;
+
+            if (Zoom < 0.5f)
+                Zoom = 0.5f;
+
+            if (Zoom > 3f)
+                Zoom = 3f;
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private double WorldToScreenX(double worldX) => (worldX - CameraX) * Zoom;
+        private double WorldToScreenY(double worldY) => (worldY - CameraY) * Zoom;
+        private double ScaledTileSize(int tileSize) => tileSize * Zoom;
+
         #endregion
     }
 }
