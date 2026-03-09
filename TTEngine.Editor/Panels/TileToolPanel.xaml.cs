@@ -64,7 +64,7 @@ namespace TTEngine.Editor.Panels
         {
             if (sender is Image img && img.DataContext is TileDefinition tile && !string.IsNullOrEmpty(tile.SpritePath))
             {
-                string path = Path.Combine(EditorPaths.GetTextureFolder(), tile.SpritePath);
+                string path = Path.Combine(Editor.Project.TexturesPath, tile.SpritePath);
 
                 if (!File.Exists(path))
                     return;

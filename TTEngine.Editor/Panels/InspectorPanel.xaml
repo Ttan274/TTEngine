@@ -27,7 +27,7 @@
 
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Background="#2B2B2B">
         <ContentControl Content="{Binding CurrentSelection}" />
     </Grid>
 </UserControl>

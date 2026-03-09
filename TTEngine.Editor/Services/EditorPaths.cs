@@ -12,33 +12,10 @@ namespace TTEngine.Editor.Services
 
         //Asset Folders
         public static string Assets => Combine("Assets");
-        //public static string Data => Combine("Assets", "Data");
-        //public static string Maps => Combine("Assets", "Maps");
-        //public static string Textures => Combine("Assets", "Textures");
-        //public static string Animation => Combine("Assets", "Animation");
-        
-        ////Data Files
-        //public static string LevelDefs => Path.Combine(Data, "Levels.json");
 
         //Helper
         private static string Combine(params string[] parts)
             => Path.GetFullPath(Path.Combine(new[] { Root }.Concat(parts).ToArray()));
-
-        //will be deleted 
-        public static string GetTextureFolder()
-        {
-            return Path.GetFullPath(Path.Combine(Root, "Assets", "Textures"));
-        }
-
-        public static string GetAnimationFolder()
-        {
-            return Path.GetFullPath(Path.Combine(Root, "Assets", "Animations"));
-        }
-
-        public static string GetAnimatorFolder()
-        {
-            return Path.GetFullPath(Path.Combine(Root, "Assets", "Animators"));
-        }
 
         //Engine Exe
         public static string GetEngineExe()

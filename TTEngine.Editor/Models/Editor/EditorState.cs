@@ -49,22 +49,6 @@ namespace TTEngine.Editor.Models.Editor
             Project = project;
         }
 
-        ////Map Session Helper
-        //public void SaveActiveMap()
-        //{
-        //    SceneSession.Save();
-        //    Console.Log("Active scene saved");
-        //}
-
-        //public void SaveCurrentAsset()
-        //{
-        //    if(CurrentSelection is AssetSelectionViewModel asset)
-        //    {
-        //        asset.Save();
-        //        Console.Log($"Asset saved");
-        //    }
-        //}
-
         //Save Helper
         public void SaveHelper()
         {

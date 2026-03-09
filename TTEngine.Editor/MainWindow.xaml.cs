@@ -41,7 +41,8 @@ namespace TTEngine.Editor
         //Engine Launcher
         private EngineLauncher _engineLauncher = new EngineLauncher();
 
-        public MainWindow(EditorState editor, 
+        public MainWindow(
+            EditorState editor, 
             AssetPanel assetPanel, 
             AnimationPanel animationPanel,
             AnimatorPanel animatorPanel,
@@ -60,10 +61,9 @@ namespace TTEngine.Editor
             _assetPanel.AssetCreated += OpenAsset;
             _assetPanel.AssetOpened += OpenAsset;
             _hierarchyPanel.RequestMapRedraw += RedrawMap;
-           
 
-            AddTab("Assets", assetPanel);
-            AddTab("Hierarchy", hierarchyPanel);
+            AddTab(BottomTabPanel, "Assets", assetPanel);
+            AddTab(TopLeftTab,"Hierarchy", hierarchyPanel);
 
             ContextSetup();
             WindowSetup();
@@ -270,7 +270,7 @@ namespace TTEngine.Editor
 
                 if(!IsAnimTabOpened)
                 {
-                    AddTab("Animation", _animationPanel);
+                    AddTab(TopRightTab, "Animation", _animationPanel);
                     IsAnimTabOpened = true;
                 }
 
@@ -283,7 +283,7 @@ namespace TTEngine.Editor
 
                 if(!IsAnimatorTabOpened)
                 {
-                    AddTab("Animator", _animatorPanel);
+                    AddTab(TopLeftTab, "Animator", _animatorPanel);
                     IsAnimatorTabOpened = true;
                 }
 
@@ -321,7 +321,7 @@ namespace TTEngine.Editor
             }
         }
 
-        private void AddTab(string header, object panel)
+        private void AddTab(TabControl tabControl, string header, object panel)
         {
             var tab = new TabItem
             {
@@ -329,8 +329,8 @@ namespace TTEngine.Editor
                 Content = panel
             };
 
-            DocumentTabs.Items.Add(tab);
-            DocumentTabs.SelectedItem = tab;
+            tabControl.Items.Add(tab);
+            tabControl.SelectedItem = tab;
         }
 
         private void RedrawMap()

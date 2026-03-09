@@ -21,9 +21,9 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="40"
-                                Height="40"
-                                Margin="4"
+                        <Border Width="25"
+                                Height="25"
+                                Margin="3"
                                 Tag="{Binding Id}"
                                 BorderThickness="1"
                                 BorderBrush="DimGray"

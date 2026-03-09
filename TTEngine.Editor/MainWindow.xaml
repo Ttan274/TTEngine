@@ -7,59 +7,125 @@
         xmlns:panels="clr-namespace:TTEngine.Editor.Panels"
         mc:Ignorable="d"
         Title="TTEngine Editor"
-        Height="600"
-        Width="1000"
+        Height="700"
+        Width="1200"
         KeyDown="Window_KeyDown">
 
     <Grid>
+
+        <!-- ROOT GRID -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="180"/>
+            <!-- Left Panel -->
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="300"/>
+            <!-- Scene -->
+            <ColumnDefinition Width="5"/>
+            <!-- Splitter-->
+            <ColumnDefinition Width="350"/>
+            <!-- Right Panels -->
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT: TILE TOOL PANEL + LAYER PANEL + CONSOLE PANEL -->
+        <!-- ===================================== -->
+        <!-- LEFT SIDE -->
+        <!-- ===================================== -->
+
         <Grid Grid.Column="0">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <!-- Layers -->
-                <RowDefinition Height="Auto"/>
-                <!-- Tile Tools -->
+                <!-- Scene selector -->
                 <RowDefinition Height="*"/>
-                <!-- Spacer -->
-                <RowDefinition Height="180"/>
-                <!-- Console -->
+                <!-- Toolbar -->
             </Grid.RowDefinitions>
-            
+
+            <!-- Scene Selection Panel -->
             <panels:ScenePanel x:Name="ScenePanel" Grid.Row="0"/>
-            <panels:TileToolPanel x:Name="TileTools" Grid.Row="1"/>
-            
-            <!-- CONSOLE -->
-            <panels:EditorConsolePanel x:Name="ConsoleEditor" Grid.Row="3"/>
+
+            <!-- Toolbar -->
+            <Border Grid.Row="1" Background="#2A2A2A">
+                <panels:TileToolPanel x:Name="TileTools"/>
+            </Border>
+
         </Grid>
 
+        <!-- ===================================== -->
+        <!-- SCENE VIEW -->
+        <!-- ===================================== -->
 
-        <!-- CENTER: MAP -->
-        <ScrollViewer Grid.Column="1"
-                      HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto"
-                      PreviewMouseWheel="Canvas_MouseWheel">
-            <Canvas x:Name="MapCanvas"
-                    Background="Transparent"
-                    MouseDown="Canvas_MouseDown"
-                    MouseMove="Canvas_MouseMove"
-                    MouseUp="Canvas_MouseUp"/>
-        </ScrollViewer>
+        <Border Grid.Column="1" Background="#1E1E1E">
 
-        <!-- RIGHT: INSPECTOR -->
-        <Grid Grid.Column="2">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          PreviewMouseWheel="Canvas_MouseWheel">
+
+                <Canvas x:Name="MapCanvas"
+                        Background="Transparent"
+                        MouseDown="Canvas_MouseDown"
+                        MouseMove="Canvas_MouseMove"
+                        MouseUp="Canvas_MouseUp"/>
+
+            </ScrollViewer>
+
+        </Border>
+
+        <!-- Splitter -->
+        <GridSplitter Grid.Column="2"
+                      Width="5"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="#444"
+                      ShowsPreview="True"/>
+
+        <!-- ===================================== -->
+        <!-- RIGHT SIDE PANELS -->
+        <!-- ===================================== -->
+
+        <Grid Grid.Column="3">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="300"/>
+                <RowDefinition Height="250"/>
             </Grid.RowDefinitions>
 
-            <panels:InspectorPanel  x:Name="Inspector" Grid.Row="0"/>
-            <TabControl Grid.Row="1" x:Name="DocumentTabs"/>
+            <!-- TOP RIGHT -->
+            <Grid Grid.Row="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Hierarchy / Animator -->
+                <TabControl Grid.Column="0" x:Name="TopLeftTab"></TabControl>
+
+                <!-- Splitter -->
+                <GridSplitter Grid.Column="1"
+                              Width="5"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              Background="#444"
+                              ShowsPreview="True"/>
+
+                <!-- Inspector / Animation -->
+                <TabControl Grid.Column="2" x:Name="TopRightTab">
+
+                    <TabItem Header="Inspector">
+                        <panels:InspectorPanel x:Name="Inspector"/>
+                    </TabItem>
+                </TabControl>
+
+            </Grid>
+
+            <!-- BOTTOM RIGHT -->
+            <TabControl Grid.Row="1" x:Name="BottomTabPanel">
+                <TabItem Header="Console">
+                    <panels:EditorConsolePanel x:Name="ConsoleEditor"/>
+                </TabItem>
+
+            </TabControl>
+
         </Grid>
+
     </Grid>
 </Window>
